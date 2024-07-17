@@ -18,276 +18,275 @@ LLM REST API 세트 및 llama.cpp와 상호 작용하기 위한 간단한 웹 �
 ## 사용법
 
 ```
-usage: ./llama-server [options]
+사용법: ./llama-server [옵션]
 
-general:
+일반:
 
-  -h,    --help, --usage          print usage and exit
-         --version                show version and build info
-  -v,    --verbose                print verbose information
-         --verbosity N            set specific verbosity level (default: 0)
-         --verbose-prompt         print a verbose prompt before generation (default: false)
-         --no-display-prompt      don't print prompt at generation (default: false)
-  -co,   --color                  colorise output to distinguish prompt and user input from generations (default: false)
-  -s,    --seed SEED              RNG seed (default: -1, use random seed for < 0)
-  -t,    --threads N              number of threads to use during generation (default: 8)
-  -tb,   --threads-batch N        number of threads to use during batch and prompt processing (default: same as --threads)
-  -td,   --threads-draft N        number of threads to use during generation (default: same as --threads)
-  -tbd,  --threads-batch-draft N  number of threads to use during batch and prompt processing (default: same as --threads-draft)
-         --draft N                number of tokens to draft for speculative decoding (default: 5)
-  -ps,   --p-split N              speculative decoding split probability (default: 0.1)
+  -h,    --help, --usage          사용법을 출력하고 종료
+         --version                버전 및 빌드 정보 표시
+  -v,    --verbose                자세한 정보 출력
+         --verbosity N            특정 자세한 정보 수준 설정 (기본값: 0)
+         --verbose-prompt         생성 전에 자세한 프롬프트 출력 (기본값: false)
+         --no-display-prompt      생성 시 프롬프트 출력 안 함 (기본값: false)
+  -co,   --color                  프롬프트와 사용자 입력을 구분하기 위해 출력에 색상 적용 (기본값: false)
+  -s,    --seed SEED              RNG 시드 (기본값: -1, 0보다 작으면 랜덤 시드 사용)
+  -t,    --threads N              생성 시 사용할 스레드 수 (기본값: 8)
+  -tb,   --threads-batch N        배치 및 프롬프트 처리 시 사용할 스레드 수 (기본값: --threads와 동일)
+  -td,   --threads-draft N        생성 시 사용할 스레드 수 (기본값: --threads와 동일)
+  -tbd,  --threads-batch-draft N  배치 및 프롬프트 처리 시 사용할 스레드 수 (기본값: --threads-draft와 동일)
+         --draft N                추측 디코딩을 위해 초안 작성할 토큰 수 (기본값: 5)
+  -ps,   --p-split N              추측 디코딩 분할 확률 (기본값: 0.1)
   -lcs,  --lookup-cache-static FNAME
-                                  path to static lookup cache to use for lookup decoding (not updated by generation)
+                                  조회 디코딩에 사용할 정적 조회 캐시 경로 (생성 시 업데이트되지 않음)
   -lcd,  --lookup-cache-dynamic FNAME
-                                  path to dynamic lookup cache to use for lookup decoding (updated by generation)
-  -c,    --ctx-size N             size of the prompt context (default: 0, 0 = loaded from model)
-  -n,    --predict N              number of tokens to predict (default: -1, -1 = infinity, -2 = until context filled)
-  -b,    --batch-size N           logical maximum batch size (default: 2048)
-  -ub,   --ubatch-size N          physical maximum batch size (default: 512)
-         --keep N                 number of tokens to keep from the initial prompt (default: 0, -1 = all)
-         --chunks N               max number of chunks to process (default: -1, -1 = all)
-  -fa,   --flash-attn             enable Flash Attention (default: disabled)
-  -p,    --prompt PROMPT          prompt to start generation with
-                                  in conversation mode, this will be used as system prompt
-                                  (default: '')
-  -f,    --file FNAME             a file containing the prompt (default: none)
-         --in-file FNAME          an input file (repeat to specify multiple files)
-  -bf,   --binary-file FNAME      binary file containing the prompt (default: none)
-  -e,    --escape                 process escapes sequences (\n, \r, \t, \', \", \\) (default: true)
-         --no-escape              do not process escape sequences
-  -ptc,  --print-token-count N    print token count every N tokens (default: -1)
-         --prompt-cache FNAME     file to cache prompt state for faster startup (default: none)
-         --prompt-cache-all       if specified, saves user input and generations to cache as well
-                                  not supported with --interactive or other interactive options
-         --prompt-cache-ro        if specified, uses the prompt cache but does not update it
-  -r,    --reverse-prompt PROMPT  halt generation at PROMPT, return control in interactive mode
-                                  can be specified more than once for multiple prompts
-  -sp,   --special                special tokens output enabled (default: false)
-  -cnv,  --conversation           run in conversation mode, does not print special tokens and suffix/prefix
-                                  if suffix/prefix are not specified, default chat template will be used
-                                  (default: false)
-  -i,    --interactive            run in interactive mode (default: false)
-  -if,   --interactive-first      run in interactive mode and wait for input right away (default: false)
-  -mli,  --multiline-input        allows you to write or paste multiple lines without ending each in '\'
-         --in-prefix-bos          prefix BOS to user inputs, preceding the `--in-prefix` string
-         --in-prefix STRING       string to prefix user inputs with (default: empty)
-         --in-suffix STRING       string to suffix after user inputs with (default: empty)
-         --spm-infill             use Suffix/Prefix/Middle pattern for infill (instead of Prefix/Suffix/Middle) as some models prefer this. (default: disabled)
+                                  조회 디코딩에 사용할 동적 조회 캐시 경로 (생성 시 업데이트됨)
+  -c,    --ctx-size N             프롬프트 컨텍스트 크기 (기본값: 0, 0 = 모델에서 로드됨)
+  -n,    --predict N              예측할 토큰 수 (기본값: -1, -1 = 무한, -2 = 컨텍스트가 채워질 때까지)
+  -b,    --batch-size N           논리적 최대 배치 크기 (기본값: 2048)
+  -ub,   --ubatch-size N          물리적 최대 배치 크기 (기본값: 512)
+         --keep N                 초기 프롬프트에서 유지할 토큰 수 (기본값: 0, -1 = 모두)
+         --chunks N               처리할 최대 청크 수 (기본값: -1, -1 = 모두)
+  -fa,   --flash-attn             Flash Attention 활성화 (기본값: 비활성화)
+  -p,    --prompt PROMPT          생성 시작 프롬프트
+                                  대화 모드에서는 시스템 프롬프트로 사용됨
+                                  (기본값: '')
+  -f,    --file FNAME             프롬프트가 포함된 파일 (기본값: 없음)
+         --in-file FNAME          입력 파일 (여러 파일을 지정하려면 반복)
+  -bf,   --binary-file FNAME      프롬프트가 포함된 바이너리 파일 (기본값: 없음)
+  -e,    --escape                 이스케이프 시퀀스 처리 (\n, \r, \t, \', \", \\) (기본값: true)
+         --no-escape              이스케이프 시퀀스 처리 안 함
+  -ptc,  --print-token-count N    N 토큰마다 토큰 수 출력 (기본값: -1)
+         --prompt-cache FNAME     빠른 시작을 위해 프롬프트 상태를 캐시할 파일 (기본값: 없음)
+         --prompt-cache-all       지정된 경우, 사용자 입력 및 생성을 캐시에 저장
+                                  --interactive 또는 다른 대화형 옵션과 함께 사용 불가
+         --prompt-cache-ro        지정된 경우, 프롬프트 캐시를 사용하지만 업데이트하지 않음
+  -r,    --reverse-prompt PROMPT  PROMPT에서 생성 중지, 대화형 모드에서 제어 반환
+                                  여러 프롬프트를 위해 여러 번 지정 가능
+  -sp,   --special                특수 토큰 출력 활성화 (기본값: false)
+  -cnv,  --conversation           대화 모드 실행, 특수 토큰 및 접미사/접두사 출력 안 함
+                                  접미사/접두사가 지정되지 않은 경우 기본 채팅 템플릿 사용
+                                  (기본값: false)
+  -i,    --interactive            대화형 모드 실행 (기본값: false)
+  -if,   --interactive-first      대화형 모드 실행 및 즉시 입력 대기 (기본값: false)
+  -mli,  --multiline-input        여러 줄을 작성하거나 붙여넣을 수 있도록 허용, 각 줄 끝에 '\' 필요 없음
+         --in-prefix-bos          사용자 입력 앞에 BOS 접두사 추가, `--in-prefix` 문자열 앞에 위치
+         --in-prefix STRING       사용자 입력에 접두사로 추가할 문자열 (기본값: 빈 문자열)
+         --in-suffix STRING       사용자 입력 뒤에 접미사로 추가할 문자열 (기본값: 빈 문자열)
+         --spm-infill             일부 모델이 선호하는 접미사/접두사/중간 패턴 사용 (기본값: 비활성화)
 
-sampling:
+샘플링:
 
-         --samplers SAMPLERS      samplers that will be used for generation in the order, separated by ';'
-                                  (default: top_k;tfs_z;typical_p;top_p;min_p;temperature)
-         --sampling-seq SEQUENCE  simplified sequence for samplers that will be used (default: kfypmt)
-         --ignore-eos             ignore end of stream token and continue generating (implies --logit-bias EOS-inf)
-         --penalize-nl            penalize newline tokens (default: false)
-         --temp N                 temperature (default: 0.8)
-         --top-k N                top-k sampling (default: 40, 0 = disabled)
-         --top-p N                top-p sampling (default: 0.9, 1.0 = disabled)
-         --min-p N                min-p sampling (default: 0.1, 0.0 = disabled)
-         --tfs N                  tail free sampling, parameter z (default: 1.0, 1.0 = disabled)
-         --typical N              locally typical sampling, parameter p (default: 1.0, 1.0 = disabled)
-         --repeat-last-n N        last n tokens to consider for penalize (default: 64, 0 = disabled, -1 = ctx_size)
-         --repeat-penalty N       penalize repeat sequence of tokens (default: 1.0, 1.0 = disabled)
-         --presence-penalty N     repeat alpha presence penalty (default: 0.0, 0.0 = disabled)
-         --frequency-penalty N    repeat alpha frequency penalty (default: 0.0, 0.0 = disabled)
-         --dynatemp-range N       dynamic temperature range (default: 0.0, 0.0 = disabled)
-         --dynatemp-exp N         dynamic temperature exponent (default: 1.0)
-         --mirostat N             use Mirostat sampling.
-                                  Top K, Nucleus, Tail Free and Locally Typical samplers are ignored if used.
-                                  (default: 0, 0 = disabled, 1 = Mirostat, 2 = Mirostat 2.0)
-         --mirostat-lr N          Mirostat learning rate, parameter eta (default: 0.1)
-         --mirostat-ent N         Mirostat target entropy, parameter tau (default: 5.0)
-         -l TOKEN_ID(+/-)BIAS     modifies the likelihood of token appearing in the completion,
-                                  i.e. `--logit-bias 15043+1` to increase likelihood of token ' Hello',
-                                  or `--logit-bias 15043-1` to decrease likelihood of token ' Hello'
+         --samplers SAMPLERS      생성에 사용할 샘플러, 순서대로 세미콜론으로 구분
+                                  (기본값: top_k;tfs_z;typical_p;top_p;min_p;temperature)
+         --sampling-seq SEQUENCE  사용할 샘플러의 단순화된 시퀀스 (기본값: kfypmt)
+         --ignore-eos             스트림 종료 토큰 무시하고 계속 생성 (암시적으로 --logit-bias EOS-inf)
+         --penalize-nl            새 줄 토큰에 페널티 부여 (기본값: false)
+         --temp N                 온도 (기본값: 0.8)
+         --top-k N                top-k 샘플링 (기본값: 40, 0 = 비활성화)
+         --top-p N                top-p 샘플링 (기본값: 0.9, 1.0 = 비활성화)
+         --min-p N                min-p 샘플링 (기본값: 0.1, 0.0 = 비활성화)
+         --tfs N                  tail free 샘플링, 파라미터 z (기본값: 1.0, 1.0 = 비활성화)
+         --typical N              locally typical 샘플링, 파라미터 p (기본값: 1.0, 1.0 = 비활성화)
+         --repeat-last-n N        페널티를 부여할 마지막 n 토큰 (기본값: 64, 0 = 비활성화, -1 = ctx_size)
+         --repeat-penalty N       반복되는 토큰 시퀀스에 페널티 부여 (기본값: 1.0, 1.0 = 비활성화)
+         --presence-penalty N     반복 알파 존재 페널티 (기본값: 0.0, 0.0 = 비활성화)
+         --frequency-penalty N    반복 알파 빈도 페널티 (기본값: 0.0, 0.0 = 비활성화)
+         --dynatemp-range N       동적 온도 범위 (기본값: 0.0, 0.0 = 비활성화)
+         --dynatemp-exp N         동적 온도 지수 (기본값: 1.0)
+         --mirostat N             Mirostat 샘플링 사용.
+                                  Top K, Nucleus, Tail Free 및 Locally Typical 샘플러는 무시됨.
+                                  (기본값: 0, 0 = 비활성화, 1 = Mirostat, 2 = Mirostat 2.0)
+         --mirostat-lr N          Mirostat 학습률, 파라미터 eta (기본값: 0.1)
+         --mirostat-ent N         Mirostat 목표 엔트로피, 파라미터 tau (기본값: 5.0)
+         -l TOKEN_ID(+/-)BIAS     토큰이 생성에 나타날 확률 수정,
+                                  예: `--logit-bias 15043+1`은 ' Hello' 토큰의 확률 증가,
+                                  또는 `--logit-bias 15043-1`은 ' Hello' 토큰의 확률 감소
          --cfg-negative-prompt PROMPT
-                                  negative prompt to use for guidance (default: '')
+                                  가이던스에 사용할 부정 프롬프트 (기본값: '')
          --cfg-negative-prompt-file FNAME
-                                  negative prompt file to use for guidance
-         --cfg-scale N            strength of guidance (default: 1.0, 1.0 = disable)
+                                  가이던스에 사용할 부정 프롬프트 파일
+         --cfg-scale N            가이던스 강도 (기본값: 1.0, 1.0 = 비활성화)
          --chat-template JINJA_TEMPLATE
-                                  set custom jinja chat template (default: template taken from model's metadata)
-                                  if suffix/prefix are specified, template will be disabled
-                                  only commonly used templates are accepted:
+                                  사용자 정의 jinja 채팅 템플릿 설정 (기본값: 모델의 메타데이터에서 가져온 템플릿)
+                                  접미사/접두사가 지정된 경우 템플릿 비활성화
+                                  일반적으로 사용되는 템플릿만 허용됨:
                                   https://github.com/ggerganov/llama.cpp/wiki/Templates-supported-by-llama_chat_apply_template
 
-grammar:
+문법:
 
-         --grammar GRAMMAR        BNF-like grammar to constrain generations (see samples in grammars/ dir) (default: '')
-         --grammar-file FNAME     file to read grammar from
-  -j,    --json-schema SCHEMA     JSON schema to constrain generations (https://json-schema.org/), e.g. `{}` for any JSON object
-                                  For schemas w/ external $refs, use --grammar + example/json_schema_to_grammar.py instead
+         --grammar GRAMMAR        BNF 유사 문법을 사용하여 생성 제한 (samples/ 디렉토리의 샘플 참조) (기본값: '')
+         --grammar-file FNAME     문법을 읽을 파일
+  -j,    --json-schema SCHEMA     JSON 스키마를 사용하여 생성 제한 (https://json-schema.org/), 예: `{}`는 모든 JSON 객체
+                                  외부 $refs가 있는 스키마의 경우, --grammar + example/json_schema_to_grammar.py 사용
 
-embedding:
+임베딩:
 
          --pooling {none,mean,cls,last}
-                                  pooling type for embeddings, use model default if unspecified
+                                  임베딩에 사용할 풀링 유형, 지정되지 않은 경우 모델 기본값 사용
          --attention {causal,non-causal}
-                                  attention type for embeddings, use model default if unspecified
+                                  임베딩에 사용할 주의 유형, 지정되지 않은 경우 모델 기본값 사용
 
-context hacking:
+컨텍스트 해킹:
 
          --rope-scaling {none,linear,yarn}
-                                  RoPE frequency scaling method, defaults to linear unless specified by the model
-         --rope-scale N           RoPE context scaling factor, expands context by a factor of N
-         --rope-freq-base N       RoPE base frequency, used by NTK-aware scaling (default: loaded from model)
-         --rope-freq-scale N      RoPE frequency scaling factor, expands context by a factor of 1/N
-         --yarn-orig-ctx N        YaRN: original context size of model (default: 0 = model training context size)
-         --yarn-ext-factor N      YaRN: extrapolation mix factor (default: -1.0, 0.0 = full interpolation)
-         --yarn-attn-factor N     YaRN: scale sqrt(t) or attention magnitude (default: 1.0)
-         --yarn-beta-slow N       YaRN: high correction dim or alpha (default: 1.0)
-         --yarn-beta-fast N       YaRN: low correction dim or beta (default: 32.0)
-  -gan,  --grp-attn-n N           group-attention factor (default: 1)
-  -gaw,  --grp-attn-w N           group-attention width (default: 512.0)
-  -dkvc, --dump-kv-cache          verbose print of the KV cache
-  -nkvo, --no-kv-offload          disable KV offload
-  -ctk,  --cache-type-k TYPE      KV cache data type for K (default: f16)
-  -ctv,  --cache-type-v TYPE      KV cache data type for V (default: f16)
+                                  RoPE 주파수 스케일링 방법, 모델에서 지정하지 않은 경우 기본값은 linear
+         --rope-scale N           RoPE 컨텍스트 스케일링 계수, 컨텍스트를 N 배로 확장
+         --rope-freq-base N       RoPE 기본 주파수, NTK 인식 스케일링에 사용 (기본값: 모델에서 로드됨)
+         --rope-freq-scale N      RoPE 주파수 스케일링 계수, 컨텍스트를 1/N 배로 확장
+         --yarn-orig-ctx N        YaRN: 모델의 원래 컨텍스트 크기 (기본값: 0 = 모델 훈련 컨텍스트 크기)
+         --yarn-ext-factor N      YaRN: 외삽 혼합 계수 (기본값: -1.0, 0.0 = 완전 보간)
+         --yarn-attn-factor N     YaRN: sqrt(t) 또는 주의 크기 스케일 (기본값: 1.0)
+         --yarn-beta-slow N       YaRN: 높은 보정 차원 또는 알파 (기본값: 1.0)
+         --yarn-beta-fast N       YaRN: 낮은 보정 차원 또는 베타 (기본값: 32.0)
+  -gan,  --grp-attn-n N           그룹 주의 계수 (기본값: 1)
+  -gaw,  --grp-attn-w N           그룹 주의 너비 (기본값: 512.0)
+  -dkvc, --dump-kv-cache          KV 캐시의 자세한 출력
+  -nkvo, --no-kv-offload          KV 오프로드 비활성화
+  -ctk,  --cache-type-k TYPE      K의 KV 캐시 데이터 유형 (기본값: f16)
+  -ctv,  --cache-type-v TYPE      V의 KV 캐시 데이터 유형 (기본값: f16)
 
-perplexity:
+혼란도:
 
-         --all-logits             return logits for all tokens in the batch (default: false)
-         --hellaswag              compute HellaSwag score over random tasks from datafile supplied with -f
-         --hellaswag-tasks N      number of tasks to use when computing the HellaSwag score (default: 400)
-         --winogrande             compute Winogrande score over random tasks from datafile supplied with -f
-         --winogrande-tasks N     number of tasks to use when computing the Winogrande score (default: 0)
-         --multiple-choice        compute multiple choice score over random tasks from datafile supplied with -f
+         --all-logits             배치의 모든 토큰에 대한 로짓 반환 (기본값: false)
+         --hellaswag              -f로 제공된 데이터 파일에서 무작위 작업에 대한 HellaSwag 점수 계산
+         --hellaswag-tasks N      HellaSwag 점수를 계산할 작업 수 (기본값: 400)
+         --winogrande             -f로 제공된 데이터 파일에서 무작위 작업에 대한 Winogrande 점수 계산
+         --winogrande-tasks N     Winogrande 점수를 계산할 작업 수 (기본값: 0)
+         --multiple-choice        -f로 제공된 데이터 파일에서 무작위 작업에 대한 다중 선택 점수 계산
          --multiple-choice-tasks N
-                                  number of tasks to use when computing the multiple choice score (default: 0)
-         --kl-divergence          computes KL-divergence to logits provided via --kl-divergence-base
-         --ppl-stride N           stride for perplexity calculation (default: 0)
-         --ppl-output-type {0,1}  output type for perplexity calculation (default: 0)
+                                  다중 선택 점수를 계산할 작업 수 (기본값: 0)
+         --kl-divergence          --kl-divergence-base를 통해 제공된 로짓에 대한 KL-발산 계산
+         --ppl-stride N           혼란도 계산을 위한 스트라이드 (기본값: 0)
+         --ppl-output-type {0,1}  혼란도 계산을 위한 출력 유형 (기본값: 0)
 
-parallel:
+병렬:
 
-  -dt,   --defrag-thold N         KV cache defragmentation threshold (default: -1.0, < 0 - disabled)
-  -np,   --parallel N             number of parallel sequences to decode (default: 1)
-  -ns,   --sequences N            number of sequences to decode (default: 1)
-  -cb,   --cont-batching          enable continuous batching (a.k.a dynamic batching) (default: enabled)
+  -dt,   --defrag-thold N         KV 캐시 조각 모음 임계값 (기본값: -1.0, < 0 - 비활성화)
+  -np,   --parallel N             병렬로 디코딩할 시퀀스 수 (기본값: 1)
+  -ns,   --sequences N            디코딩할 시퀀스 수 (기본값: 1)
+  -cb,   --cont-batching          연속 배치 (동적 배치) 활성화 (기본값: 활성화)
 
-multi-modality:
+다중 모달리티:
 
-         --mmproj FILE            path to a multimodal projector file for LLaVA. see examples/llava/README.md
-         --image FILE             path to an image file. use with multimodal models. Specify multiple times for batching
+         --mmproj FILE            LLaVA를 위한 다중 모달 프로젝터 파일 경로. examples/llava/README.md 참조
+         --image FILE             이미지 파일 경로. 다중 모달 모델과 함께 사용. 배치를 위해 여러 번 지정
 
-backend:
+백엔드:
 
-         --rpc SERVERS            comma separated list of RPC servers
-         --mlock                  force system to keep model in RAM rather than swapping or compressing
-         --no-mmap                do not memory-map model (slower load but may reduce pageouts if not using mlock)
-         --numa TYPE              attempt optimizations that help on some NUMA systems
-                                    - distribute: spread execution evenly over all nodes
-                                    - isolate: only spawn threads on CPUs on the node that execution started on
-                                    - numactl: use the CPU map provided by numactl
-                                  if run without this previously, it is recommended to drop the system page cache before using this
-                                  see https://github.com/ggerganov/llama.cpp/issues/1437
+         --rpc SERVERS            RPC 서버의 쉼표로 구분된 목록
+         --mlock                  모델을 RAM에 유지하여 스왑 또는 압축 방지
+         --no-mmap                모델 메모리 매핑 안 함 (로드 속도 느리지만 mlock을 사용하지 않는 경우 페이지 아웃 감소 가능)
+         --numa TYPE              일부 NUMA 시스템에서 도움이 되는 최적화 시도
+                                    - distribute: 모든 노드에 균등하게 실행 분산
+                                    - isolate: 실행이 시작된 노드의 CPU에서만 스레드 생성
+                                    - numactl: numactl에서 제공한 CPU 맵 사용
+                                  이전에 이 옵션 없이 실행한 경우, 이를 사용하기 전에 시스템 페이지 캐시를 삭제하는 것이 좋음
+                                  https://github.com/ggerganov/llama.cpp/issues/1437 참조
 
-model:
+모델:
 
-         --check-tensors          check model tensor data for invalid values (default: false)
+         --check-tensors          모델 텐서 데이터의 유효하지 않은 값 확인 (기본값: false)
          --override-kv KEY=TYPE:VALUE
-                                  advanced option to override model metadata by key. may be specified multiple times.
-                                  types: int, float, bool, str. example: --override-kv tokenizer.ggml.add_bos_token=bool:false
-         --lora FNAME             apply LoRA adapter (implies --no-mmap)
-         --lora-scaled FNAME S    apply LoRA adapter with user defined scaling S (implies --no-mmap)
-         --lora-base FNAME        optional model to use as a base for the layers modified by the LoRA adapter
-         --control-vector FNAME   add a control vector
-                                  note: this argument can be repeated to add multiple control vectors
+                                  키로 모델 메타데이터 재정의하는 고급 옵션. 여러 번 지정 가능.
+                                  유형: int, float, bool, str. 예: --override-kv tokenizer.ggml.add_bos_token=bool:false
+         --lora FNAME             LoRA 어댑터 적용 (암시적으로 --no-mmap)
+         --lora-scaled FNAME S    사용자 정의 스케일링 S로 LoRA 어댑터 적용 (암시적으로 --no-mmap)
+         --lora-base FNAME        LoRA 어댑터로 수정된 레이어에 사용할 기본 모델 선택
+         --control-vector FNAME   제어 벡터 추가
+                                  참고: 이 인수는 여러 번 반복하여 여러 제어 벡터 추가 가능
          --control-vector-scaled FNAME SCALE
-                                  add a control vector with user defined scaling SCALE
-                                  note: this argument can be repeated to add multiple scaled control vectors
+                                  사용자 정의 스케일링 SCALE로 제어 벡터 추가
+                                  참고: 이 인수는 여러 번 반복하여 여러 스케일링된 제어 벡터 추가 가능
          --control-vector-layer-range START END
-                                  layer range to apply the control vector(s) to, start and end inclusive
-  -m,    --model FNAME            model path (default: models/$filename with filename from --hf-file
-                                  or --model-url if set, otherwise models/7B/ggml-model-f16.gguf)
-  -md,   --model-draft FNAME      draft model for speculative decoding (default: unused)
-  -mu,   --model-url MODEL_URL    model download url (default: unused)
-  -hfr,  --hf-repo REPO           Hugging Face model repository (default: unused)
-  -hff,  --hf-file FILE           Hugging Face model file (default: unused)
-  -hft,  --hf-token TOKEN         Hugging Face access token (default: value from HF_TOKEN environment variable)
+                                  제어 벡터를 적용할 레이어 범위, 시작과 끝 포함
+  -m,    --model FNAME            모델 경로 (기본값: models/$filename, --hf-file
+                                  또는 --model-url이 설정된 경우, 그렇지 않으면 models/7B/ggml-model-f16.gguf)
+  -md,   --model-draft FNAME      추측 디코딩을 위한 초안 모델 (기본값: 사용 안 함)
+  -mu,   --model-url MODEL_URL    모델 다운로드 URL (기본값: 사용 안 함)
+  -hfr,  --hf-repo REPO           Hugging Face 모델 저장소 (기본값: 사용 안 함)
+  -hff,  --hf-file FILE           Hugging Face 모델 파일 (기본값: 사용 안 함)
+  -hft,  --hf-token TOKEN         Hugging Face 액세스 토큰 (기본값: HF_TOKEN 환경 변수 값)
 
-retrieval:
+검색:
 
-         --context-file FNAME     file to load context from (repeat to specify multiple files)
-         --chunk-size N           minimum length of embedded text chunks (default: 64)
+         --context-file FNAME     컨텍스트를 로드할 파일 (여러 파일을 지정하려면 반복)
+         --chunk-size N           임베딩된 텍스트 청크의 최소 길이 (기본값: 64)
          --chunk-separator STRING
-                                  separator between chunks (default: '
+                                  청크 사이의 구분자 (기본값: '
                                   ')
 
-passkey:
+패스키:
 
-         --junk N                 number of times to repeat the junk text (default: 250)
-         --pos N                  position of the passkey in the junk text (default: -1)
+         --junk N                 정크 텍스트를 반복할 횟수 (기본값: 250)
+         --pos N                  정크 텍스트에서 패스키의 위치 (기본값: -1)
 
 imatrix:
 
-  -o,    --output FNAME           output file (default: 'imatrix.dat')
-         --output-frequency N     output the imatrix every N iterations (default: 10)
-         --save-frequency N       save an imatrix copy every N iterations (default: 0)
-         --process-output         collect data for the output tensor (default: false)
-         --no-ppl                 do not compute perplexity (default: true)
-         --chunk N                start processing the input from chunk N (default: 0)
+  -o,    --output FNAME           출력 파일 (기본값: 'imatrix.dat')
+         --output-frequency N     N 반복마다 imatrix 출력 (기본값: 10)
+         --save-frequency N       N 반복마다 imatrix 복사본 저장 (기본값: 0)
+         --process-output         출력 텐서 데이터를 수집 (기본값: false)
+         --no-ppl                 당혹도(perplexity) 계산 안 함 (기본값: true)
+         --chunk N                N 번째 청크부터 입력 처리 시작 (기본값: 0)
 
 bench:
 
-  -pps                            is the prompt shared across parallel sequences (default: false)
-  -npp n0,n1,...                  number of prompt tokens
-  -ntg n0,n1,...                  number of text generation tokens
-  -npl n0,n1,...                  number of parallel prompts
+  -pps                            프롬프트가 병렬 시퀀스 간에 공유되는지 여부 (기본값: false)
+  -npp n0,n1,...                  프롬프트 토큰 수
+  -ntg n0,n1,...                  텍스트 생성 토큰 수
+  -npl n0,n1,...                  병렬 프롬프트 수
 
 embedding:
 
-         --embd-normalize         normalisation for embendings (default: 2) (-1=none, 0=max absolute int16, 1=taxicab, 2=euclidean, >2=p-norm)
-         --embd-output-format     empty = default, "array" = [[],[]...], "json" = openai style, "json+" = same "json" + cosine similarity matrix
-         --embd-separator         separator of embendings (default \n) for example "<#sep#>"
+         --embd-normalize         임베딩 정규화 (기본값: 2) (-1=없음, 0=최대 절대 int16, 1=택시캡, 2=유클리드, >2=p-노름)
+         --embd-output-format     빈 값 = 기본값, "array" = [[],[]...], "json" = openai 스타일, "json+" = "json" + 코사인 유사도 행렬
+         --embd-separator         임베딩 구분자 (기본값 \n) 예: "<#sep#>"
 
 server:
 
-         --host HOST              ip address to listen (default: 127.0.0.1)
-         --port PORT              port to listen (default: 8080)
-         --path PATH              path to serve static files from (default: )
-         --embedding(s)           enable embedding endpoint (default: disabled)
-         --api-key KEY            API key to use for authentication (default: none)
-         --api-key-file FNAME     path to file containing API keys (default: none)
-         --ssl-key-file FNAME     path to file a PEM-encoded SSL private key
-         --ssl-cert-file FNAME    path to file a PEM-encoded SSL certificate
-         --timeout N              server read/write timeout in seconds (default: 600)
-         --threads-http N         number of threads used to process HTTP requests (default: -1)
+         --host HOST              수신할 IP 주소 (기본값: 127.0.0.1)
+         --port PORT              수신할 포트 (기본값: 8080)
+         --path PATH              정적 파일을 제공할 경로 (기본값: )
+         --embedding(s)           임베딩 엔드포인트 활성화 (기본값: 비활성화)
+         --api-key KEY            인증에 사용할 API 키 (기본값: 없음)
+         --api-key-file FNAME     API 키가 포함된 파일 경로 (기본값: 없음)
+         --ssl-key-file FNAME     PEM 인코딩된 SSL 개인 키 파일 경로
+         --ssl-cert-file FNAME    PEM 인코딩된 SSL 인증서 파일 경로
+         --timeout N              서버 읽기/쓰기 타임아웃 (초) (기본값: 600)
+         --threads-http N         HTTP 요청을 처리할 스레드 수 (기본값: -1)
          --system-prompt-file FNAME
-                                  set a file to load a system prompt (initial prompt of all slots), this is useful for chat applications
+                                  시스템 프롬프트를 로드할 파일 설정 (모든 슬롯의 초기 프롬프트), 채팅 애플리케이션에 유용
          --log-format {text,json}
-                                  log output format: json or text (default: json)
-         --metrics                enable prometheus compatible metrics endpoint (default: disabled)
-         --no-slots               disables slots monitoring endpoint (default: enabled)
-         --slot-save-path PATH    path to save slot kv cache (default: disabled)
+                                  로그 출력 형식: json 또는 text (기본값: json)
+         --metrics                prometheus 호환 메트릭 엔드포인트 활성화 (기본값: 비활성화)
+         --no-slots               슬롯 모니터링 엔드포인트 비활성화 (기본값: 활성화)
+         --slot-save-path PATH    슬롯 kv 캐시를 저장할 경로 (기본값: 비활성화)
          --chat-template JINJA_TEMPLATE
-                                  set custom jinja chat template (default: template taken from model's metadata)
-                                  only commonly used templates are accepted:
+                                  사용자 정의 jinja 채팅 템플릿 설정 (기본값: 모델의 메타데이터에서 가져온 템플릿)
+                                  일반적으로 사용되는 템플릿만 허용:
                                   https://github.com/ggerganov/llama.cpp/wiki/Templates-supported-by-llama_chat_apply_template
   -sps,  --slot-prompt-similarity SIMILARITY
-                                  how much the prompt of a request must match the prompt of a slot in order to use that slot (default: 0.50, 0.0 = disabled)
-
+                                  요청의 프롬프트가 슬롯의 프롬프트와 일치해야 하는 정도 (기본값: 0.50, 0.0 = 비활성화)
 
 logging:
 
-         --simple-io              use basic IO for better compatibility in subprocesses and limited consoles
-  -ld,   --logdir LOGDIR          path under which to save YAML logs (no logging if unset)
-         --log-test               Run simple logging test
-         --log-disable            Disable trace logs
-         --log-enable             Enable trace logs
-         --log-file FNAME         Specify a log filename (without extension)
-         --log-new                Create a separate new log file on start. Each log file will have unique name: "<name>.<ID>.log"
-         --log-append             Don't truncate the old log file.
+         --simple-io              하위 프로세스 및 제한된 콘솔에서 더 나은 호환성을 위한 기본 IO 사용
+  -ld,   --logdir LOGDIR          YAML 로그를 저장할 경로 (설정되지 않으면 로깅 안 함)
+         --log-test               간단한 로깅 테스트 실행
+         --log-disable            추적 로그 비활성화
+         --log-enable             추적 로그 활성화
+         --log-file FNAME         로그 파일 이름 지정 (확장자 제외)
+         --log-new                시작 시 별도의 새 로그 파일 생성. 각 로그 파일은 고유한 이름을 가짐: "<name>.<ID>.log"
+         --log-append             기존 로그 파일을 잘라내지 않음
 
 cvector:
 
-  -o,    --output FNAME           output file (default: 'control_vector.gguf')
-         --positive-file FNAME    positive prompts file, one prompt per line (default: 'examples/cvector-generator/positive.txt')
-         --negative-file FNAME    negative prompts file, one prompt per line (default: 'examples/cvector-generator/negative.txt')
-         --pca-batch N            batch size used for PCA. Larger batch runs faster, but uses more memory (default: 100)
-         --pca-iter N             number of iterations used for PCA (default: 1000)
-         --method {pca,mean}      dimensionality reduction method to be used (default: pca)
+  -o,    --output FNAME           출력 파일 (기본값: 'control_vector.gguf')
+         --positive-file FNAME    긍정 프롬프트 파일, 한 줄에 하나의 프롬프트 (기본값: 'examples/cvector-generator/positive.txt')
+         --negative-file FNAME    부정 프롬프트 파일, 한 줄에 하나의 프롬프트 (기본값: 'examples/cvector-generator/negative.txt')
+         --pca-batch N            PCA에 사용되는 배치 크기. 배치가 클수록 빠르게 실행되지만 메모리를 더 많이 사용 (기본값: 100)
+         --pca-iter N             PCA에 사용되는 반복 횟수 (기본값: 1000)
+         --method {pca,mean}      사용할 차원 축소 방법 (기본값: pca)
 ```
 
 
