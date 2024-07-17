@@ -1,67 +1,67 @@
-# Security Policy
+# 보안 정책
 
- - [**Using llama.cpp securely**](#using-llamacpp-securely)
-   - [Untrusted models](#untrusted-models)
-   - [Untrusted inputs](#untrusted-inputs)
-   - [Data privacy](#data-privacy)
-   - [Untrusted environments or networks](#untrusted-environments-or-networks)
-   - [Multi-Tenant environments](#multi-tenant-environments)
- - [**Reporting a vulnerability**](#reporting-a-vulnerability)
+ - [**llama.cpp를 안전하게 사용하기**](#llamacpp를-안전하게-사용하기)
+   - [신뢰되지 않는 모델](#신뢰되지-않는-모델)
+   - [신뢰되지 않는 입력](#신뢰되지-않는-입력)
+   - [데이터 프라이버시](#데이터-프라이버시)
+   - [신뢰되지 않는 환경 또는 네트워크](#신뢰되지-않는-환경-또는-네트워크)
+   - [다중 임대주 환경](#다중-임대주-환경)
+ - [**취약점 신고**](#취약점-신고)
 
-## Using llama.cpp securely
+## llama.cpp를 안전하게 사용하는 방법
 
-### Untrusted models
-Be careful when running untrusted models. This classification includes models created by unknown developers or utilizing data obtained from unknown sources.
+### 신뢰되지 않는 모델
+신뢰되지 않는 모델을 실행할 때는 주의해야 합니다. 이 분류에는 알 수 없는 개발자가 만든 모델 또는 알 수 없는 출처에서 얻은 데이터를 사용하는 모델이 포함됩니다.
 
-*Always execute untrusted models within a secure, isolated environment such as a sandbox* (e.g., containers, virtual machines). This helps protect your system from potentially malicious code.
+*신뢰되지 않는 모델은 항상 샌드박스(예: 컨테이너, 가상 머신)와 같은 안전하고 격리된 환경에서 실행해야 합니다.* 이렇게 하면 시스템이 잠재적으로 악의적인 코드로부터 보호됩니다.
 
 > [!NOTE]
-> The trustworthiness of a model is not binary. You must always determine the proper level of caution depending on the specific model and how it matches your use case and risk tolerance.
+> 모델의 신뢰성은 이진이 아닙니다. 특정 모델과 사용 사례 및 위험 감수 수준에 따라 적절한 수준의 주의를 항상 결정해야 합니다.
 
-### Untrusted inputs
+### 신뢰되지 않는 입력
 
-Some models accept various input formats (text, images, audio, etc.). The libraries converting these inputs have varying security levels, so it's crucial to isolate the model and carefully pre-process inputs to mitigate script injection risks.
+일부 모델은 다양한 입력 형식 (텍스트, 이미지, 오디오 등)을 수용합니다. 이러한 입력을 변환하는 라이브러리의 보안 수준은 다르므로, 스크립트 주입 위험을 완화하기 위해 모델을 격리하고 입력을 신중하게 사전 처리하는 것이 중요합니다.
 
-For maximum security when handling untrusted inputs, you may need to employ the following:
+신뢰되지 않는 입력을 처리할 때 최대 보안을 위해 다음과 같은 작업을 수행해야 할 수 있습니다.
 
-* Sandboxing: Isolate the environment where the inference happens.
-* Pre-analysis: Check how the model performs by default when exposed to prompt injection (e.g. using [fuzzing for prompt injection](https://github.com/FonduAI/awesome-prompt-injection?tab=readme-ov-file#tools)). This will give you leads on how hard you will have to work on the next topics.
-* Updates: Keep both LLaMA C++ and your libraries updated with the latest security patches.
-* Input Sanitation: Before feeding data to the model, sanitize inputs rigorously. This involves techniques such as:
-    * Validation: Enforce strict rules on allowed characters and data types.
-    * Filtering: Remove potentially malicious scripts or code fragments.
-    * Encoding: Convert special characters into safe representations.
-    * Verification: Run tooling that identifies potential script injections (e.g. [models that detect prompt injection attempts](https://python.langchain.com/docs/guides/safety/hugging_face_prompt_injection)).
+* 샌드박싱: 인프런이 발생하는 환경을 격리합니다.
+* 사전 분석: 모델이 프롬프트 주입에 노출되었을 때 기본적으로 어떻게 작동하는지 확인합니다. (예: [프롬프트 주입을 위한 fuzzing](https://github.com/FonduAI/awesome-prompt-injection?tab=readme-ov-file#tools)). 이를 통해 다음 주제에 대해 얼마나 노력해야 하는지에 대한 단서를 얻을 수 있습니다.
+* 업데이트: LLaMA C++ 및 라이브러리를 최신 보안 패치로 업데이트합니다.
+* 입력 정화: 데이터를 모델에 전달하기 전에 엄격하게 입력을 정화합니다. 이에는 다음과 같은 기술이 포함됩니다.
+    * 검증: 허용되는 문자와 데이터 유형에 대한 엄격한 규칙을 적용합니다.
+    * 필터링: 잠재적으로 악의적인 스크립트 또는 코드 조각을 제거합니다.
+    * 인코딩: 특수 문자를 안전한 표현으로 변환합니다.
+    * 검증: 잠재적인 스크립트 주입을 식별하는 도구를 실행합니다. (예: [프롬프트 주입 시도를 감지하는 모델](https://python.langchain.com/docs/guides/safety/hugging_face_prompt_injection)).
 
-### Data privacy
+### 데이터 프라이버시
 
-To protect sensitive data from potential leaks or unauthorized access, it is crucial to sandbox the model execution. This means running the model in a secure, isolated environment, which helps mitigate many attack vectors.
+민감한 데이터가 누출되거나 무단으로 접근되는 것을 방지하기 위해 모델 실행을 샌드박스하는 것이 중요합니다. 즉, 모델을 안전하고 격리된 환경에서 실행하는 것을 의미하며, 이는 많은 공격 벡터를 완화하는 데 도움이 됩니다.
 
-### Untrusted environments or networks
+### 신뢰되지 않는 환경이나 네트워크
 
-If you can't run your models in a secure and isolated environment or if it must be exposed to an untrusted network, make sure to take the following security precautions:
-* Confirm the hash of any downloaded artifact (e.g. pre-trained model weights) matches a known-good value
-* Encrypt your data if sending it over the network.
+보안 및 격리된 환경에서 모델을 실행할 수 없거나 신뢰되지 않는 네트워크에 노출되어야 하는 경우 다음과 같은 보안 조치를 취하십시오.
+* 다운로드된 모든 아티팩트(예: 사전 훈련된 모델 가중치)의 해시 값이 알려진 안전한 값과 일치하는지 확인하십시오.
+* 네트워크를 통해 데이터를 전송하는 경우 데이터를 암호화하십시오.
 
-### Multi-Tenant environments
+### 다세대 환경
 
-If you intend to run multiple models in parallel with shared memory, it is your responsibility to ensure the models do not interact or access each other's data. The primary areas of concern are tenant isolation, resource allocation, model sharing and hardware attacks.
+여러 모델을 공유 메모리로 병렬 실행할 계획이라면, 모델 간 상호 작용이나 서로의 데이터에 대한 액세스를 방지하는 것이 귀하의 책임입니다. 주요 우려 사항은 테넌트 분리, 리소스 할당, 모델 공유 및 하드웨어 공격입니다.
 
-1. Tenant Isolation: Models should run separately with strong isolation methods to prevent unwanted data access. Separating networks is crucial for isolation, as it prevents unauthorized access to data or models and malicious users from sending graphs to execute under another tenant's identity.
+1. 테넌트 분리: 모델은 원치 않는 데이터 액세스를 방지하기 위해 강력한 분리 방법으로 별도로 실행되어야 합니다. 네트워크 분리는 격리에 필수적이며, 데이터 또는 모델에 대한 무단 액세스를 방지하고 악의적인 사용자가 다른 테넌트의 신원으로 실행하기 위해 그래프를 보내는 것을 방지합니다.
 
-2. Resource Allocation: A denial of service caused by one model can impact the overall system health. Implement safeguards like rate limits, access controls, and health monitoring.
+2. 리소스 할당: 하나의 모델에 의한 서비스 거부는 전체 시스템의 건강에 영향을 미칠 수 있습니다. 속도 제한, 액세스 제어 및 건강 모니터링과 같은 보호 조치를 구현하십시오.
 
-3. Model Sharing: In a multitenant model sharing design, tenants and users must understand the security risks of running code provided by others. Since there are no reliable methods to detect malicious models, sandboxing the model execution is the recommended approach to mitigate the risk.
+3. 모델 공유: 다세대 모델 공유 설계에서는 테넌트 및 사용자가 다른 사람이 제공한 코드를 실행하는 데 따른 보안 위험을 이해해야 합니다. 악의적인 모델을 감지하는 신뢰할 수 있는 방법이 없기 때문에 모델 실행을 샌드박스하는 것이 위험을 완화하는 권장 사항입니다.
 
-4. Hardware Attacks: GPUs or TPUs can also be attacked. [Researches](https://scholar.google.com/scholar?q=gpu+side+channel) has shown that side channel attacks on GPUs are possible, which can make data leak from other models or processes running on the same system at the same time.
+4. 하드웨어 공격: GPU 또는 TPU도 공격받을 수 있습니다. [연구](https://scholar.google.com/scholar?q=gpu+side+channel)에 따르면 GPU에 대한 부수적인 채널 공격이 가능하며, 동시에 동일한 시스템에서 실행 중인 다른 모델이나 프로세스에서 데이터가 유출될 수 있습니다.
 
-## Reporting a vulnerability
+## 취약점 보고
 
-Beware that none of the topics under [Using llama.cpp securely](#using-llamacpp-securely) are considered vulnerabilities of LLaMA C++.
+[llama.cpp를 안전하게 사용하기](#using-llamacpp-securely) 아래 주제들은 LLaMA C++의 취약점으로 간주되지 않습니다.
 
 <!-- normal version -->
-However, If you have discovered a security vulnerability in this project, please report it privately. **Do not disclose it as a public issue.** This gives us time to work with you to fix the issue before public exposure, reducing the chance that the exploit will be used before a patch is released.
+그러나 이 프로젝트에서 보안 취약점을 발견한 경우, 개인적으로 보고해주세요. **공개적으로 문제를 공개하지 마세요.** 이는 공개되기 전에 문제를 해결하기 위해 함께 작업할 시간을 주며, 패치가 출시되기 전에 악용될 가능성을 줄입니다.
 
-Please disclose it as a private [security advisory](https://github.com/ggerganov/llama.cpp/security/advisories/new).
+[보안 자문](https://github.com/ggerganov/llama.cpp/security/advisories/new)으로 개인적으로 보고해주세요.
 
-A team of volunteers on a reasonable-effort basis maintains this project. As such, please give us at least 90 days to work on a fix before public exposure.
+이 프로젝트는 합리적인 노력을 기반으로 하는 자원봉사자 팀이 유지 관리합니다. 따라서 공개적으로 노출되기 전에 최소 90일 동안 해결책을 찾도록 해주세요.

@@ -1,12 +1,12 @@
-## Convert llama2.c model to ggml
+## llama2.c 모델을 ggml로 변환하기
 
-This example reads weights from project [llama2.c](https://github.com/karpathy/llama2.c) and saves them in ggml compatible format. The vocab that is available in `models/ggml-vocab.bin` is used by default.
+이 예제는 [llama2.c](https://github.com/karpathy/llama2.c) 프로젝트에서 가중치를 읽어 ggml 호환 형식으로 저장합니다. `models/ggml-vocab.bin`에 있는 단어 목록이 기본적으로 사용됩니다.
 
-To convert the model first download the models from the [llama2.c](https://github.com/karpathy/llama2.c) repository:
+모델을 변환하려면 먼저 [llama2.c](https://github.com/karpathy/llama2.c) 저장소에서 모델을 다운로드합니다.
 
 `$ make -j`
 
-After successful compilation, following usage options are available:
+성공적으로 컴파일된 후 다음과 같은 사용 옵션이 사용 가능합니다:
 ```
 usage: ./llama-convert-llama2c-to-ggml [options]
 
@@ -17,12 +17,12 @@ options:
   --llama2c-output-model FNAME     model path to save the converted llama2.c model (default ak_llama_model.bin')
 ```
 
-An example command using a model from [karpathy/tinyllamas](https://huggingface.co/karpathy/tinyllamas) is as follows:
+[karpathy/tinyllamas](https://huggingface.co/karpathy/tinyllamas)에서 가져온 모델을 사용하는 예시 명령어는 다음과 같습니다.
 
 `$ ./llama-convert-llama2c-to-ggml --copy-vocab-from-model llama-2-7b-chat.gguf.q2_K.bin --llama2c-model stories42M.bin --llama2c-output-model stories42M.gguf.bin`
 
-Note: The vocabulary for `stories260K.bin` should be its own tokenizer `tok512.bin` found in [karpathy/tinyllamas/stories260K](https://huggingface.co/karpathy/tinyllamas/tree/main/stories260K).
+참고: `stories260K.bin`의 어휘는 [karpathy/tinyllamas/stories260K](https://huggingface.co/karpathy/tinyllamas/tree/main/stories260K)에서 찾을 수 있는 `tok512.bin`과 같은 독립적인 토크나이저를 사용해야 합니다.
 
-Now you can use the model with a command like:
+이제 다음과 같은 명령어로 모델을 사용할 수 있습니다.
 
 `$ ./llama-cli -m stories42M.gguf.bin -p "One day, Lily met a Shoggoth" -n 500 -c 256`

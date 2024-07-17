@@ -1,13 +1,13 @@
 # llama.cpp/example/batched-bench
 
-Benchmark the batched decoding performance of `llama.cpp`
+`llama.cpp`의 배치 디코딩 성능을 벤치마크합니다.
 
-## Usage
+## 사용법
 
-There are 2 modes of operation:
+2가지 운영 모드가 있습니다.
 
-- `prompt not shared` - each batch has a separate prompt of size `PP` (i.e. `N_KV = B*(PP + TG)`)
-- `prompt is shared` - there is a common prompt of size `PP` used by all batches (i.e. `N_KV = PP + B*TG`)
+- `prompt not shared` - 각 배치는 크기가 `PP`인 별도의 프롬프트를 사용합니다. (즉, `N_KV = B*(PP + TG)`)
+- `prompt is shared` - 모든 배치에 의해 공용으로 사용되는 크기가 `PP`인 프롬프트가 있습니다. (즉, `N_KV = PP + B*TG`)
 
 ```bash
 ./llama-batched-bench -m model.gguf -c 2048 -b 2048 -ub 512 -npp 128,256,512 -ntg 128,256 -npl 1,2,4,8,16,32 [-pps]
@@ -22,18 +22,18 @@ There are 2 modes of operation:
 ./llama-batched-bench -m ./models/llama-7b/ggml-model-q8_0.gguf -c 2048 -b 512 -ub 512 -ngl 999 -npp 128,256,512 -ntg 128,256 -npl 1,2,4,8,16,32
 ```
 
-## Sample results
+## 샘플 결과
 
-- `PP` - prompt tokens per batch
-- `TG` - generated tokens per batch
-- `B` - number of batches
-- `N_KV` - required KV cache size
-- `T_PP` - prompt processing time (i.e. time to first token)
-- `S_PP` - prompt processing speed (`(B*PP)/T_PP` or `PP/T_PP`)
-- `T_TG` - time to generate all batches
-- `S_TG` - text generation speed (`(B*TG)/T_TG`)
-- `T` - total time
-- `S` - total speed (i.e. all tokens / total time)
+- `PP` - 배치당 프롬프트 토큰 수
+- `TG` - 배치당 생성 토큰 수
+- `B` - 배치 수
+- `N_KV` - 필요한 KV 캐시 크기
+- `T_PP` - 프롬프트 처리 시간 (즉, 첫 번째 토큰까지의 시간)
+- `S_PP` - 프롬프트 처리 속도 (`(B*PP)/T_PP` 또는 `PP/T_PP`)
+- `T_TG` - 모든 배치를 생성하는 데 걸린 시간
+- `S_TG` - 텍스트 생성 속도 (`(B*TG)/T_TG`)
+- `T` - 총 시간
+- `S` - 총 속도 (즉, 모든 토큰 / 총 시간)
 
 |    PP |     TG |    B |   N_KV |   T_PP s | S_PP t/s |   T_TG s | S_TG t/s |      T s |    S t/s |
 |-------|--------|------|--------|----------|----------|----------|----------|----------|----------|

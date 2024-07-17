@@ -1,110 +1,110 @@
 # llama.cpp/examples/main
 
-This example program allows you to use various LLaMA language models easily and efficiently. It is specifically designed to work with the [llama.cpp](https://github.com/ggerganov/llama.cpp) project, which provides a plain C/C++ implementation with optional 4-bit quantization support for faster, lower memory inference, and is optimized for desktop CPUs. This program can be used to perform various inference tasks with LLaMA models, including generating text based on user-provided prompts and chat-like interactions with reverse prompts.
+이 예제 프로그램은 다양한 LLaMA 언어 모델을 쉽고 효율적으로 사용할 수 있도록 합니다. [llama.cpp](https://github.com/ggerganov/llama.cpp) 프로젝트와 함께 작동하도록 설계되었으며, 이 프로젝트는 빠르고 메모리 사용량이 적은 추론을 위한 4비트 양자화 지원을 포함하는 간단한 C/C++ 구현을 제공하며 데스크톱 CPU를 최적화했습니다. 이 프로그램은 사용자 제공된 프롬프트 기반 텍스트 생성 및 역 프롬프트를 사용한 대화형 상호 작용과 같은 다양한 추론 작업을 수행하는 데 사용할 수 있습니다.
 
-## Table of Contents
+## 표지
 
-1. [Quick Start](#quick-start)
-2. [Common Options](#common-options)
-3. [Input Prompts](#input-prompts)
-4. [Interaction](#interaction)
-5. [Context Management](#context-management)
-6. [Generation Flags](#generation-flags)
-7. [Performance Tuning and Memory Options](#performance-tuning-and-memory-options)
-8. [Additional Options](#additional-options)
+1. [빠른 시작](#빠른-시작)
+2. [공통 옵션](#공통-옵션)
+3. [입력 프롬프트](#입력-프롬프트)
+4. [상호 작용](#상호-작용)
+5. [문맥 관리](#문맥-관리)
+6. [생성 플래그](#생성-플래그)
+7. [성능 조정 및 메모리 옵션](#성능-조정-및-메모리-옵션)
+8. [추가 옵션](#추가-옵션)
 
-## Quick Start
+## 빠른 시작
 
-To get started right away, run the following command, making sure to use the correct path for the model you have:
+바로 시작하려면 다음 명령을 실행하십시오. 모델의 위치를 올바르게 지정하십시오.
 
-First, we will need to download a model. In these examples, we will use the Gemma model from the ggml-org repo on Hugging Face.
+먼저 모델을 다운로드해야 합니다. 이 예제에서는 Hugging Face의 ggml-org repo에서 Gemma 모델을 사용합니다.
 [https://huggingface.co/ggml-org/gemma-1.1-7b-it-Q4_K_M-GGUF/resolve/main/gemma-1.1-7b-it.Q4_K_M.gguf?download=true](https://huggingface.co/ggml-org/gemma-1.1-7b-it-Q4_K_M-GGUF/resolve/main/gemma-1.1-7b-it.Q4_K_M.gguf?download=true)
 
-Once downloaded, place your model in the models folder in llama.cpp.
+다운로드 후, 모델을 llama.cpp의 models 폴더에 넣으십시오.
 
-### Unix-based systems (Linux, macOS, etc.):
+### Unix 기반 시스템 (Linux, macOS 등):
 
-##### Input prompt (One-and-done)
+##### 입력 프롬프트 (한 번만 입력)
 
 ```bash
 ./llama-cli -m models/gemma-1.1-7b-it.Q4_K_M.gguf --prompt "Once upon a time"
 ```
-##### Conversation mode (Allow for continuous interaction with the model)
+##### 대화 모드 (모델과 지속적인 상호 작용을 허용)
 
 ```bash
 ./llama-cli -m models/gemma-1.1-7b-it.Q4_K_M.gguf -cnv --chat-template gemma
 ```
 
-##### Infinite text from a starting prompt (you can use `Ctrl-C` to stop it):
+##### 시작 프롬프트에서 무한한 텍스트 ( `Ctrl-C` 를 사용하여 중지할 수 있습니다):
 ```bash
 ./llama-cli -m models\gemma-1.1-7b-it.Q4_K_M.gguf --ignore-eos -n -1
 ```
 
 ### Windows:
 
-##### Input prompt (One-and-done)
+##### 입력 프롬프트 (한 번만 입력)
 ```powershell
 ./llama-cli.exe -m models\gemma-1.1-7b-it.Q4_K_M.gguf --prompt "Once upon a time"
 ```
-##### Conversation mode (Allow for continuous interaction with the model)
+##### 대화 모드 (모델과 지속적인 상호 작용을 허용)
 
 ```powershell
 ./llama-cli.exe -m models\gemma-1.1-7b-it.Q4_K_M.gguf -cnv --chat-template gemma
 ```
 
-#### Infinite text from a starting prompt (you can use `Ctrl-C` to stop it):
+#### 시작 프롬프트에서 무한한 텍스트 ( `Ctrl-C` 를 사용하여 중지할 수 있습니다):
 
 ```powershell
 llama-cli.exe -m models\gemma-1.1-7b-it.Q4_K_M.gguf --ignore-eos -n -1
 ```
 
-## Common Options
+## 일반 옵션
 
-In this section, we cover the most commonly used options for running the `llama-cli` program with the LLaMA models:
+이 섹션에서는 `llama-cli` 프로그램을 사용하여 LLaMA 모델을 실행할 때 가장 일반적으로 사용되는 옵션을 설명합니다.
 
--   `-m FNAME, --model FNAME`: Specify the path to the LLaMA model file (e.g., `models/gemma-1.1-7b-it.Q4_K_M.gguf`; inferred from `--model-url` if set).
--   `-mu MODEL_URL --model-url MODEL_URL`: Specify a remote http url to download the file (e.g [https://huggingface.co/ggml-org/gemma-1.1-7b-it-Q4_K_M-GGUF/resolve/main/gemma-1.1-7b-it.Q4_K_M.gguf?download=true](https://huggingface.co/ggml-org/gemma-1.1-7b-it-Q4_K_M-GGUF/resolve/main/gemma-1.1-7b-it.Q4_K_M.gguf?download=true)).
--   `-i, --interactive`: Run the program in interactive mode, allowing you to provide input directly and receive real-time responses.
--   `-n N, --n-predict N`: Set the number of tokens to predict when generating text. Adjusting this value can influence the length of the generated text.
--   `-c N, --ctx-size N`: Set the size of the prompt context. The default is 512, but LLaMA models were built with a context of 2048, which will provide better results for longer input/inference.
--   `-mli, --multiline-input`: Allows you to write or paste multiple lines without ending each in '\'
--   `-t N, --threads N`: Set the number of threads to use during generation. For optimal performance, it is recommended to set this value to the number of physical CPU cores your system has.
--   -   `-ngl N, --n-gpu-layers N`: When compiled with GPU support, this option allows offloading some layers to the GPU for computation. Generally results in increased performance.
+-   `-m FNAME, --model FNAME`: LLaMA 모델 파일의 경로를 지정합니다 (예: `models/gemma-1.1-7b-it.Q4_K_M.gguf`; `--model-url`이 설정된 경우 추론됩니다).
+-   `-mu MODEL_URL --model-url MODEL_URL`: 다운로드할 파일의 원격 http URL을 지정합니다 (예: [https://huggingface.co/ggml-org/gemma-1.1-7b-it-Q4_K_M-GGUF/resolve/main/gemma-1.1-7b-it.Q4_K_M.gguf?download=true](https://huggingface.co/ggml-org/gemma-1.1-7b-it-Q4_K_M-GGUF/resolve/main/gemma-1.1-7b-it.Q4_K_M.gguf?download=true)).
+-   `-i, --interactive`: 프로그램을 상호 작용 모드로 실행하여 직접 입력을 제공하고 실시간 응답을 받을 수 있도록 합니다.
+-   `-n N, --n-predict N`: 텍스트를 생성할 때 예측할 토큰 수를 설정합니다. 이 값을 조정하면 생성된 텍스트의 길이에 영향을 미칠 수 있습니다.
+-   `-c N, --ctx-size N`: 프롬프트 맥락의 크기를 설정합니다. 기본값은 512이지만, LLaMA 모델은 2048의 맥락으로 구축되었으며, 더 긴 입력/인프런스에 대해 더 나은 결과를 제공합니다.
+-   `-mli, --multiline-input`: 여러 줄을 '\'로 끝내지 않고 작성하거나 붙여넣을 수 있도록 합니다.
+-   `-t N, --threads N`: 생성 중에 사용할 스레드 수를 설정합니다. 최적의 성능을 위해 시스템에 있는 물리적 CPU 코어 수로 이 값을 설정하는 것이 좋습니다.
+-   -   `-ngl N, --n-gpu-layers N`: GPU 지원으로 컴파일된 경우, 이 옵션은 몇몇 레이어를 GPU로 전달하여 계산할 수 있도록 합니다. 일반적으로 성능 향상을 가져옵니다.
 
-## Input Prompts
+## 입력 프롬프트
 
-The `llama-cli` program provides several ways to interact with the LLaMA models using input prompts:
+`llama-cli` 프로그램은 입력 프롬프트를 사용하여 LLaMA 모델과 상호 작용하는 여러 가지 방법을 제공합니다.
 
--   `--prompt PROMPT`: Provide a prompt directly as a command-line option.
--   `--file FNAME`: Provide a file containing a prompt or multiple prompts.
--   `--interactive-first`: Run the program in interactive mode and wait for input right away. (More on this below.)
+-   `--prompt PROMPT`: 프롬프트를 명령줄 옵션으로 직접 제공합니다.
+-   `--file FNAME`: 프롬프트 또는 여러 프롬프트가 포함된 파일을 제공합니다.
+-   `--interactive-first`: 프로그램을 직접적인 입력을 기다리는 상호 작용 모드로 실행합니다. (아래에서 자세히 설명)
 
-## Interaction
+## 상호 작용
 
-The `llama-cli` program offers a seamless way to interact with LLaMA models, allowing users to engage in real-time conversations or provide instructions for specific tasks. The interactive mode can be triggered using various options, including `--interactive` and `--interactive-first`.
+`llama-cli` 프로그램은 사용자가 실시간 대화에 참여하거나 특정 작업에 대한 지침을 제공할 수 있도록 LLaMA 모델과 자연스럽게 상호 작용할 수 있는 방법을 제공합니다. 상호 작용 모드는 `--interactive` 및 `--interactive-first`와 같은 옵션을 사용하여 트리거할 수 있습니다.
 
-In interactive mode, users can participate in text generation by injecting their input during the process. Users can press `Ctrl+C` at any time to interject and type their input, followed by pressing `Return` to submit it to the LLaMA model. To submit additional lines without finalizing input, users can end the current line with a backslash (`\`) and continue typing.
+상호 작용 모드에서는 사용자가 텍스트 생성 과정 중에 입력을 주입하여 참여할 수 있습니다. 사용자는 언제든지 `Ctrl+C`를 눌러 중단하고 입력을 입력한 후 `Return` 키를 눌러 LLaMA 모델에 제출할 수 있습니다. 추가 줄을 제출하지 않고 입력을 마무리하려면 현재 줄을 백슬래시(`\`)로 끝내고 계속 입력할 수 있습니다.
 
-### Interaction Options
+### 상호 작용 옵션
 
--   `-i, --interactive`: Run the program in interactive mode, allowing users to engage in real-time conversations or provide specific instructions to the model.
--   `--interactive-first`: Run the program in interactive mode and immediately wait for user input before starting the text generation.
--   `-cnv,  --conversation`:  Run the program in conversation mode (does not print special tokens and suffix/prefix, use default chat template) (default: false)
--   `--color`: Enable colorized output to differentiate visually distinguishing between prompts, user input, and generated text.
+-   `-i, --interactive`: 사용자가 실시간 대화를 나누거나 모델에 특정 지침을 제공할 수 있는 상호 작용 모드로 프로그램을 실행합니다.
+-   `--interactive-first`: 프로그램을 상호 작용 모드로 실행하고 텍스트 생성을 시작하기 전에 사용자 입력을 즉시 기다립니다.
+-   `-cnv,  --conversation`: 대화 모드로 프로그램을 실행합니다 (특수 토큰과 접두사/접미사를 출력하지 않으며, 기본 채팅 템플릿을 사용합니다) (기본값: false)
+-   `--color`: 프롬프트, 사용자 입력 및 생성된 텍스트를 시각적으로 구분하기 위해 색상 출력을 활성화합니다.
 
-By understanding and utilizing these interaction options, you can create engaging and dynamic experiences with the LLaMA models, tailoring the text generation process to your specific needs.
+이러한 상호 작용 옵션을 이해하고 사용하면 LLaMA 모델과의 흥미롭고 역동적인 경험을 만들 수 있으며, 텍스트 생성 프로세스를 특정 요구 사항에 맞게 조정할 수 있습니다.
 
-### Reverse Prompts
+### 역순 프롬프트
 
-Reverse prompts are a powerful way to create a chat-like experience with a LLaMA model by pausing the text generation when specific text strings are encountered:
+역순 프롬프트는 특정 텍스트 문자열이 발생하면 텍스트 생성을 일시 중지하여 LLaMA 모델과 대화형 경험을 만들 수 있는 강력한 방법입니다.
 
--   `-r PROMPT, --reverse-prompt PROMPT`: Specify one or multiple reverse prompts to pause text generation and switch to interactive mode. For example, `-r "User:"` can be used to jump back into the conversation whenever it's the user's turn to speak. This helps create a more interactive and conversational experience. However, the reverse prompt doesn't work when it ends with a space.
+-   `-r PROMPT, --reverse-prompt PROMPT`: 텍스트 생성을 일시 중지하고 상호 작용 모드로 전환하기 위한 하나 또는 여러 개의 역순 프롬프트를 지정합니다. 예를 들어, `-r "User:"`를 사용하면 사용자가 말할 때마다 대화로 돌아갈 수 있습니다. 이는 더욱 상호 작용적이고 대화형 경험을 제공합니다. 그러나 역순 프롬프트가 공백으로 끝나면 작동하지 않습니다.
 
-To overcome this limitation, you can use the `--in-prefix` flag to add a space or any other characters after the reverse prompt.
+이 제한을 극복하려면 `--in-prefix` 플래그를 사용하여 역순 프롬프트 뒤에 공백이나 다른 문자를 추가할 수 있습니다.
 
 ### In-Prefix
 
-The `--in-prefix` flag is used to add a prefix to your input, primarily, this is used to insert a space after the reverse prompt. Here's an example of how to use the `--in-prefix` flag in conjunction with the `--reverse-prompt` flag:
+`--in-prefix` 플래그는 입력에 접두사를 추가하는 데 사용됩니다. 주로, 이는 역 프롬프트 뒤에 공백을 삽입하는 데 사용됩니다. `--in-prefix` 플래그를 `--reverse-prompt` 플래그와 함께 사용하는 방법의 예를 보여드리겠습니다.
 
 ```sh
 ./llama-cli -r "User:" --in-prefix " "
@@ -112,208 +112,208 @@ The `--in-prefix` flag is used to add a prefix to your input, primarily, this is
 
 ### In-Suffix
 
-The `--in-suffix` flag is used to add a suffix after your input. This is useful for adding an "Assistant:" prompt after the user's input. It's added after the new-line character (`\n`) that's automatically added to the end of the user's input. Here's an example of how to use the `--in-suffix` flag in conjunction with the `--reverse-prompt` flag:
+`--in-suffix` 플래그를 사용하면 입력 후에 접미사를 추가할 수 있습니다. 이는 사용자 입력 후에 "Assistant:" 프롬프트를 추가하는 데 유용합니다. 사용자 입력의 끝에 자동으로 추가되는 줄 바꿈 문자 (`\n`) 뒤에 추가됩니다. `--in-suffix` 플래그를 `--reverse-prompt` 플래그와 함께 사용하는 방법의 예시는 다음과 같습니다:
 
 ```sh
 ./llama-cli -r "User:" --in-prefix " " --in-suffix "Assistant:"
 ```
-When --in-prefix or --in-suffix options are enabled the chat template ( --chat-template ) is disabled
+`--in-prefix` 또는 `--in-suffix` 옵션이 활성화되면 챗 템플릿 ( `--chat-template` )이 비활성화됩니다.
 
-### Chat templates
+### 챗 템플릿
 
- `--chat-template JINJA_TEMPLATE`: This option sets a custom jinja chat template. It accepts a string, not a file name.  Default: template taken from model's metadata. Llama.cpp only supports [some pre-defined templates](https://github.com/ggerganov/llama.cpp/wiki/Templates-supported-by-llama_chat_apply_template). These include llama2, llama3, gemma, monarch, chatml, orion, vicuna, vicuna-orca, deepseek, command-r, zephyr. When --in-prefix or --in-suffix options are enabled the chat template ( --chat-template ) is disabled.
+ `--chat-template JINJA_TEMPLATE`: 이 옵션은 사용자 정의 Jinja 챗 템플릿을 설정합니다. 문자열을 받아들입니다. 파일 이름이 아닙니다. 기본값: 모델 메타데이터에서 가져온 템플릿. Llama.cpp는 [사전 정의된 템플릿](https://github.com/ggerganov/llama.cpp/wiki/Templates-supported-by-llama_chat_apply_template)만 지원합니다. llama2, llama3, gemma, monarch, chatml, orion, vicuna, vicuna-orca, deepseek, command-r, zephyr 등이 포함됩니다. `--in-prefix` 또는 `--in-suffix` 옵션이 활성화되면 챗 템플릿 (`--chat-template`)이 비활성화됩니다.
 
- Example usage: `--chat-template gemma`
+ 예시 사용법: `--chat-template gemma`
 
-## Context Management
+## 컨텍스트 관리
 
-During text generation, LLaMA models have a limited context size, which means they can only consider a certain number of tokens from the input and generated text. When the context fills up, the model resets internally, potentially losing some information from the beginning of the conversation or instructions. Context management options help maintain continuity and coherence in these situations.
+텍스트 생성 중 LLaMA 모델은 제한된 컨텍스트 크기를 가지고 있어, 입력과 생성된 텍스트에서 특정 수의 토큰만 고려할 수 있습니다. 컨텍스트가 가득 차면 모델은 내부적으로 재설정되어 대화의 시작 부분이나 지시 사항에서 일부 정보를 잃을 수 있습니다. 컨텍스트 관리 옵션은 이러한 상황에서 연속성과 일관성을 유지하는 데 도움이 됩니다.
 
-### Context Size
+### 맥락 크기
 
-- `-c N, --ctx-size N`: Set the size of the prompt context (default: 0, 0 = loaded from model). The LLaMA models were built with a context of 2048-8192, which will yield the best results on longer input/inference.
+- `-c N, --ctx-size N`: 프롬프트 맥락의 크기를 설정합니다 (기본값: 0, 0 = 모델에서 로드). LLaMA 모델은 2048-8192의 맥락으로 구축되었으며, 더 긴 입력/인퍼런스에서 가장 좋은 결과를 제공합니다.
 
-### Extended Context Size
+### 확장된 문맥 크기
 
-Some fine-tuned models have extended the context length by scaling RoPE. For example, if the original pre-trained model has a context length (max sequence length) of 4096 (4k) and the fine-tuned model has 32k. That is a scaling factor of 8, and should work by setting the above `--ctx-size` to 32768 (32k) and `--rope-scale` to 8.
+일부 미세 조정된 모델은 RoPE를 확장하여 문맥 길이를 늘렸습니다. 예를 들어, 원래의 사전 훈련된 모델의 문맥 길이(최대 문장 길이)가 4096(4k)이고 미세 조정된 모델이 32k라면, 확장 배율은 8입니다. 위의 `--ctx-size`를 32768(32k)로 설정하고 `--rope-scale`을 8로 설정하면 작동합니다.
 
--   `--rope-scale N`: Where N is the linear scaling factor used by the fine-tuned model.
+-   `--rope-scale N`: 여기서 N은 미세 조정된 모델에서 사용된 선형 확장 배율입니다.
 
-### Keep Prompt
+### 프롬프트 유지
 
-The `--keep` option allows users to retain the original prompt when the model runs out of context, ensuring a connection to the initial instruction or conversation topic is maintained.
+`--keep` 옵션을 사용하면 모델이 맥락을 초과했을 때 원본 프롬프트를 유지할 수 있습니다. 이를 통해 초기 지시나 대화 주제와의 연결이 유지됩니다.
 
--   `--keep N`: Specify the number of tokens from the initial prompt to retain when the model resets its internal context. By default, this value is set to 0 (meaning no tokens are kept). Use `-1` to retain all tokens from the initial prompt.
+-   `--keep N`: 모델이 내부 맥락을 재설정할 때 유지할 프롬프트 토큰 수를 지정합니다. 기본값은 0(토큰이 유지되지 않음)입니다. `-1`을 사용하면 초기 프롬프트의 모든 토큰을 유지합니다.
 
-By utilizing context management options like `--ctx-size` and `--keep`, you can maintain a more coherent and consistent interaction with the LLaMA models, ensuring that the generated text remains relevant to the original prompt or conversation.
+`--ctx-size`와 같은 맥락 관리 옵션과 `--keep`를 사용하면 LLaMA 모델과 더욱 일관되고 논리적인 상호 작용을 유지할 수 있습니다. 생성된 텍스트가 초기 프롬프트 또는 대화와 관련이 있는지 확인할 수 있습니다.
 
-## Generation Flags
+## 생성 플래그
 
-The following options allow you to control the text generation process and fine-tune the diversity, creativity, and quality of the generated text according to your needs. By adjusting these options and experimenting with different combinations of values, you can find the best settings for your specific use case.
+다음 옵션은 텍스트 생성 프로세스를 제어하고, 생성된 텍스트의 다양성, 창의성 및 품질을 필요에 따라 조정할 수 있도록 합니다. 이러한 옵션을 조정하고 값의 다양한 조합을 시험함으로써 특정 사용 사례에 가장 적합한 설정을 찾을 수 있습니다.
 
-### Number of Tokens to Predict
+### 예측 토큰 수
 
--   `-n N, --predict N`: Set the number of tokens to predict when generating text (default: -1, -1 = infinity, -2 = until context filled)
+-   `-n N, --predict N`: 텍스트를 생성할 때 예측할 토큰 수 설정 (기본값: -1, -1 = 무한, -2 = 맥락 채워질 때까지)
 
-The `--predict` option controls the number of tokens the model generates in response to the input prompt. By adjusting this value, you can influence the length of the generated text. A higher value will result in longer text, while a lower value will produce shorter text.
+`--predict` 옵션은 입력 프롬프트에 대한 모델이 생성하는 토큰 수를 제어합니다. 이 값을 조정하면 생성된 텍스트의 길이를 조절할 수 있습니다. 높은 값은 더 긴 텍스트를 생성하고, 낮은 값은 더 짧은 텍스트를 생성합니다.
 
-A value of -1 will enable infinite text generation, even though we have a finite context window. When the context window is full, some of the earlier tokens (half of the tokens after `--keep`) will be discarded. The context must then be re-evaluated before generation can resume. On large models and/or large context windows, this will result in a significant pause in output.
+-1 값은 맥락 창이 유한하더라도 무한한 텍스트 생성을 가능하게 합니다. 맥락 창이 가득 차면 일부 이전 토큰( `--keep` 이후 토큰의 절반)이 삭제됩니다. 그런 다음 생성을 계속하려면 맥락을 다시 평가해야 합니다. 대형 모델 및/또는 큰 맥락 창의 경우 출력이 크게 중단됩니다.
 
-If the pause is undesirable, a value of -2 will stop generation immediately when the context is filled.
+중단이 바람직하지 않으면 -2 값은 맥락이 채워질 때 즉시 생성을 중단합니다.
 
-It is important to note that the generated text may be shorter than the specified number of tokens if an End-of-Sequence (EOS) token or a reverse prompt is encountered. In interactive mode, text generation will pause and control will be returned to the user. In non-interactive mode, the program will end. In both cases, the text generation may stop before reaching the specified `--predict` value. If you want the model to keep going without ever producing End-of-Sequence on its own, you can use the `--ignore-eos` parameter.
+참고로, End-of-Sequence(EOS) 토큰 또는 역 프롬프트가 발생하면 생성된 텍스트가 지정된 토큰 수보다 짧을 수 있습니다. 상호 작용 모드에서는 텍스트 생성이 중단되고 사용자에게 제어가 반환됩니다. 비 상호 작용 모드에서는 프로그램이 종료됩니다. 두 경우 모두 텍스트 생성이 지정된 `--predict` 값에 도달하기 전에 중단될 수 있습니다. 모델이 스스로 End-of-Sequence를 생성하지 않고 계속 실행하도록하려면 `--ignore-eos` 매개변수를 사용할 수 있습니다.
 
-### Temperature
+### 온도
 
--   `--temp N`: Adjust the randomness of the generated text (default: 0.8).
+-   `--temp N`: 생성된 텍스트의 무작위성 조정 (기본값: 0.8)
 
-Temperature is a hyperparameter that controls the randomness of the generated text. It affects the probability distribution of the model's output tokens. A higher temperature (e.g., 1.5) makes the output more random and creative, while a lower temperature (e.g., 0.5) makes the output more focused, deterministic, and conservative. The default value is 0.8, which provides a balance between randomness and determinism. At the extreme, a temperature of 0 will always pick the most likely next token, leading to identical outputs in each run.
+온도는 생성된 텍스트의 무작위성을 제어하는 하이퍼파라미터입니다. 모델의 출력 토큰의 확률 분포에 영향을 미칩니다. 높은 온도(예: 1.5)는 출력을 더욱 무작위적이고 창의적으로 만들고, 낮은 온도(예: 0.5)는 출력을 더욱 집중적이고 결정론적이며 보수적으로 만듭니다. 기본값은 0.8로, 무작위성과 결정론성 사이의 균형을 제공합니다. 극단적으로 온도가 0이면 항상 가장 가능성이 높은 다음 토큰이 선택되어 각 실행에서 동일한 출력이 생성됩니다.
 
-Example usage: `--temp 0`
+사용 예시: `--temp 0`
 
-### Repeat Penalty
+### 반복 페널티
 
--   `--repeat-penalty N`: Control the repetition of token sequences in the generated text default: 1.0, 1.0 = disabled).
--   `--repeat-last-n N`: Last n tokens to consider for penalizing repetition (default: 64, 0 = disabled, -1 = ctx-size).
--   `--no-penalize-nl`: Disable penalization for newline tokens when applying the repeat penalty.
+-   `--repeat-penalty N`: 생성된 텍스트에서 토큰 순서의 반복을 제어합니다 (기본값: 1.0, 1.0 = 비활성화).
+-   `--repeat-last-n N`: 반복을 처벌할 때 고려할 마지막 n개의 토큰 (기본값: 64, 0 = 비활성화, -1 = ctx-size).
+-   `--no-penalize-nl`: 반복 페널티를 적용할 때 줄 바꿈 토큰에 대한 처벌을 비활성화합니다.
 
-The `repeat-penalty` option helps prevent the model from generating repetitive or monotonous text. A higher value (e.g., 1.5) will penalize repetitions more strongly, while a lower value (e.g., 0.9) will be more lenient. The default value is 1.
+`repeat-penalty` 옵션은 모델이 반복적이거나 단조로운 텍스트를 생성하는 것을 방지하는 데 도움이 됩니다. 높은 값 (예: 1.5)은 반복을 더 강하게 처벌하고, 낮은 값 (예: 0.9)은 더 관대한 것입니다. 기본값은 1입니다.
 
-The `repeat-last-n` option controls the number of tokens in the history to consider for penalizing repetition. A larger value will look further back in the generated text to prevent repetitions, while a smaller value will only consider recent tokens. A value of 0 disables the penalty, and a value of -1 sets the number of tokens considered equal to the context size (`ctx-size`).
+`repeat-last-n` 옵션은 반복을 처벌하기 위해 고려할 토큰의 수를 제어합니다. 더 큰 값은 생성된 텍스트에서 더 멀리 돌아가 반복을 방지하고, 더 작은 값은 최근 토큰만 고려합니다. 0은 페널티를 비활성화하고, -1은 고려되는 토큰 수를 맥락 크기 (`ctx-size`)와 같게 설정합니다.
 
-Use the `--no-penalize-nl` option to disable newline penalization when applying the repeat penalty. This option is particularly useful for generating chat conversations, dialogues, code, poetry, or any text where newline tokens play a significant role in structure and formatting. Disabling newline penalization helps maintain the natural flow and intended formatting in these specific use cases.
+`--no-penalize-nl` 옵션을 사용하여 반복 페널티를 적용할 때 줄 바꿈 페널티를 비활성화할 수 있습니다. 이 옵션은 대화, 대본, 코드, 시, 줄 바꿈 토큰이 구조 및 형식에 중요한 역할을 하는 모든 텍스트에서 특히 유용합니다. 줄 바꿈 페널티를 비활성화하면 이러한 특정 사용 사례에서 자연스러운 흐름과 의도된 형식을 유지하는 데 도움이 됩니다.
 
-Example usage: `--repeat-penalty 1.15 --repeat-last-n 128 --no-penalize-nl`
+예시 사용법: `--repeat-penalty 1.15 --repeat-last-n 128 --no-penalize-nl`
 
-### Top-K Sampling
+### Top-K 샘플링
 
--   `--top-k N`: Limit the next token selection to the K most probable tokens (default: 40).
+-   `--top-k N`: 가장 가능성이 높은 토큰 중 K개만 다음 토큰 선택에 사용합니다 (기본값: 40).
 
-Top-k sampling is a text generation method that selects the next token only from the top k most likely tokens predicted by the model. It helps reduce the risk of generating low-probability or nonsensical tokens, but it may also limit the diversity of the output. A higher value for top-k (e.g., 100) will consider more tokens and lead to more diverse text, while a lower value (e.g., 10) will focus on the most probable tokens and generate more conservative text. The default value is 40.
+Top-k 샘플링은 모델이 예측한 가장 가능성이 높은 토큰 중 K개만을 사용하여 다음 토큰을 선택하는 텍스트 생성 방법입니다. 낮은 확률 또는 의미 없는 토큰을 생성하는 위험을 줄이는 데 도움이 되지만, 출력의 다양성을 제한할 수도 있습니다. top-k 값이 높을수록 (예: 100) 더 많은 토큰을 고려하여 더 다양한 텍스트를 생성하고, 값이 낮을수록 (예: 10) 가장 가능성이 높은 토큰에 집중하여 보다 보수적인 텍스트를 생성합니다. 기본값은 40입니다.
 
-Example usage: `--top-k 30`
+사용 예시: `--top-k 30`
 
-### Top-P Sampling
+### Top-P 샘플링
 
--   `--top-p N`: Limit the next token selection to a subset of tokens with a cumulative probability above a threshold P (default: 0.9).
+-   `--top-p N`: 누적 확률이 임계값 P (기본값: 0.9) 이상인 토큰의 서브셋으로 다음 토큰 선택을 제한합니다.
 
-Top-p sampling, also known as nucleus sampling, is another text generation method that selects the next token from a subset of tokens that together have a cumulative probability of at least p. This method provides a balance between diversity and quality by considering both the probabilities of tokens and the number of tokens to sample from. A higher value for top-p (e.g., 0.95) will lead to more diverse text, while a lower value (e.g., 0.5) will generate more focused and conservative text. The default value is 0.9.
+Top-p 샘플링은 핵심 샘플링으로도 알려져 있으며, 누적 확률이 p 이상인 토큰의 서브셋에서 다음 토큰을 선택하는 텍스트 생성 방법입니다. 이 방법은 토큰의 확률과 샘플링할 토큰의 수 모두를 고려하여 다양성과 품질의 균형을 제공합니다. top-p 값이 높을수록 (예: 0.95) 다양한 텍스트가 생성되고, 낮을수록 (예: 0.5) 집중되고 보수적인 텍스트가 생성됩니다. 기본값은 0.9입니다.
 
-Example usage: `--top-p 0.95`
+사용 예시: `--top-p 0.95`
 
 ### Min-P Sampling
 
--   `--min-p N`: Sets a minimum base probability threshold for token selection (default: 0.1).
+-   `--min-p N`: 토큰 선택에 대한 최소 기본 확률 문턱을 설정합니다 (기본값: 0.1).
 
-The Min-P sampling method was designed as an alternative to Top-P, and aims to ensure a balance of quality and variety. The parameter *p* represents the minimum probability for a token to be considered, relative to the probability of the most likely token. For example, with *p*=0.05 and the most likely token having a probability of 0.9, logits with a value less than 0.045 are filtered out.
+Min-P 샘플링 방법은 Top-P의 대안으로 설계되었으며, 품질과 다양성의 균형을 맞추려고 합니다. 매개변수 *p*는 가장 가능성이 높은 토큰의 확률에 비해 고려될 토큰의 최소 확률을 나타냅니다. 예를 들어, *p*=0.05이고 가장 가능성이 높은 토큰의 확률이 0.9라면, 0.045 미만의 값을 가진 logits가 필터링됩니다.
 
-Example usage: `--min-p 0.05`
+사용 예시: `--min-p 0.05`
 
-### Tail-Free Sampling (TFS)
+### 꼬리 없는 샘플링 (TFS)
 
--   `--tfs N`: Enable tail free sampling with parameter z (default: 1.0, 1.0 = disabled).
+-   `--tfs N`: z 매개변수를 사용하여 꼬리 없는 샘플링을 활성화합니다 (기본값: 1.0, 1.0 = 비활성화).
 
-Tail-free sampling (TFS) is a text generation technique that aims to reduce the impact of less likely tokens, which may be less relevant, less coherent, or nonsensical, on the output. Similar to Top-P it tries to determine the bulk of the most likely tokens dynamically. But TFS filters out logits based on the second derivative of their probabilities. Adding tokens is stopped after the sum of the second derivatives reaches the parameter z. In short: TFS looks at how quickly the probabilities of the tokens decrease and cuts off the tail of unlikely tokens using the parameter z. Typical values for z are in the range of 0.9 to 0.95. A value of 1.0 would include all tokens and thus disables the effect of TFS.
+꼬리 없는 샘플링 (TFS)은 출력에 덜 유망한 토큰(덜 관련성이 있거나, 일관성이 없거나, 의미가 없는 토큰)의 영향을 줄이려는 텍스트 생성 기법입니다. Top-P와 유사하게 가장 유망한 토큰의 대부분을 동적으로 결정하려고 합니다. 하지만 TFS는 토큰의 확률의 이계도함수를 기반으로 로짓을 필터링합니다. 두 번째 도함수의 합이 매개변수 z에 도달하면 토큰 추가가 중단됩니다. 간단히 말해서, TFS는 토큰의 확률이 얼마나 빨리 감소하는지 살펴보고 매개변수 z를 사용하여 불확실한 토큰의 꼬리를 잘라냅니다. z의 일반적인 값은 0.9에서 0.95 사이입니다. 1.0의 값은 모든 토큰을 포함하므로 TFS의 효과를 비활성화합니다.
 
-Example usage: `--tfs 0.95`
+사용 예시: `--tfs 0.95`
 
-### Locally Typical Sampling
+### 지역적 유형 샘플링
 
--   `--typical N`: Enable locally typical sampling with parameter p (default: 1.0, 1.0 = disabled).
+-   `--typical N`: p 매개변수로 지역적 유형 샘플링을 사용하도록 설정합니다 (기본값: 1.0, 1.0 = 비활성화).
 
-Locally typical sampling promotes the generation of contextually coherent and diverse text by sampling tokens that are typical or expected based on the surrounding context. By setting the parameter p between 0 and 1, you can control the balance between producing text that is locally coherent and diverse. A value closer to 1 will promote more contextually coherent tokens, while a value closer to 0 will promote more diverse tokens. A value equal to 1 disables locally typical sampling.
+지역적 유형 샘플링은 주변 맥락에 기반하여 일반적이거나 예상되는 토큰을 샘플링하여 문맥적으로 일관성 있고 다양한 텍스트를 생성하도록 촉진합니다. p 매개변수를 0과 1 사이의 값으로 설정하면 문맥적으로 일관성 있고 다양한 텍스트를 생성하는 데 사용되는 균형을 조절할 수 있습니다. 1에 가까운 값은 문맥적으로 더 일관성 있는 토큰을 생성하는 데 기여하며, 0에 가까운 값은 더 다양한 토큰을 생성하는 데 기여합니다. 1과 같은 값은 지역적 유형 샘플링을 비활성화합니다.
 
-Example usage: `--typical 0.9`
+사용 예시: `--typical 0.9`
 
 ### Mirostat Sampling
 
--   `--mirostat N`: Enable Mirostat sampling, controlling perplexity during text generation (default: 0, 0 = disabled, 1 = Mirostat, 2 = Mirostat 2.0).
--   `--mirostat-lr N`: Set the Mirostat learning rate, parameter eta (default: 0.1).
--   `--mirostat-ent N`: Set the Mirostat target entropy, parameter tau (default: 5.0).
+-   `--mirostat N`: Mirostat 샘플링을 활성화합니다. 텍스트 생성 중 복잡도를 제어합니다 (기본값: 0, 0 = 비활성화, 1 = Mirostat, 2 = Mirostat 2.0).
+-   `--mirostat-lr N`: Mirostat 학습률을 설정합니다. 매개변수 eta (기본값: 0.1).
+-   `--mirostat-ent N`: Mirostat 목표 엔트로피를 설정합니다. 매개변수 tau (기본값: 5.0).
 
-Mirostat is an algorithm that actively maintains the quality of generated text within a desired range during text generation. It aims to strike a balance between coherence and diversity, avoiding low-quality output caused by excessive repetition (boredom traps) or incoherence (confusion traps).
+Mirostat는 텍스트 생성 중 생성된 텍스트의 품질을 원하는 범위 내에서 유지하는 알고리즘입니다. 일관성과 다양성 사이의 균형을 이루어 반복적인 출력(지루함 트랩)이나 일관성 없는 출력(혼란 트랩)으로 인한 저품질 출력을 방지합니다.
 
-The `--mirostat-lr` option sets the Mirostat learning rate (eta). The learning rate influences how quickly the algorithm responds to feedback from the generated text. A lower learning rate will result in slower adjustments, while a higher learning rate will make the algorithm more responsive. The default value is `0.1`.
+`--mirostat-lr` 옵션은 Mirostat 학습률(eta)을 설정합니다. 학습률은 알고리즘이 생성된 텍스트에서의 피드백에 얼마나 빠르게 반응하는지를 좌우합니다. 학습률이 낮으면 조정이 느려지고, 학습률이 높으면 알고리즘이 더욱 민감해집니다. 기본값은 `0.1`입니다.
 
-The `--mirostat-ent` option sets the Mirostat target entropy (tau), which represents the desired perplexity value for the generated text. Adjusting the target entropy allows you to control the balance between coherence and diversity in the generated text. A lower value will result in more focused and coherent text, while a higher value will lead to more diverse and potentially less coherent text. The default value is `5.0`.
+`--mirostat-ent` 옵션은 생성된 텍스트의 원하는 복잡도 값을 나타내는 Mirostat 목표 엔트로피(tau)를 설정합니다. 목표 엔트로피를 조정하면 생성된 텍스트의 일관성과 다양성 사이의 균형을 조절할 수 있습니다. 값이 낮으면 더욱 집중적이고 일관성 있는 텍스트가 생성되고, 값이 높으면 더욱 다양하고 일관성이 떨어질 수 있습니다. 기본값은 `5.0`입니다.
 
-Example usage: `--mirostat 2 --mirostat-lr 0.05 --mirostat-ent 3.0`
+사용 예시: `--mirostat 2 --mirostat-lr 0.05 --mirostat-ent 3.0`
 
 ### Logit Bias
 
--   `-l TOKEN_ID(+/-)BIAS, --logit-bias TOKEN_ID(+/-)BIAS`: Modify the likelihood of a token appearing in the generated text completion.
+-   `-l TOKEN_ID(+/-)BIAS, --logit-bias TOKEN_ID(+/-)BIAS`: 생성된 텍스트 완성에 특정 토큰이 나타나는 확률을 수정합니다.
 
-The logit bias option allows you to manually adjust the likelihood of specific tokens appearing in the generated text. By providing a token ID and a positive or negative bias value, you can increase or decrease the probability of that token being generated.
+Logit bias 옵션을 사용하면 생성된 텍스트에 특정 토큰이 나타나는 확률을 수동으로 조정할 수 있습니다. 토큰 ID와 양수 또는 음수의 bias 값을 제공하여 해당 토큰이 생성될 확률을 높이거나 낮출 수 있습니다.
 
-For example, use `--logit-bias 15043+1` to increase the likelihood of the token 'Hello', or `--logit-bias 15043-1` to decrease its likelihood. Using a value of negative infinity, `--logit-bias 15043-inf` ensures that the token `Hello` is never produced.
+예를 들어, `--logit-bias 15043+1`을 사용하여 'Hello' 토큰의 발생 확률을 높이거나, `--logit-bias 15043-1`을 사용하여 그 확률을 낮출 수 있습니다. 음의 무한 값을 사용하면 `--logit-bias 15043-inf` 'Hello' 토큰이 생성되지 않도록 할 수 있습니다.
 
-A more practical use case might be to prevent the generation of `\code{begin}` and `\code{end}` by setting the `\` token (29905) to negative infinity with `-l 29905-inf`. (This is due to the prevalence of LaTeX codes that show up in LLaMA model inference.)
+더 실용적인 사용 사례는 `\code{begin}`과 `\code{end}`를 생성하는 것을 방지하는 것입니다. `\` 토큰(29905)을 `-l 29905-inf`로 설정하여 음의 무한 값으로 설정합니다. (이는 LLaMA 모델 추론에서 나타나는 LaTeX 코드의 빈도 때문입니다.)
 
-Example usage: `--logit-bias 29905-inf`
+사용 예시: `--logit-bias 29905-inf`
 
 ### RNG Seed
 
--   `-s SEED, --seed SEED`: Set the random number generator (RNG) seed (default: -1, -1 = random seed).
+-   `-s SEED, --seed SEED`: 랜덤 숫자 생성기(RNG) 씨드 설정 (기본값: -1, -1 = 랜덤 씨드)
 
-The RNG seed is used to initialize the random number generator that influences the text generation process. By setting a specific seed value, you can obtain consistent and reproducible results across multiple runs with the same input and settings. This can be helpful for testing, debugging, or comparing the effects of different options on the generated text to see when they diverge. If the seed is set to a value less than 0, a random seed will be used, which will result in different outputs on each run.
+RNG 씨드는 텍스트 생성 과정에 영향을 미치는 랜덤 숫자 생성기를 초기화하는 데 사용됩니다. 특정 씨드 값을 설정하면 동일한 입력과 설정으로 여러 번 실행할 때 일관되고 재현 가능한 결과를 얻을 수 있습니다. 이는 테스트, 디버깅 또는 생성된 텍스트에 대한 다양한 옵션의 영향을 비교하는 데 도움이 될 수 있습니다. 씨드가 0 미만의 값으로 설정되면 랜덤 씨드가 사용되며, 각 실행에서 다른 출력이 발생합니다.
 
-## Performance Tuning and Memory Options
+## 성능 조정 및 메모리 옵션
 
-These options help improve the performance and memory usage of the LLaMA models. By adjusting these settings, you can fine-tune the model's behavior to better suit your system's capabilities and achieve optimal performance for your specific use case.
+이러한 옵션은 LLaMA 모델의 성능과 메모리 사용량을 향상시키는 데 도움이 됩니다. 이러한 설정을 조정하면 시스템의 기능에 맞게 모델의 동작을 미세 조정하고 특정 사용 사례에 최적화된 성능을 달성할 수 있습니다.
 
-### Number of Threads
+### 스레드 수
 
--   `-t N, --threads N`: Set the number of threads to use during generation. For optimal performance, it is recommended to set this value to the number of physical CPU cores your system has (as opposed to the logical number of cores). Using the correct number of threads can greatly improve performance.
--   `-tb N, --threads-batch N`: Set the number of threads to use during batch and prompt processing. In some systems, it is beneficial to use a higher number of threads during batch processing than during generation. If not specified, the number of threads used for batch processing will be the same as the number of threads used for generation.
+-   `-t N, --threads N`: 생성 중에 사용할 스레드 수를 설정합니다. 최적의 성능을 위해서는 시스템의 물리적 CPU 코어 수(논리적 코어 수와 구분)로 이 값을 설정하는 것이 좋습니다. 올바른 스레드 수를 사용하면 성능이 크게 향상될 수 있습니다.
+-   `-tb N, --threads-batch N`: 배치 및 프롬프트 처리 중에 사용할 스레드 수를 설정합니다. 일부 시스템에서는 생성 중보다 배치 처리 중에 더 많은 스레드를 사용하는 것이 유리할 수 있습니다. 지정하지 않으면 배치 처리에 사용되는 스레드 수는 생성에 사용되는 스레드 수와 동일합니다.
 
 ### Mlock
 
--   `--mlock`: Lock the model in memory, preventing it from being swapped out when memory-mapped. This can improve performance but trades away some of the advantages of memory-mapping by requiring more RAM to run and potentially slowing down load times as the model loads into RAM.
+-   `--mlock`: 메모리에 모델을 잠금, 메모리 매핑 시 페이지 교체로부터 방지합니다. 성능을 향상시킬 수 있지만, RAM을 더 많이 사용하고 모델이 RAM에 로드되는 동안 로드 시간이 느려질 수 있기 때문에 메모리 매핑의 일부 장점을 상실합니다.
 
-### No Memory Mapping
+### 메모리 매핑 사용 안 함
 
--   `--no-mmap`: Do not memory-map the model. By default, models are mapped into memory, which allows the system to load only the necessary parts of the model as needed. However, if the model is larger than your total amount of RAM or if your system is low on available memory, using mmap might increase the risk of pageouts, negatively impacting performance. Disabling mmap results in slower load times but may reduce pageouts if you're not using `--mlock`. Note that if the model is larger than the total amount of RAM, turning off mmap would prevent the model from loading at all.
+-   `--no-mmap`: 모델을 메모리 매핑하지 않습니다. 기본적으로 모델은 메모리에 매핑되어 있어 시스템이 필요한 부분만 로드할 수 있습니다. 그러나 모델이 전체 RAM 크기보다 크거나 시스템에 사용 가능한 메모리가 부족한 경우, mmap 사용은 페이지 아웃의 위험을 높여 성능에 부정적인 영향을 미칠 수 있습니다. mmap를 비활성화하면 로드 시간이 느려지지만 `--mlock`을 사용하지 않는 경우 페이지 아웃을 줄일 수 있습니다. 모델이 전체 RAM 크기보다 크면 mmap를 끄면 모델이 로드되지 않음을 유의하세요.
 
-### NUMA support
+### NUMA 지원
 
--   `--numa distribute`: Pin an equal proportion of the threads to the cores on each NUMA node. This will spread the load amongst all cores on the system, utilitizing all memory channels at the expense of potentially requiring memory to travel over the slow links between nodes.
--   `--numa isolate`: Pin all threads to the NUMA node that the program starts on. This limits the number of cores and amount of memory that can be used, but guarantees all memory access remains local to the NUMA node.
--   `--numa numactl`: Pin threads to the CPUMAP that is passed to the program by starting it with the numactl utility. This is the most flexible mode, and allow arbitrary core usage patterns, for example a map that uses all the cores on one NUMA nodes, and just enough cores on a second node to saturate the inter-node memory bus.
+-   `--numa distribute`: 각 NUMA 노드의 코어에 스레드의 비례분을 고정합니다. 이는 시스템의 모든 코어에 작업을 분산시켜 모든 메모리 채널을 활용하지만, 노드 간의 느린 링크를 통해 메모리가 이동해야 하는 경우가 발생할 수 있습니다.
+-   `--numa isolate`: 프로그램이 시작되는 NUMA 노드에 모든 스레드를 고정합니다. 이는 사용 가능한 코어 수와 메모리 양을 제한하지만, 모든 메모리 액세스가 NUMA 노드 내에서 유지되는 것을 보장합니다.
+-   `--numa numactl`: `numactl` 유틸리티로 프로그램을 시작하여 프로그램에 CPUMAP을 전달함으로써 스레드를 고정합니다. 이는 가장 유연한 모드이며, 모든 코어를 하나의 NUMA 노드에 사용하고 두 번째 노드에 인터 노드 메모리 버스를 포화시키는 데 필요한 코어만큼 사용하는 등 임의의 코어 사용 패턴을 허용합니다.
 
- These flags attempt optimizations that help on some systems with non-uniform memory access. This currently consists of one of the above strategies, and disabling prefetch and readahead for mmap. The latter causes mapped pages to be faulted in on first access instead of all at once, and in combination with pinning threads to NUMA nodes, more of the pages end up on the NUMA node where they are used. Note that if the model is already in the system page cache, for example because of a previous run without this option, this will have little effect unless you drop the page cache first. This can be done by rebooting the system or on Linux by writing '3' to '/proc/sys/vm/drop_caches' as root.
+ 이러한 플래그는 비일정 메모리 액세스를 가진 일부 시스템에서 도움이 되는 최적화를 시도합니다. 현재는 위의 전략 중 하나를 사용하며, mmap의 프리페치와 리드어헤드를 비활성화합니다. 후자는 매핑된 페이지가 한 번에 모두 불러오는 대신 첫 번째 액세스 시에 페이징 오류를 발생하게 하며, 스레드를 NUMA 노드에 고정하는 것과 결합하여 더 많은 페이지가 사용되는 NUMA 노드에 있게 됩니다. 이 옵션을 사용하지 않고 이전에 실행된 경우 모델이 이미 시스템 페이지 캐시에 있으면, 페이지 캐시를 먼저 삭제하지 않는 한 효과가 적습니다. 시스템을 재부팅하거나 Linux에서 root 권한으로 '/proc/sys/vm/drop_caches'에 '3'을 쓰는 것으로 페이지 캐시를 삭제할 수 있습니다.
 
-### Memory Float 32
+### 메모리 플로트 32
 
--   `--memory-f32`: Use 32-bit floats instead of 16-bit floats for memory key+value. This doubles the context memory requirement and cached prompt file size but does not appear to increase generation quality in a measurable way. Not recommended.
+-   `--memory-f32`: 메모리 키+값에 대해 16비트 플로트 대신 32비트 플로트를 사용합니다. 이는 맥스 컨텍스트 메모리 요구량과 캐시된 프롬프트 파일 크기를 두 배로 늘리지만, 측정 가능한 방식으로 생성 품질을 향상시키지 않는 것으로 보입니다. 권장하지 않습니다.
 
-### Batch Size
+### 배치 크기
 
--   `-b N, --batch-size N`: Set the batch size for prompt processing (default: `2048`). This large batch size benefits users who have BLAS installed and enabled it during the build. If you don't have BLAS enabled ("BLAS=0"), you can use a smaller number, such as 8, to see the prompt progress as it's evaluated in some situations.
+- `-b N, --batch-size N`: 프롬프트 처리를 위한 배치 크기를 설정합니다 (기본값: `2048`). 이 큰 배치 크기는 BLAS가 설치되어 있고 빌드 중에 활성화된 사용자에게 유리합니다. BLAS가 활성화되지 않았다면 ("BLAS=0"), 8과 같은 작은 숫자를 사용하여 프롬프트가 평가되는 동안 진행 상황을 확인할 수 있습니다.
 
-- `-ub N`, `--ubatch-size N`: physical maximum batch size. This is for pipeline parallelization. Default: `512`.
+- `-ub N`, `--ubatch-size N`: 물리적인 최대 배치 크기입니다. 이는 파이프라인 병렬화를 위해 사용됩니다. 기본값: `512`.
 
-### Prompt Caching
+### 프롬프트 캐싱
 
--   `--prompt-cache FNAME`: Specify a file to cache the model state after the initial prompt. This can significantly speed up the startup time when you're using longer prompts. The file is created during the first run and is reused and updated in subsequent runs. **Note**: Restoring a cached prompt does not imply restoring the exact state of the session at the point it was saved. So even when specifying a specific seed, you are not guaranteed to get the same sequence of tokens as the original generation.
+-   `--prompt-cache FNAME`: 초기 프롬프트 이후 모델 상태를 캐시하는 파일을 지정합니다. 이는 더 긴 프롬프트를 사용할 때 시작 시간을 크게 단축시킬 수 있습니다. 파일은 처음 실행 중에 생성되며, 이후 실행에서는 재사용 및 업데이트됩니다. **참고**: 캐시된 프롬프트를 복원하는 것은 저장된 시점에서 세션의 정확한 상태를 복원하는 것을 의미하지 않습니다. 따라서 특정 시드를 지정하더라도 원래 생성과 동일한 토큰 순서를 보장받을 수 없습니다.
 
-### Grammars & JSON schemas
+### 문법 및 JSON 스키마
 
--   `--grammar GRAMMAR`, `--grammar-file FILE`: Specify a grammar (defined inline or in a file) to constrain model output to a specific format. For example, you could force the model to output JSON or to speak only in emojis. See the [GBNF guide](../../grammars/README.md) for details on the syntax.
+-   `--grammar GRAMMAR`, `--grammar-file FILE`: 모델 출력을 특정 형식으로 제한하기 위해 사용되는 문법 (줄 바로 안에 정의하거나 파일에서 정의)을 지정합니다. 예를 들어, 모델이 JSON 형식으로 출력하거나, 오직 이모티콘으로만 말하도록 강제할 수 있습니다. 문법 구문에 대한 자세한 내용은 [GBNF 가이드](../../grammars/README.md)를 참조하십시오.
 
--   `--json-schema SCHEMA`: Specify a [JSON schema](https://json-schema.org/) to constrain model output to (e.g. `{}` for any JSON object, or `{"items": {"type": "string", "minLength": 10, "maxLength": 100}, "minItems": 10}` for a JSON array of strings with size constraints). If a schema uses external `$ref`s, you should use `--grammar "$( python examples/json_schema_to_grammar.py myschema.json )"` instead.
+-   `--json-schema SCHEMA`: 모델 출력을 제한하는 [JSON 스키마](https://json-schema.org/)를 지정합니다 (예: `{}`는 모든 JSON 객체, 또는 `{"items": {"type": "string", "minLength": 10, "maxLength": 100}, "minItems": 10}`는 크기 제약 조건을 가진 문자열 배열 JSON). 스키마가 외부 `$ref`를 사용하는 경우 `--grammar "$( python examples/json_schema_to_grammar.py myschema.json )"` 대신 사용하십시오.
 
-### Quantization
+### 양자화
 
-For information about 4-bit quantization, which can significantly improve performance and reduce memory usage, please refer to llama.cpp's primary [README](../../README.md#prepare-and-quantize).
+ 성능을 크게 향상시키고 메모리 사용량을 줄일 수 있는 4비트 양자화에 대한 자세한 내용은 llama.cpp의 주요 [README](../../README.md#prepare-and-quantize)를 참조하십시오.
 
-## Additional Options
+## 추가 옵션
 
-These options provide extra functionality and customization when running the LLaMA models:
+LLaMA 모델을 실행할 때 추가 기능과 사용자 정의를 제공하는 옵션입니다.
 
--   `-h, --help`: Display a help message showing all available options and their default values. This is particularly useful for checking the latest options and default values, as they can change frequently, and the information in this document may become outdated.
--   `--verbose-prompt`: Print the prompt before generating text.
--   `-mg i, --main-gpu i`: When using multiple GPUs this option controls which GPU is used for small tensors for which the overhead of splitting the computation across all GPUs is not worthwhile. The GPU in question will use slightly more VRAM to store a scratch buffer for temporary results. By default GPU 0 is used.
--   `-ts SPLIT, --tensor-split SPLIT`: When using multiple GPUs this option controls how large tensors should be split across all GPUs. `SPLIT` is a comma-separated list of non-negative values that assigns the proportion of data that each GPU should get in order. For example, "3,2" will assign 60% of the data to GPU 0 and 40% to GPU 1. By default the data is split in proportion to VRAM but this may not be optimal for performance.
--   `--lora FNAME`: Apply a LoRA (Low-Rank Adaptation) adapter to the model (implies --no-mmap). This allows you to adapt the pretrained model to specific tasks or domains.
--   `--lora-base FNAME`: Optional model to use as a base for the layers modified by the LoRA adapter. This flag is used in conjunction with the `--lora` flag, and specifies the base model for the adaptation.
--   `-hfr URL --hf-repo URL`: The url to the Hugging Face model repository. Used in conjunction with `--hf-file` or `-hff`. The model is downloaded and stored in the file provided by `-m` or `--model`. If `-m` is not provided, the model is auto-stored in the path specified by the `LLAMA_CACHE` environment variable  or in an OS-specific local cache.
+-   `-h, --help`: 모든 사용 가능한 옵션과 기본값을 표시하는 도움 메시지를 표시합니다. 최신 옵션과 기본값을 확인하는 데 특히 유용하며, 이 문서의 정보가 오래됨을 방지합니다.
+-   `--verbose-prompt`: 텍스트를 생성하기 전에 프롬프트를 출력합니다.
+-   `-mg i, --main-gpu i`: 여러 GPU를 사용할 때 이 옵션은 작은 텐서를 사용할 GPU를 제어합니다. 모든 GPU에 걸쳐 계산을 분할하는 오버헤드가 합리적이지 않은 경우 GPU가 사용됩니다. 해당 GPU는 일시적인 결과를 저장하는 스크래치 버퍼를 저장하기 위해 약간 더 많은 VRAM을 사용합니다. 기본적으로 GPU 0이 사용됩니다.
+-   `-ts SPLIT, --tensor-split SPLIT`: 여러 GPU를 사용할 때 이 옵션은 큰 텐서를 모든 GPU에 걸쳐 어떻게 분할해야 하는지 제어합니다. `SPLIT`은 각 GPU에 데이터의 비율을 할당하는 쉼표로 구분된 비음수 값의 목록입니다. 예를 들어, "3,2"는 GPU 0에 데이터의 60%를, GPU 1에 40%를 할당합니다. 기본적으로 데이터는 VRAM 비율에 따라 분할되지만 성능에 최적화되지 않을 수 있습니다.
+-   `--lora FNAME`: 모델에 LoRA(Low-Rank Adaptation) 어댑터를 적용합니다( `--no-mmap`를 의미합니다). 이를 통해 미리 학습된 모델을 특정 작업이나 도메인에 적응시킬 수 있습니다.
+-   `--lora-base FNAME`: LoRA 어댑터로 수정된 레이어의 기본 모델로 사용할 옵션 모델입니다. 이 플래그는 `--lora` 플래그와 함께 사용되며, 적응에 사용되는 기본 모델을 지정합니다.
+-   `-hfr URL --hf-repo URL`: Hugging Face 모델 저장소의 URL입니다. `--hf-file` 또는 `-hff`와 함께 사용되어 모델이 `-m` 또는 `--model`로 제공된 파일에서 다운로드되고 저장됩니다. `-m`이 제공되지 않으면 모델이 `LLAMA_CACHE` 환경 변수 또는 OS-특정 로컬 캐시에 자동으로 저장됩니다.

@@ -1,6 +1,6 @@
 # llama.cpp/example/batched
 
-The example demonstrates batched generation from a given prompt
+이 예제는 주어진 프롬프트로부터 배치 생성을 보여줍니다.
 
 ```bash
 ./llama-batched -m ./models/llama-7b-v2/ggml-model-f16.gguf -p "Hello my name is" -np 4

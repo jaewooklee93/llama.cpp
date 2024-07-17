@@ -1,38 +1,37 @@
 # Perplexity
 
-The `perplexity` example can be used to calculate the so-called perplexity value of a language model over a given text corpus.
-Perplexity measures how well the model can predict the next token with lower values being better.
-Note that perplexity is **not** directly comparable between models, especially if they use different tokenizers.
-Also note that finetunes typically result in a higher perplexity value even though the human-rated quality of outputs increases.
+`perplexity` 예제는 주어진 텍스트 코퍼스에 대한 언어 모델의 복잡도 값을 계산하는 데 사용할 수 있습니다.
+복잡도는 모델이 다음 토큰을 예측하는 능력을 나타내며, 값이 낮을수록 좋습니다.
+참고로 복잡도는 모델이 다른 토큰화기를 사용하는 경우 **직접 비교할 수 없습니다.**
+또한, fine-tuning은 일반적으로 출력의 인간 평가된 품질이 향상되더라도 복잡도 값이 더 높아질 수 있습니다.
 
-Within llama.cpp the perplexity of base models is used primarily to judge the quality loss from e.g. quantized models vs. FP16.
-The convention among contributors is to use the Wikitext-2 test set for testing unless noted otherwise (can be obtained with `scripts/get-wikitext-2.sh`).
-When numbers are listed all command line arguments and compilation options are left at their defaults unless noted otherwise.
-llama.cpp numbers are **not** directly comparable to those of other projects because the exact values depend strongly on the implementation details.
+llama.cpp 내에서 기본 모델의 복잡도는 예를 들어 양자화된 모델과 FP16 모델의 품질 손실을 판단하는 데 주로 사용됩니다.
+기여자들 사이의 관습은 `scripts/get-wikitext-2.sh`로 얻을 수 있는 Wikitext-2 테스트 세트를 사용하여 테스트하는 것입니다.
+숫자가 나열된 경우 모든 명령줄 인수와 컴파일 옵션이 기본값으로 유지됩니다.
+llama.cpp 숫자는 정확한 값이 구현 세부 사항에 크게 의존하기 때문에 다른 프로젝트의 숫자와 **직접 비교할 수 없습니다.**
 
-By default only the mean perplexity value and the corresponding uncertainty is calculated.
-The uncertainty is determined empirically by assuming a Gaussian distribution of the "correct" logits per and then applying error propagation.
+기본적으로는 평균 복잡도 값과 해당 불확실성만 계산됩니다.
+불확실성은 각 토큰에 대한 "올바른" 로짓에 대한 가우시안 분포를 가정하고 오류 전파를 적용하여 실험적으로 결정됩니다.
 
-More statistics can be obtained by recording the logits from the FP16 version of a model.
-To do this, supply `perplexity` with `--kl-divergence-base path/to/logit/binary/file.kld`.
-The program will then record all logits and save them to the provided path in binary format.
-**The logit file will be very large, 11 GiB for LLaMA 2 or 37 GiB for LLaMA 3 when using the Wikitext-2 test set.**
-Once you have the file, supply `perplexity` with the quantized model, the logits file via `--kl-divergence-base`,
-and finally the `--kl-divergence` argument to indicate that the program should calculate the so-called Kullback-Leibler divergence.
-This is a measure of how similar the FP16 and the quantized logit distributions are with a value of 0 indicating that the distribution are the same.
-The uncertainty on the mean KL divergence is calculated by assuming the KL divergence per token follows a Gaussian distribution.
+더 많은 통계를 얻으려면 FP16 버전의 모델에서 로짓을 기록할 수 있습니다.
+이렇게 하려면 `perplexity`에 `--kl-divergence-base path/to/logit/binary/file.kld`를 제공합니다.
+프로그램은 제공된 경로에 로짓을 이진 형식으로 저장합니다.
+**로짓 파일은 매우 크며, Wikitext-2 테스트 세트를 사용하면 LLaMA 2의 경우 11 GiB, LLaMA 3의 경우 37 GiB가 됩니다.**
+로짓 파일을 얻으면 양자화된 모델, `--kl-divergence-base`를 통해 로짓 파일을 제공하고, 마지막으로 `--kl-divergence` 인수를 제공하여 프로그램이 FP16과 양자화된 로짓 분포의 Kullback-Leibler 발산을 계산하도록 합니다.
+이것은 FP16과 양자화된 로짓 분포가 얼마나 유사한지를 나타내는 지표로, 0은 분포가 동일하다는 것을 의미합니다.
+평균 KL 발산의 불확실성은 KL 발산이 토큰별로 가우시안 분포를 따른다고 가정하여 계산됩니다.
 
-In addition to the KL divergence the following statistics are calculated with `--kl-divergence`:
+`--kl-divergence`를 사용하면 다음과 같은 통계도 계산됩니다.
 
-* Ratio of mean FP16 PPL and quantized PPL. Uncertainty is estimated on logits, then propagated. The logarithm of this metric is also calculated and printed, it is 0 if the logit distributions are the same.
-* Difference of mean FP16 PPL and quantized PPL. Uncertainty is estimated on logits, then propagated.
-* Mean change in "correct" token probability. Positive values mean the model gets better at prediction, negative values mean it gets worse.
-* Pearson correlation coefficient of the "correct" token probabilites between models.
-* Percentiles of change in "correct" token probability. Positive values mean the model gets better at prediction, negative values mean it gets worse. Can be used to judge noise vs. quality loss from quantization. If the percentiles are symmetric then the quantization is essentially just adding noise. If the negative values are significantly larger than the positive values then this indicates that the model is actually becoming worse from the quantization.
-* The root mean square of the change in token probabilities. If you were to assume that the quantization simply causes Gaussian noise on the token probabilities then this would be the standard deviation of said noise. The uncertainty on the value is calculated that the change in token probabilities follows a Gaussian distribution. Related discussion: https://github.com/ggerganov/llama.cpp/discussions/2875 .
-* Same top p: Percentage of how often the token was assigned the highest probabilites by both models. The uncertainty is calculated from the Gaussian approximation of the binomial distribution.
+* 평균 FP16 PPL과 양자화된 PPL의 비율. 불확실성은 로짓에서 추정되고, 그런 다음 전파됩니다. 이 지표의 로그도 계산되고 출력됩니다. 로짓 분포가 동일하면 0입니다.
+* 평균 FP16 PPL과 양자화된 PPL의 차이. 불확실성은 로짓에서 추정되고, 그런 다음 전파됩니다.
+* "올바른" 토큰 확률의 평균 변화. 긍정적인 값은 모델이 예측에 더 능숙해진다는 것을 의미하며, 부정적인 값은 모델이 예측에 더 부족해진다는 것을 의미합니다.
+* 두 모델 간의 "올바른" 토큰 확률의 피어슨 상관계수.
+* "올바른" 토큰 확률의 변화의 백분위수. 긍정적인 값은 모델이 예측에 더 능숙해진다는 것을 의미하며, 부정적인 값은 모델이 예측에 더 부족해진다는 것을 의미합니다. 양자화로 인한 소음과 품질 손실을 판단하는 데 사용할 수 있습니다. 백분위수가 대칭이라면 양자화는 단순히 소음을 추가하는 것과 같습니다. 부정적인 값이 긍정적인 값보다 크게 떨어진다면 모델이 양자화로 인해 실제로 더 나빠지고 있음을 나타냅니다.
+* 토큰 확률의 변화의 제곱근 평균. 양자화가 토큰 확률에 가우시안 소음을 일으키는 것으로 가정하면 이 값은 해당 소음의 표준 편차입니다. 값의 불확실성은 토큰 확률의 변화가 가우시안 분포를 따른다고 계산됩니다. 관련 토론: https://github.com/ggerganov/llama.cpp/discussions/2875 .
+* 동일한 top p: 두 모델 모두에서 토큰이 가장 높은 확률을 할당받은 빈도의 백분율입니다. 불확실성은 이항 분포의 가우시안 근사에서 계산됩니다.
 
-## LLaMA 3 8b Scoreboard
+## LLaMA 3 8b 점수표
 
 | Revision | f364eb6f           |
 |:---------|:-------------------|
@@ -40,11 +39,11 @@ In addition to the KL divergence the following statistics are calculated with `-
 | CPU      | AMD Epyc 7742      |
 | GPU      | 1x NVIDIA RTX 4090 |
 
-Results were generated using the CUDA backend and are sorted by Kullback-Leibler divergence relative to FP16.
-The "WT" importance matrices were created using varying numbers of Wikitext tokens and can be found [here](https://huggingface.co/JohannesGaessler/llama.cpp_importance_matrices/blob/main/imatrix-llama_3-8b-f16-2.7m_tokens.dat).
-Note: the FP16 logits used for the calculation of all metrics other than perplexity are stored in a binary file between runs.
-In order to save space this file does **not** contain the exact same FP32 logits but instead casts them to 16 bit unsigned integers (with some scaling).
-So the "f16" results are to be understood as the difference resulting only from this downcast.
+CUDA 백엔드를 사용하여 생성된 결과이며, FP16에 대한 Kullback-Leibler 분산에 따라 정렬되었습니다.
+"WT" 중요 행렬은 다양한 수의 Wikitext 토큰을 사용하여 생성되었으며, [여기](https://huggingface.co/JohannesGaessler/llama.cpp_importance_matrices/blob/main/imatrix-llama_3-8b-f16-2.7m_tokens.dat)에서 찾을 수 있습니다.
+참고: perplexity 외 다른 모든 지표를 계산하는 데 사용되는 FP16 logits는 실행 간에 이진 파일로 저장됩니다.
+공간을 절약하기 위해 이 파일에는 정확한 FP32 logits가 포함되어 있지 않으며, 대신 16비트 무리수 정수로 변환됩니다 (일부 스케일링이 적용됩니다).
+따라서 "f16" 결과는 이 변환으로 인해 발생하는 차이만을 나타냅니다.
 
 | Quantization | imatrix | Model size [GiB] | PPL                    | ΔPPL                   | KLD                   | Mean Δp           | RMS Δp           |
 |--------------|---------|------------------|------------------------|------------------------|-----------------------|-------------------|------------------|
@@ -95,10 +94,10 @@ So the "f16" results are to be understood as the difference resulting only from 
 | iq1_S        | WT 10m  |             1.88 | 60.694593 ±   0.471290 | 54.462959 ±   0.449644 | 2.254554 ±   0.004868 | -31.973 ± 0.088 % | 46.271 ± 0.086 % |
 | iq1_S        | WT 10k  |             1.88 | 63.221324 ±   0.493077 | 56.989691 ±   0.471423 | 2.293527 ±   0.004885 | -32.261 ± 0.089 % | 46.562 ± 0.086 % |
 
-There seems to be no consistent improvement from using more Wikitext tokens for the importance matrix.
-K-quants score better on mean Δp than the legacy quants than e.g. KL divergence would suggest.
+Wikitext 토큰을 더 많이 사용하여 중요 행렬을 생성하는 것이 일관된 개선을 가져오지 않는 것 같습니다.
+K-quants는 KL 분산이 시사하는 것보다 평균 Δp에서 전통적인 quants보다 더 나은 점수를 얻습니다.
 
-## LLaMA 2 vs. LLaMA 3 Quantization comparison
+## LLaMA 2 vs. LLaMA 3 Quantization 비교
 
 | Revision | f364eb6f           |
 |:---------|:-------------------|
@@ -124,7 +123,7 @@ K-quants score better on mean Δp than the legacy quants than e.g. KL divergence
 | RMS Δp          |     9.762 ± 0.053 % |    21.421 ± 0.079 % |     3.252 ± 0.024 % |     5.519 ± 0.050 % |     1.339 ± 0.010 % |     2.295 ± 0.019 % |     0.618 ± 0.011 % |     1.198 ± 0.007 % |
 | Same top p      |    85.584 ± 0.086 % |    71.138 ± 0.119 % |    94.665 ± 0.055 % |    91.901 ± 0.072 % |    97.520 ± 0.038 % |    96.031 ± 0.051 % |    98.846 ± 0.026 % |    97.674 ± 0.040 % |
 
-## LLaMA 3 BF16 vs. FP16 comparison
+## LLaMA 3 BF16 vs. FP16 비교
 
 | Revision | 83330d8c      |
 |:---------|:--------------|
@@ -132,7 +131,7 @@ K-quants score better on mean Δp than the legacy quants than e.g. KL divergence
 | CPU      | AMD Epyc 7742 |
 | GPU      | N/A           |
 
-Results were calculated with LLaMA 3 8b BF16 as `--kl-divergence-base` and LLaMA 3 8b FP16 as the `--model` for comparison.
+결과는 `--kl-divergence-base`로 LLaMA 3 8b BF16을 사용하고, 비교를 위해 `--model`로 LLaMA 3 8b FP16을 사용하여 계산되었습니다.
 
 | Metric                         |                    Value |
 |--------------------------------|--------------------------|
@@ -169,10 +168,10 @@ Results were calculated with LLaMA 3 8b BF16 as `--kl-divergence-base` and LLaMA
 | RMS Δp                         |          0.150 ± 0.001 % |
 | Same top p                     |         99.739 ± 0.013 % |
 
-## Old Numbers
+## 이전 숫자
 
 <details>
-<summary>Llama 2 70B Scoreboard</summary>
+<summary>Llama 2 70B 점수표</summary>
 
 | Quantization | Model size (GiB) | Perplexity | Delta to fp16 |
 |--------------|------------------|------------|---------------|

@@ -1,74 +1,74 @@
-# llama.cpp for SYCL
+# SYCL를 사용한 llama.cpp
 
-- [Background](#background)
-- [Recommended Release](#recommended-release)
-- [News](#news)
-- [OS](#os)
-- [Hardware](#hardware)
+- [개요](#개요)
+- [권장 버전](#권장-버전)
+- [뉴스](#뉴스)
+- [운영체제](#운영체제)
+- [하드웨어](#하드웨어)
 - [Docker](#docker)
 - [Linux](#linux)
 - [Windows](#windows)
-- [Environment Variable](#environment-variable)
-- [Known Issue](#known-issues)
+- [환경 변수](#환경-변수)
+- [알려진 문제](#알려진-문제)
 - [Q&A](#qa)
 - [TODO](#todo)
 
-## Background
+## 배경
 
-**SYCL** is a high-level parallel programming model designed to improve developers productivity writing code across various hardware accelerators such as CPUs, GPUs, and FPGAs. It is a single-source language designed for heterogeneous computing and based on standard C++17.
+**SYCL**은 CPU, GPU 및 FPGA와 같은 다양한 하드웨어 가속기에서 코드를 작성하는 개발자 생산성을 향상시키기 위해 설계된 고수준 병렬 프로그래밍 모델입니다. CPU, GPU 및 FPGA와 같은 다양한 하드웨어에서 동일한 코드를 실행할 수 있도록 설계된 단일 소스 언어이며 C++17 기반입니다.
 
-**oneAPI** is an open ecosystem and a standard-based specification, supporting multiple architectures including but not limited to intel CPUs, GPUs and FPGAs. The key components of the oneAPI ecosystem include:
+**oneAPI**는 Intel CPU, GPU 및 FPGA를 포함한 여러 아키텍처를 지원하는 오픈 이코시스템 및 표준 기반 명세입니다. oneAPI 이코시스템의 핵심 구성 요소는 다음과 같습니다.
 
-- **DPCPP** *(Data Parallel C++)*: The primary oneAPI SYCL implementation, which includes the icpx/icx Compilers.
-- **oneAPI Libraries**: A set of highly optimized libraries targeting multiple domains *(e.g. oneMKL - Math Kernel Library)*.
-- **oneAPI LevelZero**: A high performance low level interface for fine-grained control over intel iGPUs and dGPUs.
-- **Nvidia & AMD Plugins**: These are plugins extending oneAPI's DPCPP support to SYCL on Nvidia and AMD GPU targets.
+- **DPCPP** *(데이터 병렬 C++)*: oneAPI SYCL 구현의 주요 구성 요소로, icpx/icx 컴파일러를 포함합니다.
+- **oneAPI 라이브러리**: 여러 영역을 대상으로 하는 최적화된 라이브러리 세트 *(예: oneMKL - 수학 커널 라이브러리)*.
+- **oneAPI LevelZero**: Intel iGPU 및 dGPU에 대한 미세 조정 제어를 위한 고성능 저수준 인터페이스.
+- **Nvidia & AMD 플러그인**: Nvidia 및 AMD GPU 대상의 SYCL에 대한 oneAPI의 DPCPP 지원을 확장하는 플러그인입니다.
 
 ### Llama.cpp + SYCL
 
-The llama.cpp SYCL backend is designed to support **Intel GPU** firstly. Based on the cross-platform feature of SYCL, it could support other vendor GPUs: Nvidia GPU (*AMD GPU coming*).
+Llama.cpp SYCL 백엔드는 **Intel GPU**를 먼저 지원하도록 설계되었습니다. SYCL의 크로스 플랫폼 기능을 기반으로 **Nvidia GPU**(*AMD GPU 예정*)도 지원할 수 있습니다.
 
-When targeting **Intel CPU**, it is recommended to use llama.cpp for [Intel oneMKL](README.md#intel-onemkl) backend.
+**Intel CPU**를 대상으로 할 때는 llama.cpp의 [Intel oneMKL](README.md#intel-onemkl) 백엔드를 사용하는 것이 좋습니다.
 
-It has the similar design of other llama.cpp BLAS-based paths such as *OpenBLAS, cuBLAS, etc..*. In beginning work, the oneAPI's [SYCLomatic](https://github.com/oneapi-src/SYCLomatic) open-source migration tool (Commercial release [Intel® DPC++ Compatibility Tool](https://www.intel.com/content/www/us/en/developer/tools/oneapi/dpc-compatibility-tool.html)) was used for this purpose.
+OpenBLAS, cuBLAS 등 다른 llama.cpp BLAS 기반 경로와 유사한 디자인을 가지고 있습니다. 초기 작업에서는 oneAPI의 [SYCLomatic](https://github.com/oneapi-src/SYCLomatic) 오픈 소스 마이그레이션 도구(상용 출시 [Intel® DPC++ 호환성 도구](https://www.intel.com/content/www/us/en/developer/tools/oneapi/dpc-compatibility-tool.html))가 이 목적으로 사용되었습니다.
 
-## Recommended Release
+## 권장 버전
 
-The SYCL backend would be broken by some PRs due to no online CI.
+온라인 CI가 없어 SYCL 백엔드가 일부 PR로 인해 오류가 발생합니다.
 
-The following release is verified with good quality:
+다음 버전은 좋은 품질로 검증되었습니다.
 
 |Commit ID|Tag|Release|Verified  Platform|
 |-|-|-|-|
 |fb76ec31a9914b7761c1727303ab30380fd4f05c|b3038 |[llama-b3038-bin-win-sycl-x64.zip](https://github.com/ggerganov/llama.cpp/releases/download/b3038/llama-b3038-bin-win-sycl-x64.zip) |Arc770/Linux/oneAPI 2024.1<br>MTL Arc GPU/Windows 11/oneAPI 2024.1|
 
 
-## News
+## 뉴스
 
 - 2024.5
-  - Performance is increased: 34 -> 37 tokens/s of llama-2-7b.Q4_0 on Arc770.
-  - Arch Linux is verified successfully.
+  - 성능 향상: Arc770에서 llama-2-7b.Q4_0의 토큰/초 처리 속도가 34 -> 37로 증가.
+  - Arch Linux에서 성공적으로 검증.
 
 - 2024.4
-  - Support data types: GGML_TYPE_IQ4_NL, GGML_TYPE_IQ4_XS, GGML_TYPE_IQ3_XXS, GGML_TYPE_IQ3_S, GGML_TYPE_IQ2_XXS, GGML_TYPE_IQ2_XS, GGML_TYPE_IQ2_S, GGML_TYPE_IQ1_S, GGML_TYPE_IQ1_M.
+  - 데이터 유형 지원: GGML_TYPE_IQ4_NL, GGML_TYPE_IQ4_XS, GGML_TYPE_IQ3_XXS, GGML_TYPE_IQ3_S, GGML_TYPE_IQ2_XXS, GGML_TYPE_IQ2_XS, GGML_TYPE_IQ2_S, GGML_TYPE_IQ1_S, GGML_TYPE_IQ1_M.
 
 - 2024.3
-  - Release binary files of Windows.
-  - A blog is published: **Run LLM on all Intel GPUs Using llama.cpp**: [intel.com](https://www.intel.com/content/www/us/en/developer/articles/technical/run-llm-on-all-gpus-using-llama-cpp-artical.html) or [medium.com](https://medium.com/@jianyu_neo/run-llm-on-all-intel-gpus-using-llama-cpp-fd2e2dcbd9bd).
-  - New base line is ready: [tag b2437](https://github.com/ggerganov/llama.cpp/tree/b2437).
-  - Support multiple cards: **--split-mode**: [none|layer]; not support [row], it's on developing.
-  - Support to assign main GPU by **--main-gpu**, replace $GGML_SYCL_DEVICE.
-  - Support detecting all GPUs with level-zero and same top **Max compute units**.
-  - Support OPs
+  - Windows의 이진 파일 배포.
+  - 블로그 게시: **Intel GPU를 사용하여 LLM 실행**: [intel.com](https://www.intel.com/content/www/us/en/developer/articles/technical/run-llm-on-all-gpus-using-llama-cpp-artical.html) 또는 [medium.com](https://medium.com/@jianyu_neo/run-llm-on-all-intel-gpus-using-llama-cpp-fd2e2dcbd9bd).
+  - 새로운 기준선 준비: [tag b2437](https://github.com/ggerganov/llama.cpp/tree/b2437).
+  - 여러 카드 지원: **--split-mode**: [none|layer]; [row]는 개발 중입니다.
+  - **--main-gpu**로 메인 GPU 할당 지원, $GGML_SYCL_DEVICE 대체.
+  - level-zero를 사용하여 모든 GPU를 감지하고 최상위 **Max compute units**를 동일하게 지원.
+  - 지원되는 연산자
     - hardsigmoid
     - hardswish
     - pool2d
 
 - 2024.1
-  - Create SYCL backend for Intel GPU.
-  - Support Windows build
+  - Intel GPU를 위한 SYCL 백엔드 생성.
+  - Windows 빌드 지원
 
-## OS
+## 운영체제
 
 | OS      | Status  | Verified                                       |
 |---------|---------|------------------------------------------------|
@@ -76,11 +76,11 @@ The following release is verified with good quality:
 | Windows | Support | Windows 11                                     |
 
 
-## Hardware
+## 하드웨어
 
 ### Intel GPU
 
-**Verified devices**
+**확인된 기기**
 
 | Intel GPU                     | Status  | Verified Model                        |
 |-------------------------------|---------|---------------------------------------|
@@ -90,19 +90,19 @@ The following release is verified with good quality:
 | Intel built-in Arc GPU        | Support | built-in Arc GPU in Meteor Lake       |
 | Intel iGPU                    | Support | iGPU in i5-1250P, i7-1260P, i7-1165G7 |
 
-*Notes:*
+*참고 사항:*
 
-- **Memory**
-  - The device memory is a limitation when running a large model. The loaded model size, *`llm_load_tensors: buffer_size`*, is displayed in the log when running `./bin/llama-cli`.
+- **메모리**
+  - 장대 모델을 실행할 때 장치 메모리는 제한 요소입니다. `./bin/llama-cli`를 실행하면 로그에 로드된 모델 크기, *`llm_load_tensors: buffer_size`*가 표시됩니다.
 
-  - Please make sure the GPU shared memory from the host is large enough to account for the model's size. For e.g. the *llama-2-7b.Q4_0* requires at least 8.0GB for integrated GPU and 4.0GB for discrete GPU.
+  - 호스트에서 GPU 공유 메모리가 모델 크기에 충분한지 확인하십시오. 예를 들어, *llama-2-7b.Q4_0*은 통합 GPU에 최소 8.0GB, 별도 GPU에 최소 4.0GB가 필요합니다.
 
-- **Execution Unit (EU)**
-  - If the iGPU has less than 80 EUs, the inference speed will likely be too slow for practical use.
+- **실행 유닛 (EU)**
+  - iGPU가 80개 미만의 EU를 갖고 있다면, 실질적인 사용에 적합한 속도로 인프런스가 실행되지 않습니다.
 
-### Other Vendor GPU
+### 다른 벤더 GPU
 
-**Verified devices**
+**검증된 기기**
 
 | Nvidia GPU               | Status  | Verified Model |
 |--------------------------|---------|----------------|
@@ -110,21 +110,21 @@ The following release is verified with good quality:
 | Ampere Series *(Mobile)* | Support | RTX 40 Series  |
 
 ## Docker
-The docker build option is currently limited to *intel GPU* targets.
+Docker 빌드 옵션은 현재 *intel GPU* 대상에만 제한됩니다.
 
-### Build image
+### 이미지 빌드
 ```sh
 # Using FP16
 docker build -t llama-cpp-sycl --build-arg="GGML_SYCL_F16=ON" -f .devops/llama-cli-intel.Dockerfile .
 ```
 
-*Notes*:
+*참고사항*:
 
-To build in default FP32 *(Slower than FP16 alternative)*, you can remove the `--build-arg="GGML_SYCL_F16=ON"` argument from the previous command.
+기본 FP32 *(FP16 대안보다 느림)*로 빌드하려면 이전 명령어에서 `--build-arg="GGML_SYCL_F16=ON"` 인수를 제거할 수 있습니다.
 
-You can also use the `.devops/llama-server-intel.Dockerfile`, which builds the *"server"* alternative.
+또는 `.devops/llama-server-intel.Dockerfile` 을 사용하여 *"서버"* 대안을 빌드할 수 있습니다.
 
-### Run container
+### 컨테이너 실행
 
 ```sh
 # First, find all the DRI cards
@@ -133,39 +133,39 @@ ls -la /dev/dri
 docker run -it --rm -v "$(pwd):/app:Z" --device /dev/dri/renderD128:/dev/dri/renderD128 --device /dev/dri/card1:/dev/dri/card1 llama-cpp-sycl -m "/app/models/YOUR_MODEL_FILE" -p "Building a website can be done in 10 simple steps:" -n 400 -e -ngl 33
 ```
 
-*Notes:*
-- Docker has been tested successfully on native Linux. WSL support has not been verified yet.
-- You may need to install Intel GPU driver on the **host** machine *(Please refer to the [Linux configuration](#linux) for details)*.
+*참고사항:*
+- Docker는 네이티브 Linux에서 성공적으로 테스트되었습니다. WSL 지원은 아직 확인되지 않았습니다.
+- **호스트** 머신에 Intel GPU 드라이버를 설치해야 할 수 있습니다. (자세한 내용은 [Linux 구성](#linux)을 참조하세요.)
 
 ## Linux
 
-### I. Setup Environment
+### I. 환경 설정
 
-1. **Install GPU drivers**
+1. **GPU 드라이버 설치**
 
-  - **Intel GPU**
+  - **인텔 GPU**
 
-Intel data center GPUs drivers installation guide and download page can be found here: [Get intel dGPU Drivers](https://dgpu-docs.intel.com/driver/installation.html#ubuntu-install-steps).
+인텔 데이터 센터 GPU 드라이버 설치 가이드 및 다운로드 페이지는 여기에서 찾을 수 있습니다: [인텔 dGPU 드라이버 가져오기](https://dgpu-docs.intel.com/driver/installation.html#ubuntu-install-steps).
 
-*Note*: for client GPUs *(iGPU & Arc A-Series)*, please refer to the [client iGPU driver installation](https://dgpu-docs.intel.com/driver/client/overview.html).
+*참고*: 클라이언트 GPU *(iGPU & Arc A 시리즈)* 에 대해서는 [클라이언트 iGPU 드라이버 설치](https://dgpu-docs.intel.com/driver/client/overview.html)를 참조하십시오.
 
-Once installed, add the user(s) to the `video` and `render` groups.
+설치 후 사용자를 `video` 및 `render` 그룹에 추가하십시오.
 
 ```sh
 sudo usermod -aG render $USER
 sudo usermod -aG video $USER
 ```
 
-*Note*: logout/re-login for the changes to take effect.
+*참고*: 변경 사항이 적용되려면 로그아웃/재로그인하세요.
 
-Verify installation through `clinfo`:
+`clinfo`를 통해 설치 여부를 확인하세요:
 
 ```sh
 sudo apt install clinfo
 sudo clinfo -l
 ```
 
-Sample output:
+샘플 출력:
 
 ```sh
 Platform #0: Intel(R) OpenCL Graphics
@@ -177,26 +177,26 @@ Platform #0: Intel(R) OpenCL HD Graphics
 
 - **Nvidia GPU**
 
-In order to target Nvidia GPUs through SYCL, please make sure the CUDA/CUBLAS native requirements *-found [here](README.md#cuda)-* are installed.
+Nvidia GPU를 SYCL을 통해 타겟하려면 CUDA/CUBLAS 기본 요구 사항 *- README.md#cuda 에서 찾을 수 있습니다 *- 을 설치해야 합니다.
 
-2. **Install Intel® oneAPI Base toolkit**
+2. **Intel® oneAPI Base Toolkit 설치**
 
-- **For Intel GPU**
+- **Intel GPU를 위한 경우**
 
-The base toolkit can be obtained from the official [Intel® oneAPI Base Toolkit](https://www.intel.com/content/www/us/en/developer/tools/oneapi/base-toolkit.html) page.
+기본 툴킷은 공식 [Intel® oneAPI Base Toolkit](https://www.intel.com/content/www/us/en/developer/tools/oneapi/base-toolkit.html) 페이지에서 얻을 수 있습니다.
 
-Please follow the instructions for downloading and installing the Toolkit for Linux, and preferably keep the default installation values unchanged, notably the installation path *(`/opt/intel/oneapi` by default)*.
+Linux용 툴킷 다운로드 및 설치 지침을 따르십시오. 설치 경로 (*`/opt/intel/oneapi` 기본값*)를 포함하여 기본 설치 값을 변경하지 않는 것이 좋습니다.
 
-Following guidelines/code snippets assume the default installation values. Otherwise, please make sure the necessary changes are reflected where applicable.
+다음 지침/코드 스니펫은 기본 설치 값을 가정합니다. 필요에 따라 필요한 변경 사항이 반영되어 있는지 확인하십시오.
 
-Upon a successful installation, SYCL is enabled for the available intel devices, along with relevant libraries such as oneAPI MKL for intel GPUs.
+성공적인 설치 후 SYCL은 사용 가능한 Intel 기기에 대해 활성화되며, Intel GPU에 대한 oneAPI MKL과 같은 관련 라이브러리가 함께 제공됩니다.
 
-- **Adding support to Nvidia GPUs**
+- **Nvidia GPU에 대한 지원 추가**
 
-**oneAPI Plugin**: In order to enable SYCL support on Nvidia GPUs, please install the [Codeplay oneAPI Plugin for Nvidia GPUs](https://developer.codeplay.com/products/oneapi/nvidia/download). User should also make sure the plugin version matches the installed base toolkit one *(previous step)* for a seamless "oneAPI on Nvidia GPU" setup.
+**oneAPI 플러그인**: Nvidia GPU에서 SYCL 지원을 활성화하려면 [Codeplay oneAPI 플러그인 for Nvidia GPUs](https://developer.codeplay.com/products/oneapi/nvidia/download)을 설치하십시오. 사용자는 또한 플러그인 버전이 설치된 기본 툴킷과 일치하도록 해야 합니다 *(이전 단계)*.  seamless "oneAPI on Nvidia GPU" 설정을 위해.
 
 
-**oneMKL for cuBlas**: The current oneMKL releases *(shipped with the oneAPI base-toolkit)* do not contain the cuBLAS backend. A build from source of the upstream [oneMKL](https://github.com/oneapi-src/oneMKL) with the *cuBLAS* backend enabled is thus required to run it on Nvidia GPUs.
+**oneMKL for cuBlas**: 현재 oneMKL 출시판 *(oneAPI base-toolkit에 포함됨)*에는 cuBLAS 백엔드가 포함되어 있지 않습니다. 따라서 Nvidia GPU에서 실행하려면 *cuBLAS* 백엔드를 사용하도록 구성한 upstream [oneMKL](https://github.com/oneapi-src/oneMKL)의 소스 코드를 빌드해야 합니다.
 
 ```sh
 git clone https://github.com/oneapi-src/oneMKL
@@ -206,17 +206,17 @@ cmake --build buildWithCublas --config Release
 ```
 
 
-3. **Verify installation and environment**
+3. **설치 및 환경 확인**
 
-In order to check the available SYCL devices on the machine, please use the `sycl-ls` command.
+기계에서 사용 가능한 SYCL 장치를 확인하려면 `sycl-ls` 명령을 사용하십시오.
 ```sh
 source /opt/intel/oneapi/setvars.sh
 sycl-ls
 ```
 
-- **Intel GPU**
+- **인텔 GPU**
 
-When targeting an intel GPU, the user should expect one or more level-zero devices among the available SYCL devices. Please make sure that at least one GPU is present, for instance [`ext_oneapi_level_zero:gpu:0`] in the sample output below:
+인텔 GPU를 대상으로 할 때, 사용자는 사용 가능한 SYCL 장치 중 하나 이상의 레벨 제로 장치를 기대해야 합니다. 예를 들어 아래 샘플 출력에서 [`ext_oneapi_level_zero:gpu:0`]과 같이 적어도 하나의 GPU가 존재하는지 확인하십시오.
 
 ```
 [opencl:acc:0] Intel(R) FPGA Emulation Platform for OpenCL(TM), Intel(R) FPGA Emulation Device OpenCL 1.2  [2023.16.10.0.17_160000]
@@ -227,14 +227,14 @@ When targeting an intel GPU, the user should expect one or more level-zero devic
 
 - **Nvidia GPU**
 
-Similarly, user targeting Nvidia GPUs should expect at least one SYCL-CUDA device [`ext_oneapi_cuda:gpu`] as bellow:
+Nvidia GPU를 사용하는 사용자는 아래와 같이 적어도 하나의 SYCL-CUDA 장치 [`ext_oneapi_cuda:gpu`]를 기대할 수 있습니다.
 ```
 [opencl:acc:0] Intel(R) FPGA Emulation Platform for OpenCL(TM), Intel(R) FPGA Emulation Device OpenCL 1.2  [2023.16.12.0.12_195853.xmain-hotfix]
 [opencl:cpu:1] Intel(R) OpenCL, Intel(R) Xeon(R) Gold 6326 CPU @ 2.90GHz OpenCL 3.0 (Build 0) [2023.16.12.0.12_195853.xmain-hotfix]
 [ext_oneapi_cuda:gpu:0] NVIDIA CUDA BACKEND, NVIDIA A100-PCIE-40GB 8.0 [CUDA 12.2]
 ```
 
-### II. Build llama.cpp
+### II. llama.cpp 빌드
 
 #### Intel GPU
 ```sh
@@ -274,26 +274,26 @@ cmake --build build --config Release -j -v
 
 ```
 
-### III. Run the inference
+### III. 인프런 실행
 
-1. Retrieve and prepare model
+1. 모델 가져오기 및 준비
 
-You can refer to the general [*Prepare and Quantize*](README.md#prepare-and-quantize) guide for model prepration, or simply download [llama-2-7b.Q4_0.gguf](https://huggingface.co/TheBloke/Llama-2-7B-GGUF/blob/main/llama-2-7b.Q4_0.gguf) model as example.
+모델 준비 방법은 일반적인 [*Prepare and Quantize*](README.md#prepare-and-quantize) 가이드를 참조하거나, [llama-2-7b.Q4_0.gguf](https://huggingface.co/TheBloke/Llama-2-7B-GGUF/blob/main/llama-2-7b.Q4_0.gguf) 모델을 예시로 다운로드할 수 있습니다.
 
-2. Enable oneAPI running environment
+2. oneAPI 실행 환경 활성화
 
 ```sh
 source /opt/intel/oneapi/setvars.sh
 ```
 
-3. List devices information
+3. 기기 정보 목록
 
-Similar to the native `sycl-ls`, available SYCL devices can be queried as follow:
+`sycl-ls`와 유사하게, 사용 가능한 SYCL 기기를 다음과 같이 문의할 수 있습니다:
 
 ```sh
 ./build/bin/llama-ls-sycl-device
 ```
-A example of such log in a system with 1 *intel CPU* and 1 *intel GPU* can look like the following:
+1 *intel CPU*와 1 *intel GPU* 시스템에서 이와 같은 로그의 예시는 다음과 같습니다:
 ```
 found 6 SYCL devices:
 |  |                  |                                             |Compute   |Max compute|Max work|Max sub|               |
@@ -312,95 +312,95 @@ found 6 SYCL devices:
 | compute capability 1.3 | Level-zero driver/runtime, recommended                      |
 | compute capability 3.0 | OpenCL driver/runtime, slower than level-zero in most cases |
 
-4. Launch inference
+4. 인퍼런스 실행
 
-There are two device selection modes:
+두 가지 장치 선택 모드가 있습니다.
 
-- Single device: Use one device target specified by the user.
-- Multiple devices: Automatically select the devices with the same largest Max compute-units.
+- 단일 장치: 사용자가 지정한 하나의 장치 대상을 사용합니다.
+- 여러 장치: 가장 큰 Max compute-units를 가진 장치를 자동으로 선택합니다.
 
 | Device selection | Parameter                              |
 |------------------|----------------------------------------|
 | Single device    | --split-mode none --main-gpu DEVICE_ID |
 | Multiple devices | --split-mode layer (default)           |
 
-Examples:
+예시:
 
-- Use device 0:
+- 기기 0 사용:
 
 ```sh
 ZES_ENABLE_SYSMAN=1 ./build/bin/llama-cli -m models/llama-2-7b.Q4_0.gguf -p "Building a website can be done in 10 simple steps:" -n 400 -e -ngl 33 -sm none -mg 0
 ```
-or run by script:
+혹은 스크립트로 실행:
 
 ```sh
 ./examples/sycl/run_llama2.sh 0
 ```
 
-- Use multiple devices:
+- 여러 개의 장치를 사용하세요:
 
 ```sh
 ZES_ENABLE_SYSMAN=1 ./build/bin/llama-cli -m models/llama-2-7b.Q4_0.gguf -p "Building a website can be done in 10 simple steps:" -n 400 -e -ngl 33 -sm layer
 ```
 
-Otherwise, you can run the script:
+그렇지 않으면 스크립트를 실행할 수 있습니다:
 
 ```sh
 ./examples/sycl/run_llama2.sh
 ```
 
-*Notes:*
+*참고사항:*
 
-- Upon execution, verify the selected device(s) ID(s) in the output log, which can for instance be displayed as follow:
+- 실행 시, 출력 로그에서 선택된 장치 ID를 확인하십시오. 예를 들어 다음과 같이 표시될 수 있습니다.
 
 ```sh
 detect 1 SYCL GPUs: [0] with top Max compute units:512
 ```
-Or
+ 아니면
 ```sh
 use 1 SYCL GPUs: [0] with Max compute units:512
 ```
 
 ## Windows
 
-### I. Setup Environment
+### I. 환경 설정
 
-1. Install GPU driver
+1. GPU 드라이버 설치
 
-Intel GPU drivers instructions guide and download page can be found here: [Get intel GPU Drivers](https://www.intel.com/content/www/us/en/products/docs/discrete-gpus/arc/software/drivers.html).
+Intel GPU 드라이버 지침 및 다운로드 페이지는 여기에서 찾을 수 있습니다: [Intel GPU 드라이버 가져오기](https://www.intel.com/content/www/us/en/products/docs/discrete-gpus/arc/software/drivers.html).
 
-2. Install Visual Studio
+2. Visual Studio 설치
 
-If you already have a recent version of Microsoft Visual Studio, you can skip this step. Otherwise, please refer to the official download page for [Microsoft Visual Studio](https://visualstudio.microsoft.com/).
+이미 최신 버전의 Microsoft Visual Studio가 있는 경우, 이 단계를 건너뛸 수 있습니다. 그렇지 않은 경우, [Microsoft Visual Studio](https://visualstudio.microsoft.com/)의 공식 다운로드 페이지를 참조하십시오.
 
-3. Install Intel® oneAPI Base toolkit
+3. Intel® oneAPI Base Toolkit 설치
 
-The base toolkit can be obtained from the official [Intel® oneAPI Base Toolkit](https://www.intel.com/content/www/us/en/developer/tools/oneapi/base-toolkit.html) page.
+기본 툴킷은 공식 [Intel® oneAPI Base Toolkit](https://www.intel.com/content/www/us/en/developer/tools/oneapi/base-toolkit.html) 페이지에서 얻을 수 있습니다.
 
-Please follow the instructions for downloading and installing the Toolkit for Windows, and preferably keep the default installation values unchanged, notably the installation path *(`C:\Program Files (x86)\Intel\oneAPI` by default)*.
+Windows용 툴킷 다운로드 및 설치 지침을 따르십시오. 설치 경로(*(`C:\Program Files (x86)\Intel\oneAPI` 기본값)*)를 기본값으로 유지하는 것이 좋습니다.
 
-Following guidelines/code snippets assume the default installation values. Otherwise, please make sure the necessary changes are reflected where applicable.
+다음 지침/코드 스니펫은 기본 설치 값을 가정합니다. 그렇지 않은 경우, 적용 가능한 경우 필요한 변경 사항이 반영되었는지 확인하십시오.
 
-b. Enable oneAPI running environment:
+b. oneAPI 실행 환경 활성화:
 
-- Type "oneAPI" in the search bar, then open the `Intel oneAPI command prompt for Intel 64 for Visual Studio 2022` App.
+- 검색창에 "oneAPI"를 입력한 후 `Intel oneAPI command prompt for Intel 64 for Visual Studio 2022` 앱을 열습니다.
 
-- On the command prompt, enable the runtime environment with the following:
+- 명령 프롬프트에서 다음을 사용하여 실행 환경을 활성화합니다:
 ```
 "C:\Program Files (x86)\Intel\oneAPI\setvars.bat" intel64
 ```
 
-c. Verify installation
+c. 설치 확인
 
-In the oneAPI command line, run the following to print the available SYCL devices:
+oneAPI 명령 프롬프트에서 다음 명령을 실행하여 사용 가능한 SYCL 장치를 출력합니다.
 
 ```
 sycl-ls
 ```
 
-There should be one or more *level-zero* GPU devices displayed as **[ext_oneapi_level_zero:gpu]**. Below is example of such output detecting an *intel Iris Xe* GPU as a Level-zero SYCL device:
+하나 이상의 *level-zero* GPU 장치가 **[ext_oneapi_level_zero:gpu]**로 표시되어야 합니다. 아래는 *intel Iris Xe* GPU를 Level-zero SYCL 장치로 감지하는 출력 예입니다.
 
-Output (example):
+출력 (예시):
 ```
 [opencl:acc:0] Intel(R) FPGA Emulation Platform for OpenCL(TM), Intel(R) FPGA Emulation Device OpenCL 1.2  [2023.16.10.0.17_160000]
 [opencl:cpu:1] Intel(R) OpenCL, 11th Gen Intel(R) Core(TM) i7-1185G7 @ 3.00GHz OpenCL 3.0 (Build 0) [2023.16.10.0.17_160000]
@@ -408,15 +408,15 @@ Output (example):
 [ext_oneapi_level_zero:gpu:0] Intel(R) Level-Zero, Intel(R) Iris(R) Xe Graphics 1.3 [1.3.28044]
 ```
 
-4. Install build tools
+4. 빌드 도구 설치
 
-a. Download & install cmake for Windows: https://cmake.org/download/ (CMake can also be installed from Visual Studio Installer)
-b. The new Visual Studio will install Ninja as default. (If not, please install it manually: https://ninja-build.org/)
+a. Windows용 cmake 다운로드 및 설치: https://cmake.org/download/ (CMake는 Visual Studio Installer에서도 설치할 수 있습니다)
+b. 새로운 Visual Studio는 Ninja를 기본으로 설치합니다. (설치되지 않았다면, 수동으로 설치하십시오: https://ninja-build.org/)
 
 
-### II. Build llama.cpp
+### II. llama.cpp 빌드
 
-On the oneAPI command line window, step into the llama.cpp main directory and run the following:
+oneAPI 명령줄 창에서 llama.cpp 메인 디렉토리로 이동하고 다음을 실행합니다.
 
 ```
 @call "C:\Program Files (x86)\Intel\oneAPI\setvars.bat" intel64 --force
@@ -430,12 +430,12 @@ cmake -B build -G "Ninja" -DGGML_SYCL=ON -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPI
 cmake --build build --config Release -j
 ```
 
-Otherwise, run the `win-build-sycl.bat` wrapper which encapsulates the former instructions:
+그렇지 않으면, 이전 지침을 캡슐화한 `win-build-sycl.bat` 래퍼를 실행합니다:
 ```sh
 .\examples\sycl\win-build-sycl.bat
 ```
 
-Or, use CMake presets to build:
+또는 CMake 프리셋을 사용하여 빌드하세요:
 ```sh
 cmake --preset x64-windows-sycl-release
 cmake --build build-x64-windows-sycl-release -j --target llama-cli
@@ -447,34 +447,34 @@ cmake --preset x64-windows-sycl-debug
 cmake --build build-x64-windows-sycl-debug -j --target llama-cli
 ```
 
-Or, you can use Visual Studio to open llama.cpp folder as a CMake project. Choose the sycl CMake presets (`x64-windows-sycl-release` or `x64-windows-sycl-debug`) before you compile the project.
+또는 Visual Studio를 사용하여 llama.cpp 폴더를 CMake 프로젝트로 열 수 있습니다. 프로젝트를 컴파일하기 전에 sycl CMake 프리셋 (`x64-windows-sycl-release` 또는 `x64-windows-sycl-debug`)을 선택하십시오.
 
-*Notes:*
+*참고 사항:* 
 
-- In case of a minimal experimental setup, the user can build the inference executable only through `cmake --build build --config Release -j --target llama-cli`.
+- 최소한의 실험적 설정의 경우, 사용자는 `cmake --build build --config Release -j --target llama-cli`를 통해만 인프런 실행 파일을 빌드할 수 있습니다.
 
-### III. Run the inference
+### III. 인프런 실행
 
-1. Retrieve and prepare model
+1. 모델 가져오기 및 준비
 
-You can refer to the general [*Prepare and Quantize*](README#prepare-and-quantize) guide for model prepration, or simply download [llama-2-7b.Q4_0.gguf](https://huggingface.co/TheBloke/Llama-2-7B-GGUF/blob/main/llama-2-7b.Q4_0.gguf) model as example.
+모델 준비 방법은 일반 [*Prepare and Quantize*](README#prepare-and-quantize) 가이드를 참조하거나, [llama-2-7b.Q4_0.gguf](https://huggingface.co/TheBloke/Llama-2-7B-GGUF/blob/main/llama-2-7b.Q4_0.gguf) 모델을 예시로 다운로드할 수 있습니다.
 
-2. Enable oneAPI running environment
+2. oneAPI 실행 환경 활성화
 
-On the oneAPI command line window, run the following and step into the llama.cpp directory:
+oneAPI 명령줄 창에서 다음을 실행하고 llama.cpp 디렉토리로 이동합니다.
 ```
 "C:\Program Files (x86)\Intel\oneAPI\setvars.bat" intel64
 ```
 
-3. List devices information
+3. 기기 정보 목록
 
-Similar to the native `sycl-ls`, available SYCL devices can be queried as follow:
+`sycl-ls`와 유사하게, 사용 가능한 SYCL 기기를 다음과 같이 문의할 수 있습니다:
 
 ```
 build\bin\ls-sycl-device.exe
 ```
 
-The output of this command in a system with 1 *intel CPU* and 1 *intel GPU* would look like the following:
+이 명령어의 출력은 1 *intel CPU*와 1 *intel GPU*가 있는 시스템에서 다음과 같이 표시됩니다.
 ```
 found 6 SYCL devices:
 |  |                  |                                             |Compute   |Max compute|Max work|Max sub|               |
@@ -495,52 +495,52 @@ found 6 SYCL devices:
 | compute capability 3.0 | OpenCL running time, slower than level-zero in most cases |
 
 
-4. Launch inference
+4. 인퍼런스 실행
 
-There are two device selection modes:
+두 가지 장치 선택 모드가 있습니다.
 
-- Single device: Use one device assigned by user.
-- Multiple devices: Automatically choose the devices with the same biggest Max compute units.
+- 단일 장치: 사용자가 지정한 하나의 장치를 사용합니다.
+- 여러 장치: 가장 큰 컴퓨트 유닛을 가진 동일한 장치를 자동으로 선택합니다.
 
 | Device selection | Parameter                              |
 |------------------|----------------------------------------|
 | Single device    | --split-mode none --main-gpu DEVICE_ID |
 | Multiple devices | --split-mode layer (default)           |
 
-Examples:
+예시:
 
-- Use device 0:
+- 기기 0 사용:
 
 ```
 build\bin\llama-cli.exe -m models\llama-2-7b.Q4_0.gguf -p "Building a website can be done in 10 simple steps:\nStep 1:" -n 400 -e -ngl 33 -s 0 -sm none -mg 0
 ```
 
-- Use multiple devices:
+- 여러 개의 장치를 사용하세요:
 
 ```
 build\bin\llama-cli.exe -m models\llama-2-7b.Q4_0.gguf -p "Building a website can be done in 10 simple steps:\nStep 1:" -n 400 -e -ngl 33 -s 0 -sm layer
 ```
-Otherwise, run the following wrapper script:
+그렇지 않으면 다음 래퍼 스크립트를 실행하십시오:
 
 ```
 .\examples\sycl\win-run-llama2.bat
 ```
 
-Note:
+참고:
 
-- Upon execution, verify the selected device(s) ID(s) in the output log, which can for instance be displayed as follow:
+- 실행 시, 출력 로그에서 선택된 장치(들) ID(들)를 확인하십시오. 예를 들어 다음과 같이 표시될 수 있습니다:
 
 ```sh
 detect 1 SYCL GPUs: [0] with top Max compute units:512
 ```
-Or
+ 아니면
 ```sh
 use 1 SYCL GPUs: [0] with Max compute units:512
 ```
 
-## Environment Variable
+## 환경 변수
 
-#### Build
+#### 빌드
 
 | Name               | Value                             | Function                                    |
 |--------------------|-----------------------------------|---------------------------------------------|
@@ -550,43 +550,43 @@ use 1 SYCL GPUs: [0] with Max compute units:512
 | CMAKE_C_COMPILER   | icx                               | Set *icx* compiler for SYCL code path.      |
 | CMAKE_CXX_COMPILER | icpx *(Linux)*, icx *(Windows)*   | Set `icpx/icx` compiler for SYCL code path. |
 
-#### Runtime
+#### 실행 시간
 
 | Name              | Value            | Function                                                                                                                  |
 |-------------------|------------------|---------------------------------------------------------------------------------------------------------------------------|
 | GGML_SYCL_DEBUG   | 0 (default) or 1 | Enable log function by macro: GGML_SYCL_DEBUG                                                                             |
 | ZES_ENABLE_SYSMAN | 0 (default) or 1 | Support to get free memory of GPU by sycl::aspect::ext_intel_free_memory.<br>Recommended to use when --split-mode = layer |
 
-## Known Issues
+## 알려진 문제
 
-- `Split-mode:[row]` is not supported.
+- `Split-mode:[row]` 는 지원되지 않습니다.
 
-## Q&A
+## 질문 및 답변
 
-- Error:  `error while loading shared libraries: libsycl.so.7: cannot open shared object file: No such file or directory`.
+- 오류:  `error while loading shared libraries: libsycl.so.7: cannot open shared object file: No such file or directory`.
 
-  - Potential cause: Unavailable oneAPI installation or not set ENV variables.
-  - Solution: Install *oneAPI base toolkit* and enable its ENV through: `source /opt/intel/oneapi/setvars.sh`.
+  - 가능한 원인: oneAPI 설치가 되어 있지 않거나 ENV 변수가 설정되지 않았습니다.
+  - 해결 방법: *oneAPI 기본 툴킷*을 설치하고 `source /opt/intel/oneapi/setvars.sh`를 통해 ENV를 활성화합니다.
 
-- General compiler error:
+- 일반 컴파일러 오류:
 
-  - Remove **build** folder or try a clean-build.
+  - **build** 폴더를 삭제하거나 깨끗한 빌드를 시도합니다.
 
-- I can **not** see `[ext_oneapi_level_zero:gpu]` afer installing the GPU driver on Linux.
+- Linux에서 GPU 드라이버를 설치한 후에도 `[ext_oneapi_level_zero:gpu]`를 볼 수 없습니다.
 
-  Please double-check with `sudo sycl-ls`.
+  `sudo sycl-ls`로 확인해주세요.
 
-  If it's present in the list, please add video/render group to your user then **logout/login** or restart your system:
+  만약 목록에 존재한다면, 사용자에게 video/render 그룹을 추가한 후 **로그아웃/로그인** 또는 시스템을 다시 시작하세요:
 
   ```
   sudo usermod -aG render $USER
   sudo usermod -aG video $USER
   ```
-  Otherwise, please double-check the GPU driver installation steps.
+  그렇지 않다면, GPU 드라이버 설치 단계를 다시 한번 확인해주세요.
 
-### **GitHub contribution**:
-Please add the **[SYCL]** prefix/tag in issues/PRs titles to help the SYCL-team check/address them without delay.
+### **GitHub 기여**:
+문제/PR 제목에 **[SYCL]** 접두사/태그를 추가하여 SYCL 팀이 지연 없이 확인/처리할 수 있도록 도와주세요.
 
 ## TODO
 
-- Support row layer split for multiple card runs.
+- 여러 카드 실행에 대한 행 레이어 분할 지원.

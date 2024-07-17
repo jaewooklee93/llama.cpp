@@ -1,17 +1,17 @@
 # MobileVLM
 
-Currently this implementation supports [MobileVLM-1.7B](https://huggingface.co/mtgv/MobileVLM-1.7B) / [MobileVLM_V2-1.7B](https://huggingface.co/mtgv/MobileVLM_V2-1.7B) variants.
+현재 이 구현은 [MobileVLM-1.7B](https://huggingface.co/mtgv/MobileVLM-1.7B) / [MobileVLM_V2-1.7B](https://huggingface.co/mtgv/MobileVLM_V2-1.7B) 변이를 지원합니다.
 
-for more information, please go to [Meituan-AutoML/MobileVLM](https://github.com/Meituan-AutoML/MobileVLM)
+더 자세한 내용은 [Meituan-AutoML/MobileVLM](https://github.com/Meituan-AutoML/MobileVLM)을 참조하십시오.
 
-The implementation is based on llava, and is compatible with llava and mobileVLM. The usage is basically same as llava.
+이 구현은 llava 기반이며, llava 및 mobileVLM과 호환됩니다. 사용법은 llava와 거의 동일합니다.
 
-Notice: The overall process of model inference for both **MobileVLM** and **MobileVLM_V2** models is the same, but the process of model conversion is a little different. Therefore, using **MobileVLM-1.7B** as an example, the different conversion step will be shown.
+참고: **MobileVLM** 및 **MobileVLM_V2** 모델의 모델 추론 전체 과정은 동일하지만, 모델 변환 과정은 약간 다릅니다. 따라서 **MobileVLM-1.7B**를 예시로 사용하여 다른 변환 단계를 보여드리겠습니다.
 
-## Usage
-Build with cmake or run `make llama-llava-cli` to build it.
+## 사용법
+cmake로 빌드하거나 `make llama-llava-cli`를 실행하여 빌드합니다.
 
-After building, run: `./llama-llava-cli` to see the usage. For example:
+빌드 후, `./llama-llava-cli`를 실행하여 사용법을 확인합니다. 예를 들어:
 
 ```sh
 ./llama-llava-cli -m MobileVLM-1.7B/ggml-model-q4_k.gguf \
@@ -20,9 +20,9 @@ After building, run: `./llama-llava-cli` to see the usage. For example:
     -p "A chat between a curious user and an artificial intelligence assistant. The assistant gives helpful, detailed, and polite answers to the user's questions. USER: <image>\nWho is the author of this book? Answer the question using a single word or phrase. ASSISTANT:"
 ```
 
-## Model conversion
+## 모델 변환
 
-1. Clone `mobileVLM-1.7B` and `clip-vit-large-patch14-336` locally:
+1. `mobileVLM-1.7B` 및 `clip-vit-large-patch14-336`을 로컬로 복제합니다.
 
 ```sh
 git clone https://huggingface.co/mtgv/MobileVLM-1.7B
@@ -30,13 +30,13 @@ git clone https://huggingface.co/mtgv/MobileVLM-1.7B
 git clone https://huggingface.co/openai/clip-vit-large-patch14-336
 ```
 
-2. Use `llava_surgery.py` to split the LLaVA model to LLaMA and multimodel projector constituents:
+2. `llava_surgery.py`를 사용하여 LLaVA 모델을 LLaMA와 다중 모델 프로젝터 구성 요소로 분할합니다:
 
 ```sh
 python ./examples/llava/llava_surgery.py -m path/to/MobileVLM-1.7B
 ```
 
-3. Use `convert_image_encoder_to_gguf.py` with `--projector-type ldp` (for **V2** please use `--projector-type ldpv2`) to convert the LLaVA image encoder to GGUF:
+3. `convert_image_encoder_to_gguf.py`를 사용하여 `--projector-type ldp` (**V2**의 경우 `--projector-type ldpv2`)로 LLaVA 이미지 인코더를 GGUF로 변환합니다.
 
 ```sh
 python ./examples/llava/convert_image_encoder_to_gguf \
@@ -54,33 +54,33 @@ python ./examples/llava/convert_image_encoder_to_gguf \
     --projector-type ldpv2
 ```
 
-4. Use `examples/convert_legacy_llama.py` to convert the LLaMA part of LLaVA to GGUF:
+4. `examples/convert_legacy_llama.py`를 사용하여 LLaVA의 LLaMA 부분을 GGUF로 변환합니다.
 
 ```sh
 python ./examples/convert_legacy_llama.py path/to/MobileVLM-1.7B
 ```
 
-5. Use `quantize` to convert LLaMA part's DataType from `fp16` to `q4_k`
+5. `quantize`를 사용하여 LLaMA 부분의 DataType를 `fp16`에서 `q4_k`로 변환합니다.
 ```sh
 ./llama-quantize path/to/MobileVLM-1.7B/ggml-model-f16.gguf path/to/MobileVLM-1.7B/ggml-model-q4_k.gguf q4_k_s
 ```
 
-Now both the LLaMA part and the image encoder is in the `MobileVLM-1.7B` directory.
+이제 LLaMA 부분과 이미지 인코더가 모두 `MobileVLM-1.7B` 디렉토리에 있습니다.
 
-## Android compile and run
-### compile
-refer to `examples/llava/android/build_64.sh`
+## 안드로이드 컴파일 및 실행
+### 컴파일
+`examples/llava/android/build_64.sh`를 참조하세요
 ```sh
 mkdir examples/llava/android/build_64
 cd examples/llava/android/build_64
 ../build_64.sh
 ```
-### run on Android
-refer to `android/adb_run.sh`, modify resources' `name` and `path`
+### Android에서 실행
+`android/adb_run.sh`를 참조하여 리소스의 `name`과 `path`를 수정하세요.
 
-## Some result on Android with `Snapdragon 888` chip
+## Snapdragon 888 칩셋에서 안드로이드에서의 일부 결과
 ### case 1
-**input**
+**입력**
 ```sh
 /data/local/tmp/llama-llava-cli \
     -m /data/local/tmp/ggml-model-q4_k.gguf \
@@ -89,7 +89,7 @@ refer to `android/adb_run.sh`, modify resources' `name` and `path`
     --image /data/local/tmp/demo.jpg \
     -p "A chat between a curious user and an artificial intelligence assistant. The assistant gives helpful, detailed, and polite answers to the user's questions. USER: <image>\nWho is the author of this book? \nAnswer the question using a single word or phrase. ASSISTANT:"
 ```
-**output**
+**출력**
 ```sh
 encode_image_with_clip: image encoded in 21148.71 ms by CLIP (  146.87 ms per image patch)
  Susan Wise Bauer
@@ -99,8 +99,8 @@ llama_print_timings: prompt eval time =   12460.15 ms /   246 tokens (   50.65 m
 llama_print_timings:        eval time =     424.86 ms /     6 runs   (   70.81 ms per token,    14.12 tokens per second)
 llama_print_timings:       total time =   34731.93 ms
 ```
-### case 2
-**input**
+### 사례 2
+**입력**
 ```sh
 /data/local/tmp/llama-llava-cli \
     -m /data/local/tmp/ggml-model-q4_k.gguf \
@@ -109,7 +109,7 @@ llama_print_timings:       total time =   34731.93 ms
     --image /data/local/tmp/cat.jpeg \
     -p "A chat between a curious user and an artificial intelligence assistant. The assistant gives helpful, detailed, and polite answers to the user's questions. USER: <image>\nWhat is in the image? ASSISTANT:"
 ```
-**output**
+**출력**
 ```sh
 encode_image_with_clip: image encoded in 21149.51 ms by CLIP (  146.87 ms per image patch)
  The image depicts a cat sitting in the grass near some tall green plants.
@@ -121,10 +121,10 @@ llama_print_timings:       total time =   34570.79 ms
 ```
 
 
-## Some result on Android with `Snapdragon 778G` chip
-### MobileVLM-1.7B case
+## Snapdragon 778G 칩으로 실행한 안드로이드 결과물
+### MobileVLM-1.7B 사례
 #### llava-cli release-b2005
-**input**
+**입력**
 ```sh
 /data/local/tmp/llama-llava-cli \
     -m /data/local/tmp/ggml-model-q4_k.gguf \
@@ -133,7 +133,7 @@ llama_print_timings:       total time =   34570.79 ms
     --image /data/local/tmp/many_llamas.jpeg \
     -p "A chat between a curious user and an artificial intelligence assistant. The assistant gives helpful, detailed, and polite answers to the user's questions. USER: <image>\nWhat's that? ASSISTANT:"
 ```
-**output**
+**출력**
 ```sh
 encode_image_with_clip: image encoded in 18728.52 ms by CLIP (  130.06 ms per image patch)
 system_prompt: A chat between a curious user and an artificial intelligence assistant. The assistant gives helpful, detailed, and polite answers to the user's questions. USER:
@@ -147,12 +147,12 @@ llama_print_timings: prompt eval time =    8119.49 ms /   191 tokens (   42.51 m
 llama_print_timings:        eval time =    1005.75 ms /    14 runs   (   71.84 ms per token,    13.92 tokens per second)
 llama_print_timings:       total time =   28038.34 ms /   205 tokens
 ```
-#### llava-cli latest-version
-**input**
+#### llava-cli 최신 버전
+**입력**
 
-Just the same as above.
+위와 동일합니다.
 
-**output**(seems to be much slower)
+**출력**(아마도 훨씬 느리겠습니다)
 ```sh
 encode_image_with_clip: image embedding created: 144 tokens
 
@@ -168,13 +168,13 @@ llama_print_timings: prompt eval time =  529274.69 ms /   191 tokens ( 2771.07 m
 llama_print_timings:        eval time =   43894.02 ms /    13 runs   ( 3376.46 ms per token,     0.30 tokens per second)
 llama_print_timings:       total time =  865441.76 ms /   204 tokens
 ```
-### MobileVLM_V2-1.7B case
+### MobileVLM_V2-1.7B 사례
 #### llava-cli release-2005b
-**input**
+**입력**
 
-Just the same as above.
+위와 동일합니다.
 
-**output**
+**출력**
 ```sh
 encode_image_with_clip: image encoded in 20609.61 ms by CLIP (  143.12 ms per image patch)
 system_prompt: A chat between a curious user and an artificial intelligence assistant. The assistant gives helpful, detailed, and polite answers to the user's questions. USER:
@@ -191,14 +191,14 @@ llama_print_timings:        eval time =   14497.49 ms /   186 runs   (   77.94 m
 llama_print_timings:       total time =   44411.01 ms /   377 tokens
 ```
 
-## Orin compile and run
-### compile
+## Orin 컴파일 및 실행
+### 컴파일
 ```sh
 make GGML_CUDA=1 CUDA_DOCKER_ARCH=sm_87 GGML_CUDA_F16=1 -j 32
 ```
-### run on Orin
+### Orin에서 실행하기
 ### case 1
-**input**
+**입력**
 ```sh
 ./llama-llava-cli \
     -m /data/local/tmp/ggml-model-q4_k.gguf \
@@ -207,7 +207,7 @@ make GGML_CUDA=1 CUDA_DOCKER_ARCH=sm_87 GGML_CUDA_F16=1 -j 32
     -p "A chat between a curious user and an artificial intelligence assistant. The assistant gives helpful, detailed, and polite answers to the user's questions. USER: <image>\nWho is the author of this book? \nAnswer the question using a single word or phrase. ASSISTANT:" \
     --n-gpu-layers 999
 ```
-**output**
+**출력**
 ```sh
 
 encode_image_with_clip: image encoded in   296.62 ms by CLIP (    2.06 ms per image patch)
@@ -221,8 +221,8 @@ llama_print_timings:        eval time =      91.50 ms /     6 runs   (   15.25 m
 llama_print_timings:       total time =    1352.63 ms /   252 tokens
 ```
 
-### case 2
-**input**
+### 사례 2
+**입력**
 ```sh
 ./llama-llava-cli \
     -m /data/local/tmp/ggml-model-q4_k.gguf \
@@ -231,7 +231,7 @@ llama_print_timings:       total time =    1352.63 ms /   252 tokens
     --n-gpu-layers 999
 
 ```
-**output**
+**출력**
 ```sh
 encode_image_with_clip: image encoded in   302.15 ms by CLIP (    2.10 ms per image patch)
 
@@ -244,22 +244,22 @@ llama_print_timings:        eval time =     166.65 ms /    11 runs   (   15.15 m
 llama_print_timings:       total time =    1365.47 ms /   243 tokens
 ```
 
-## Running on Intel(R) Core(TM) i7-10750H
-### Operating system
+## Intel(R) Core(TM) i7-10750H에서 실행하기
+### 운영 체제
 Ubuntu22.04
-### compile
+### 컴파일
 ```sh
 make -j32
 ```
-### MobileVLM-1.7B case
-**input**
+### MobileVLM-1.7B 사례
+**입력**
 ```sh
 -m /path/to/ggml-model-q4_k.gguf \
     --mmproj /path/to/mmproj-model-f16.gguf \
     --image /path/to/many_llamas.jpeg
     -p "A chat between a curious user and an artificial intelligence assistant. The assistant gives helpful, detailed, and polite answers to the user's questions. USER: <image>\nWhat's that? ASSISTANT:" \
 ```
-**output**
+**출력**
 ```sh
 encode_image_with_clip: image embedding created: 144 tokens
 
@@ -276,12 +276,12 @@ llama_print_timings:        eval time =     438.92 ms /    12 runs   (   36.58 m
 llama_print_timings:       total time =    5990.25 ms /   202 tokens
 ```
 
-### MobileVLM_V2-1.7B case
-**input**
+### MobileVLM_V2-1.7B 사례
+**입력**
 
-Just the same as above.
+위와 동일합니다.
 
-**ouput**
+**출력**
 ```sh
 encode_image_with_clip: image embedding created: 144 tokens
 
@@ -302,21 +302,21 @@ llama_print_timings:        eval time =    8760.60 ms /   222 runs   (   39.46 m
 llama_print_timings:       total time =   15513.95 ms /   412 tokens
 ```
 
-## Run on Intel(R) Core(TM) Ultra7 115H
-### operation system
+## Intel(R) Core(TM) Ultra7 115H에서 실행하기
+### 운영 체제
 Windows11
-### comiple
+### 컴파일
 ```sh
 make -j32
 ```
-### MobileVLM-1.7B case
-**input**
+### MobileVLM-1.7B 사례
+**입력**
 ```sh
 -m /path/to/ggml-model-q4_k.gguf \
     --mmproj /path/to/tmp/mmproj-model-f16.gguf \
     -p "A chat between a curious user and an artificial intelligence assistant. The assistant gives helpful, detailed, and polite answers to the user's questions. USER: <image>\nWhat's that? ASSISTANT:" \
 ```
-**output**
+**출력**
 ```sh
 encode_image_with_clip: image encoded in  4902.81 ms by CLIP (   34.05 ms per image patch)
 system_prompt: A chat between a curious user and an artificial intelligence assistant. The assistant gives helpful, detailed, and polite answers to the user's questions. USER:
@@ -331,12 +331,12 @@ llama_print_timings:        eval time =     512.35 ms /    18 runs   (   28.46 m
 llama_print_timings:       total time =    7987.23 ms /   209 tokens
 ```
 
-### MobileVLM_V2-1.7B case
-**input**
+### MobileVLM_V2-1.7B 사례
+**입력**
 
-Just the same as above.
+위와 동일합니다.
 
-**output**
+**출력**
 ```sh
 encode_image_with_clip: image encoded in  4682.44 ms by CLIP (   32.52 ms per image patch)
 system_prompt: A chat between a curious user and an artificial intelligence assistant. The assistant gives helpful, detailed, and polite answers to the user's questions. USER:
@@ -362,16 +362,16 @@ llama_print_timings:       total time =   14371.19 ms /   446 tokens
 
 ## TODO
 
-- [x] Support non-CPU backend for the new operators, such as `depthwise`, `hardswish`, `hardsigmoid`
-- [ ] Optimize LDP projector performance
+- [x] 새로운 연산자( `depthwise`, `hardswish`, `hardsigmoid` )에 대한 CPU 이외의 백엔드 지원
+- [ ] LDP 프로젝터 성능 최적화
 
-      - Optimize the structure definition to avoid unnecessary memory rearrangements, to reduce the use of `ggml_permute_cpy`;
-      - Optimize operator implementation (ARM CPU/NVIDIA GPU): such as depthwise conv, hardswish, hardsigmoid, etc.
-- [x] run MobileVLM on `Jetson Orin`
-- [ ] Support more model variants, such as `MobileVLM-3B`.
+      - 불필요한 메모리 재배열을 피하기 위해 구조 정의 최적화, `ggml_permute_cpy` 사용량 감소;
+      - 연산자 구현 (ARM CPU/NVIDIA GPU) 최적화: depthwise conv, hardswish, hardsigmoid 등
+- [x] Jetson Orin에서 MobileVLM 실행
+- [ ] MobileVLM-3B와 같은 더 많은 모델 변형 지원.
 
 
-## contributor
+## 기여자
 ```sh
 zhangjidong05, yangyang260, huyiming03, chenxiaotao03, ZiangWu-77
 ```

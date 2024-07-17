@@ -1,10 +1,10 @@
-## GGUF split Example
+## GGUF split 예제
 
-CLI to split / merge GGUF files.
+GGUF 파일을 분할/병합하는 CLI입니다.
 
-**Command line options:**
+**명령줄 옵션:**
 
-- `--split`: split GGUF to multiple GGUF, default operation.
-- `--split-max-size`: max size per split in `M` or `G`, f.ex. `500M` or `2G`.
-- `--split-max-tensors`: maximum tensors in each split: default(128)
-- `--merge`: merge multiple GGUF to a single GGUF.
+- `--split`: GGUF를 여러 개의 GGUF로 분할하는 기본 작업.
+- `--split-max-size`: 분할당 최대 크기 (M 또는 G), 예: `500M` 또는 `2G`.
+- `--split-max-tensors`: 각 분할당 최대 텐서 수: 기본값(128)
+- `--merge`: 여러 개의 GGUF를 하나의 GGUF로 병합합니다.

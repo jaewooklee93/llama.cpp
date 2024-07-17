@@ -1,12 +1,12 @@
 # llama.cpp/example/embedding
 
-This example demonstrates generate high-dimensional embedding vector of a given text with llama.cpp.
+이 예제는 llama.cpp를 사용하여 주어진 텍스트의 고차원 임베딩 벡터를 생성하는 방법을 보여줍니다.
 
-## Quick Start
+## 빠른 시작
 
-To get started right away, run the following command, making sure to use the correct path for the model you have:
+바로 시작하려면 다음 명령을 실행하고, 사용 중인 모델의 경로를 올바르게 지정하십시오.
 
-### Unix-based systems (Linux, macOS, etc.):
+### Unix 기반 시스템 (Linux, macOS 등):
 
 ```bash
 ./llama-embedding -m ./path/to/model --log-disable -p "Hello World!" 2>/dev/null
@@ -18,9 +18,9 @@ To get started right away, run the following command, making sure to use the cor
 llama-embedding.exe -m ./path/to/model --log-disable -p "Hello World!" 2>$null
 ```
 
-The above command will output space-separated float values.
+위 명령어를 실행하면 공백으로 구분된 부동 소수점 값이 출력됩니다.
 
-## extra parameters
+## 추가 매개변수
 ### --embd-normalize $integer$
 | $integer$ | description         | formula |
 |-----------|---------------------|---------|
@@ -39,7 +39,7 @@ The above command will output space-separated float values.
 | 'json'     | openai style                 |
 | 'json+'    | add cosine similarity matrix |
 
-### --embd-separator $"string"$
+### --embd-separator "string"
 | $"string"$   | |
 |--------------|-|
 | "\n"         | (default)
@@ -47,7 +47,7 @@ The above command will output space-separated float values.
 | "<#sep#>"    | other exemple
 
 ## examples
-### Unix-based systems (Linux, macOS, etc.):
+### Unix 기반 시스템 (Linux, macOS 등):
 
 ```bash
 ./embedding -p 'Castle<#sep#>Stronghold<#sep#>Dog<#sep#>Cat' --embd-separator '<#sep#>' --embd-normalize 2  --embd-output-format '' -m './path/to/model.gguf' --n-gpu-layers 99 --log-disable 2>/dev/null

@@ -1,39 +1,39 @@
-# Install pre-built version of llama.cpp
+# llama.cpp의 미리 빌드된 버전 설치하기
 
 ## Homebrew
 
-On Mac and Linux, the homebrew package manager can be used via
+Mac과 Linux에서 홈브루  pakege 관리자를 사용할 수 있습니다.
 
 ```sh
 brew install llama.cpp
 ```
-The formula is automatically updated with new `llama.cpp` releases. More info: https://github.com/ggerganov/llama.cpp/discussions/7668
+포뮬러는 새롭게 출시된 `llama.cpp` 버전으로 자동으로 업데이트됩니다. 자세한 내용은: https://github.com/ggerganov/llama.cpp/discussions/7668
 
 ## Nix
 
-On Mac and Linux, the Nix package manager can be used via
+Mac과 Linux에서 Nix 패키지 관리기를 사용할 수 있습니다.
 
 ```sh
 nix profile install nixpkgs#llama-cpp
 ```
-For flake enabled installs.
+flake 활성화된 설치를 위해.
 
-Or
+또는
 
 ```sh
 nix-env --file '<nixpkgs>' --install --attr llama-cpp
 ```
 
-For non-flake enabled installs.
+flake 사용이 비활성화된 설치를 위해.
 
-This expression is automatically updated within the [nixpkgs repo](https://github.com/NixOS/nixpkgs/blob/nixos-24.05/pkgs/by-name/ll/llama-cpp/package.nix#L164).
+이 표현식은 [nixpkgs repo](https://github.com/NixOS/nixpkgs/blob/nixos-24.05/pkgs/by-name/ll/llama-cpp/package.nix#L164) 내에서 자동으로 업데이트됩니다.
 
 ## Flox
 
-On Mac and Linux, Flox can be used to install llama.cpp within a Flox environment via
+Mac과 Linux에서 Flox를 사용하여 Flox 환경 내에서 llama.cpp를 설치할 수 있습니다.
 
 ```sh
 flox install llama-cpp
 ```
 
-Flox follows the nixpkgs build of llama.cpp.
+Flox는 llama.cpp의 nixpkgs 빌드를 따릅니다.

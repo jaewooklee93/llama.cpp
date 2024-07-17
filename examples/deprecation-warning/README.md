@@ -1,11 +1,11 @@
-# Migration notice for binary filenames
+# 이진 파일 이름 마이그레이션 안내
 
-> [!IMPORTANT]
-[2024 Jun 12] Binaries have been renamed w/ a `llama-` prefix. `main` is now `llama-cli`, `server` is `llama-server`, etc (https://github.com/ggerganov/llama.cpp/pull/7809)
+> [!중요]
+[2024년 6월 12일] 이진 파일 이름에 `llama-` 접두사가 추가되었습니다. `main`은 `llama-cli`로, `server`는 `llama-server`로 변경되었습니다. (https://github.com/ggerganov/llama.cpp/pull/7809)
 
-This migration was important, but it is a breaking change that may not always be immediately obvious to users.
+이 마이그레이션은 중요하지만, 사용자에게 항상 즉시 명확하지 않을 수 있는 버전 변경 사항입니다.
 
-Please update all scripts and workflows to use the new binary names.
+모든 스크립트 및 워크플로우에서 새 이진 파일 이름을 사용하도록 업데이트하십시오.
 
 | Old Filename | New Filename |
 | ---- | ---- |

@@ -1,16 +1,16 @@
 # llama.cpp/example/main-cmake-pkg
 
-This program builds [llama-cli](../main) using a relocatable CMake package. It serves as an example of using the `find_package()` CMake command to conveniently include [llama.cpp](https://github.com/ggerganov/llama.cpp) in projects which live outside of the source tree.
+이 프로그램은 재사용 가능한 CMake 패키지를 사용하여 [llama-cli](../main)를 빌드합니다. [llama.cpp](https://github.com/ggerganov/llama.cpp)를 소스 트리 외부에 있는 프로젝트에 편리하게 포함하는 데 `find_package()` CMake 명령을 사용하는 방법을 보여줍니다.
 
-## Building
+## 빌드
 
-Because this example is "outside of the source tree", it is important to first build/install llama.cpp using CMake. An example is provided here, but please see the [llama.cpp build instructions](../..) for more detailed build instructions.
+이 예제가 "소스 트리 외부"이기 때문에, 먼저 CMake을 사용하여 llama.cpp를 빌드/설치하는 것이 중요합니다. 여기 예시가 제공되지만, 자세한 빌드 지침은 [llama.cpp 빌드 지침](../..)을 참조하십시오.
 
-### Considerations
+### 고려 사항
 
-When hardware acceleration libraries are used (e.g. CUDA, Metal, etc.), CMake must be able to locate the associated CMake package.
+하드웨어 가속 라이브러리가 사용될 때 (예: CUDA, Metal 등), CMake은 관련된 CMake 패키지를 찾을 수 있어야 합니다.
 
-### Build llama.cpp and install to C:\LlamaCPP directory
+### llama.cpp를 빌드하고 C:\LlamaCPP 디렉토리에 설치하기
 
 ```cmd
 git clone https://github.com/ggerganov/llama.cpp
@@ -20,7 +20,7 @@ cmake --build build --config Release
 cmake --install build --prefix C:/LlamaCPP
 ```
 
-### Build llama-cli-cmake-pkg
+### llama-cli-cmake-pkg 빌드하기
 
 
 ```cmd

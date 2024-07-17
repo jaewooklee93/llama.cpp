@@ -1,30 +1,30 @@
 # LLaVA
 
-Currently this implementation supports [llava-v1.5](https://huggingface.co/liuhaotian/llava-v1.5-7b) variants,
-as well as llava-1.6 [llava-v1.6](https://huggingface.co/collections/liuhaotian/llava-16-65b9e40155f60fd046a5ccf2) variants.
+현재 이 구현은 [llava-v1.5](https://huggingface.co/liuhaotian/llava-v1.5-7b) 변형 및
+llava-1.6 [llava-v1.6](https://huggingface.co/collections/liuhaotian/llava-16-65b9e40155f60fd046a5ccf2) 변형을 지원합니다.
 
-The pre-converted [7b](https://huggingface.co/mys/ggml_llava-v1.5-7b)
-and [13b](https://huggingface.co/mys/ggml_llava-v1.5-13b)
-models are available.
-For llava-1.6 a variety of prepared gguf models are available as well [7b-34b](https://huggingface.co/cmp-nct/llava-1.6-gguf)
+사전 변환된 [7b](https://huggingface.co/mys/ggml_llava-v1.5-7b)
+및 [13b](https://huggingface.co/mys/ggml_llava-v1.5-13b)
+모델이 사용 가능합니다.
+llava-1.6의 경우 다양한 준비된 gguf 모델도 사용 가능합니다 [7b-34b](https://huggingface.co/cmp-nct/llava-1.6-gguf)
 
-After API is confirmed, more models will be supported / uploaded.
+API가 확인되면 더 많은 모델이 지원/업로드될 예정입니다.
 
-## Usage
-Build with cmake or run `make llama-llava-cli` to build it.
+## 사용법
+cmake로 빌드하거나 `make llama-llava-cli`를 실행하여 빌드합니다.
 
-After building, run: `./llama-llava-cli` to see the usage. For example:
+빌드 후, `./llama-llava-cli`를 실행하여 사용법을 확인합니다. 예를 들어:
 
 ```sh
 ./llama-llava-cli -m ../llava-v1.5-7b/ggml-model-f16.gguf --mmproj ../llava-v1.5-7b/mmproj-model-f16.gguf --image path/to/an/image.jpg
 ```
 
-**note**: A lower temperature like 0.1 is recommended for better quality. add `--temp 0.1` to the command to do so.
-**note**: For GPU offloading ensure to use the `-ngl` flag just like usual
+**참고**: 더 나은 품질을 위해 0.1과 같은 낮은 온도를 권장합니다. 명령에 `--temp 0.1`을 추가하여 이를 수행하십시오.
+**참고**: GPU 오프로드를 위해서는 일반과 같이 `-ngl` 플래그를 사용해야 합니다.
 
 ## LLaVA 1.5
 
-1. Clone a LLaVA and a CLIP model ([available options](https://github.com/haotian-liu/LLaVA/blob/main/docs/MODEL_ZOO.md)). For example:
+1. LLaVA와 CLIP 모델을 복제합니다 ([가용 옵션](https://github.com/haotian-liu/LLaVA/blob/main/docs/MODEL_ZOO.md)). 예를 들어:
 
 ```sh
 git clone https://huggingface.co/liuhaotian/llava-v1.5-7b
@@ -32,51 +32,51 @@ git clone https://huggingface.co/liuhaotian/llava-v1.5-7b
 git clone https://huggingface.co/openai/clip-vit-large-patch14-336
 ```
 
-2. Install the required Python packages:
+2. 필요한 Python 패키지를 설치하세요:
 
 ```sh
 pip install -r examples/llava/requirements.txt
 ```
 
-3. Use `llava_surgery.py` to split the LLaVA model to LLaMA and multimodel projector constituents:
+3. `llava_surgery.py`를 사용하여 LLaVA 모델을 LLaMA와 다중 모델 프로젝터 구성 요소로 분리합니다.
 
 ```sh
 python ./examples/llava/llava_surgery.py -m ../llava-v1.5-7b
 ```
 
-4. Use `convert_image_encoder_to_gguf.py` to convert the LLaVA image encoder to GGUF:
+4. `convert_image_encoder_to_gguf.py`를 사용하여 LLaVA 이미지 인코더를 GGUF로 변환합니다.
 
 ```sh
 python ./examples/llava/convert_image_encoder_to_gguf.py -m ../clip-vit-large-patch14-336 --llava-projector ../llava-v1.5-7b/llava.projector --output-dir ../llava-v1.5-7b
 ```
 
-5. Use `examples/convert_legacy_llama.py` to convert the LLaMA part of LLaVA to GGUF:
+5. `examples/convert_legacy_llama.py`를 사용하여 LLaVA의 LLaMA 부분을 GGUF로 변환합니다.
 
 ```sh
 python ./examples/convert_legacy_llama.py ../llava-v1.5-7b --skip-unknown
 ```
 
-Now both the LLaMA part and the image encoder are in the `llava-v1.5-7b` directory.
+이제 LLaMA 부분과 이미지 인코더가 모두 `llava-v1.5-7b` 디렉토리에 있습니다.
 
-## LLaVA 1.6 gguf conversion
-1) First clone a LLaVA 1.6 model:
+## LLaVA 1.6 gguf 변환
+1) 먼저 LLaVA 1.6 모델을 복제합니다:
 ```console
 git clone https://huggingface.co/liuhaotian/llava-v1.6-vicuna-7b
 ```
 
-2) Install the required Python packages:
+2) 필요한 Python 패키지를 설치하세요:
 
 ```sh
 pip install -r examples/llava/requirements.txt
 ```
 
-3) Use `llava_surgery_v2.py` which also supports llava-1.5 variants pytorch as well as safetensor models:
+3) `llava_surgery_v2.py`를 사용하세요. 이 스크립트는 llava-1.5 변형 pytorch 모델과 safetensor 모델을 모두 지원합니다:
 ```console
 python examples/llava/llava_surgery_v2.py -C -m ../llava-v1.6-vicuna-7b/
 ```
-- you will find a llava.projector and a llava.clip file in your model directory
+- 모델 디렉토리에 llava.projector와 llava.clip 파일이 있습니다.
 
-4) Copy the llava.clip file into a subdirectory (like vit), rename it to pytorch_model.bin and add a fitting vit configuration to the directory:
+4) llava.clip 파일을 하위 디렉토리(예: vit)로 복사하고 pytorch_model.bin으로 이름을 바꾸고 디렉토리에 맞는 vit 구성 파일을 추가하세요:
 ```console
 mkdir vit
 cp ../llava-v1.6-vicuna-7b/llava.clip vit/pytorch_model.bin
@@ -84,56 +84,56 @@ cp ../llava-v1.6-vicuna-7b/llava.projector vit/
 curl -s -q https://huggingface.co/cmp-nct/llava-1.6-gguf/raw/main/config_vit.json -o vit/config.json
 ```
 
-5) Create the visual gguf model:
+5) 시각적 gguf 모델 생성:
 ```console
 python ./examples/llava/convert_image_encoder_to_gguf.py -m vit --llava-projector vit/llava.projector --output-dir vit --clip-model-is-vision
 ```
-- This is similar to llava-1.5, the difference is that we tell the encoder that we are working with the pure vision model part of CLIP
+- llava-1.5와 유사하지만, 인코더에 CLIP의 순수 비전 모델 부분을 사용하고 있다는 것을 알려줍니다.
 
-6) Then convert the model to gguf format:
+6) 모델을 gguf 형식으로 변환합니다:
 ```console
 python ./examples/convert_legacy_llama.py ../llava-v1.6-vicuna-7b/ --skip-unknown
 ```
 
-7) And finally we can run the llava cli using the 1.6 model version:
+7) 마지막으로 1.6 모델 버전을 사용하여 llava cli를 실행할 수 있습니다:
 ```console
 ./llama-llava-cli -m ../llava-v1.6-vicuna-7b/ggml-model-f16.gguf --mmproj vit/mmproj-model-f16.gguf --image some-image.jpg -c 4096
 ```
 
-**note** llava-1.6 needs more context than llava-1.5, at least 3000 is needed (just run it at -c 4096)
-**note** llava-1.6 greatly benefits from batched prompt processing (defaults work)
+**참고** llava-1.6는 llava-1.5보다 더 많은 맥락이 필요합니다. 최소 3000개가 필요합니다 (단순히 -c 4096으로 실행하세요)
+**참고** llava-1.6는 배치 프롬프트 처리에서 큰 이점을 얻습니다 (기본값이 작동합니다)
 
-## llava-cli templating and llava-1.6 prompting
+## llava-cli 템플릿 및 llava-1.6 프롬프팅
 
-llava-1.5 models all use the same vicuna prompt, here you can just add your image question like `-p "Provide a full description."`
-For llava-1.5 models which are not vicuna (mistral and Yi) you need to adapt system prompt as well as user prompt, for this purpose llava-cli has a basic templating system:
+llava-1.5 모델은 모두 동일한 vicuna 프롬프트를 사용합니다. 여기서는 `-p "전체 설명을 제공하세요."`와 같이 이미지 질문을 추가할 수 있습니다.
+llava-1.5 모델 중 vicuna가 아닌 (mistral 및 Yi) 모델의 경우 시스템 프롬프트와 사용자 프롬프트를 모두 조정해야 합니다. 이를 위해 llava-cli에는 기본적인 템플릿 시스템이 있습니다.
 
-**For Mistral and using llava-cli binary:**
-Add this: `-p "<image>\nUSER:\nProvide a full description.\nASSISTANT:\n"`
-The mistral template for llava-1.6 seems to be no system print and a USER/ASSISTANT role
+**Mistral을 사용하는 경우 및 llava-cli binary를 사용하는 경우:**
+다음을 추가하세요: `-p "<이미지>\n사용자:\n전체 설명을 제공하세요.\n보조자:\n"`
+llava-1.6의 mistral 템플릿은 시스템 출력이 없고 사용자/보조자 역할이 있는 것으로 보입니다.
 
-**For the 34B this should work:**
-Add this: `-e -p <|im_start|>system\nAnswer the questions.<|im_end|><|im_start|>user\n<image>\nProvide a full description.<|im_end|><|im_start|>assistant\n`
+**34B 모델의 경우 다음이 작동해야 합니다:**
+다음을 추가하세요: `-e -p <|im_start|>system\n질문에 답하세요.<|im_end|><|im_start|>user\n<이미지>\n전체 설명을 제공하세요.<|im_end|><|im_start|>assistant\n`
 
 
-## How to know if you are running in llava-1.5 or llava-1.6 mode
+## llava-1.5 또는 llava-1.6 모드인지 확인하는 방법
 
-When running llava-cli you will see a visual information right before the prompt is being processed:
+llava-cli를 실행하면 프롬프트가 처리되기 직전에 시각적 정보가 표시됩니다.
 
 **Llava-1.5:**
 `encode_image_with_clip: image embedding created: 576 tokens`
 
-**Llava-1.6 (anything above 576):**
+**Llava-1.6 (576 이상):**
 `encode_image_with_clip: image embedding created: 2880 tokens`
 
 
-Alternatively just pay notice to how many "tokens" have been used for your prompt, it will also show 1000+ tokens for llava-1.6
+또는 프롬프트에 사용된 토큰 수에 주의를 기울이면 됩니다. llava-1.6의 경우 1000개 이상의 토큰이 사용된 것을 확인할 수 있습니다.
 
 
 
 
 ## TODO
 
-- [x] Support non-CPU backend for the image encoding part.
-- [ ] Support different sampling methods.
-- [ ] Support more model variants.
+- [x] 이미지 인코딩 부분에 대한 CPU 외 백엔드 지원
+- [ ] 다양한 샘플링 방법 지원
+- [ ] 더 많은 모델 변형체 지원

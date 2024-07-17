@@ -1,9 +1,9 @@
 # llama.cpp/examples/eval-callback
 
-A simple example which demonstrates how to use callback during the inference.
-It simply prints to the console all operations and tensor data.
+인퍼런스 중에 콜백을 사용하는 방법을 보여주는 간단한 예제입니다.
+단순히 콘솔에 모든 작업 및 텐서 데이터를 출력합니다.
 
-Usage:
+사용법:
 
 ```shell
 llama-eval-callback \
@@ -15,7 +15,7 @@ llama-eval-callback \
   -ngl 33
 ```
 
-Will print:
+출력될 내용:
 
 ```shell
 llm_load_tensors: offloaded 33/33 layers to GPU

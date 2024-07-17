@@ -1,6 +1,6 @@
 # finetune
 
-Basic usage instructions:
+기본 사용 방법 지침:
 
 ```bash
 # get training data
@@ -21,28 +21,28 @@ wget https://raw.githubusercontent.com/brunoklein99/deep-learning-notes/master/s
 ./bin/llama-cli -m open-llama-3b-v2-q8_0.gguf --lora lora-open-llama-3b-v2-q8_0-shakespeare-LATEST.bin
 ```
 
-**Only llama based models are supported!** The output files will be saved every N iterations (config with `--save-every N`).
-The pattern 'ITERATION' in the output filenames will be replaced with the iteration number and with 'LATEST' for the latest output.
-So in above example after 10 iterations these files will be written:
+**단지 llama 기반 모델만 지원됩니다!** 출력 파일은 N번 간격으로 저장됩니다( `--save-every N` 으로 구성). 
+출력 파일 이름의 'ITERATION' 패턴은 반복 횟수로 대체되며, 최신 출력에는 'LATEST'가 사용됩니다.
+위 예시에서 10번 반복 후에는 다음과 같은 파일이 작성됩니다:
 - chk-lora-open-llama-3b-v2-q8_0-shakespeare-10.gguf
 - chk-lora-open-llama-3b-v2-q8_0-shakespeare-LATEST.gguf
 - lora-open-llama-3b-v2-q8_0-shakespeare-10.bin
 - lora-open-llama-3b-v2-q8_0-shakespeare-LATEST.bin
 
-After 10 more iterations:
+10번 더 반복한 후:
 - chk-lora-open-llama-3b-v2-q8_0-shakespeare-20.gguf
 - chk-lora-open-llama-3b-v2-q8_0-shakespeare-LATEST.gguf
 - lora-open-llama-3b-v2-q8_0-shakespeare-20.bin
 - lora-open-llama-3b-v2-q8_0-shakespeare-LATEST.bin
 
-Checkpoint files (`--checkpoint-in FN`, `--checkpoint-out FN`) store the training process. When the input checkpoint file does not exist, it will begin finetuning a new randomly initialized adapter.
+체크포인트 파일 (`--checkpoint-in FN`, `--checkpoint-out FN`)은 훈련 과정을 저장합니다. 입력 체크포인트 파일이 존재하지 않으면 새롭게 초기화된 어댑터로부터 훈련을 시작합니다.
 
-llama.cpp compatible LORA adapters will be saved with filename specified by `--lora-out FN`.
-These LORA adapters can then be used by `llama-cli` together with the base model, like in the 'predict' example command above.
+llama.cpp 호환 LORA 어댑터는 `--lora-out FN`으로 지정된 파일 이름으로 저장됩니다.
+이러한 LORA 어댑터는 `llama-cli`와 기본 모델과 함께 사용할 수 있습니다.
 
-In `llama-cli` you can also load multiple LORA adapters, which will then be mixed together.
+`llama-cli`에서 여러 LORA 어댑터를 로드할 수도 있으며, 이는 혼합되어 사용됩니다.
 
-For example if you have two LORA adapters `lora-open-llama-3b-v2-q8_0-shakespeare-LATEST.bin` and `lora-open-llama-3b-v2-q8_0-bible-LATEST.bin`, you can mix them together like this:
+예를 들어 `lora-open-llama-3b-v2-q8_0-shakespeare-LATEST.bin`과 `lora-open-llama-3b-v2-q8_0-bible-LATEST.bin` 두 개의 LORA 어댑터가 있다면 다음과 같이 혼합할 수 있습니다:
 
 ```bash
 ./bin/llama-cli -m open-llama-3b-v2-q8_0.gguf \
@@ -50,9 +50,9 @@ For example if you have two LORA adapters `lora-open-llama-3b-v2-q8_0-shakespear
   --lora lora-open-llama-3b-v2-q8_0-bible-LATEST.bin
 ```
 
-You can change how strong each LORA adapter is applied to the base model by using `--lora-scaled FN SCALE` instead of `--lora FN`.
+`--lora-scaled FN SCALE`을 사용하여 기본 모델에 각 LORA 어댑터가 얼마나 강하게 적용되는지 변경할 수 있습니다.
 
-For example to apply 40% of the 'shakespeare' LORA adapter, 80% of the 'bible' LORA adapter and 100% of yet another one:
+예를 들어 'shakespeare' LORA 어댑터를 40%, 'bible' LORA 어댑터를 80%, 그리고 다른 어댑터를 100% 적용하려면 다음과 같습니다.
 
 ```bash
 ./bin/llama-cli -m open-llama-3b-v2-q8_0.gguf \
@@ -61,13 +61,13 @@ For example to apply 40% of the 'shakespeare' LORA adapter, 80% of the 'bible' L
   --lora lora-open-llama-3b-v2-q8_0-yet-another-one-LATEST.bin
 ```
 
-The scale numbers don't need to add up to one, and you can also use numbers greater than 1 to further increase the influence of an adapter. But making the values too big will sometimes result in worse output. Play around to find good values.
+규모 수는 1에 더해져야 하지 않으며, 어댑터의 영향력을 더욱 높이기 위해 1보다 큰 숫자를 사용할 수도 있습니다. 그러나 값을 너무 크게 설정하면 출력이 나빠질 수 있습니다. 좋은 값을 찾기 위해 시도해 보세요.
 
-Gradient checkpointing reduces the memory requirements by ~50% but increases the runtime.
-If you have enough RAM, you can make finetuning a bit faster by disabling checkpointing with `--no-checkpointing`.
+Gradient checkpointing은 메모리 요구량을 약 50% 줄이지만 실행 시간을 늘립니다.
+충분한 RAM이 있다면 `--no-checkpointing`으로 checkpointing을 비활성화하여 fine-tuning을 조금 더 빠르게 할 수 있습니다.
 
-The default LORA rank can be specified with `--lora-r N`.
-The LORA rank can be configured for each model tensor type separately with these command line options:
+기본 LORA 랭크는 `--lora-r N`으로 지정할 수 있습니다.
+각 모델 텐서 유형별로 LORA 랭크를 별도로 구성할 수 있습니다.
 
 ```bash
   --lora-r N                 LORA r: default rank. Also specifies resulting scaling together with lora-alpha. (default 4)
@@ -85,6 +85,6 @@ The LORA rank can be configured for each model tensor type separately with these
   --rank-ffn_up N            LORA rank for ffn_up tensor (default 4)
 ```
 
-The LORA rank of 'norm' tensors should always be 1.
+'norm' 텐서의 LORA 랭크는 항상 1이어야 합니다.
 
-To see all available options use `llama-finetune --help`.
+모든 사용 가능한 옵션을 확인하려면 `llama-finetune --help`를 사용하십시오.

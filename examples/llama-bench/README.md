@@ -1,22 +1,22 @@
 # llama.cpp/examples/llama-bench
 
-Performance testing tool for llama.cpp.
+llama.cpp의 성능 테스트 도구입니다.
 
-## Table of contents
+## 표지
 
-1. [Syntax](#syntax)
-2. [Examples](#examples)
-    1. [Text generation with different models](#text-generation-with-different-models)
-    2. [Prompt processing with different batch sizes](#prompt-processing-with-different-batch-sizes)
-    3. [Different numbers of threads](#different-numbers-of-threads)
-    4. [Different numbers of layers offloaded to the GPU](#different-numbers-of-layers-offloaded-to-the-gpu)
-3. [Output formats](#output-formats)
+1. [문법](#문법)
+2. [예시](#예시)
+    1. [다양한 모델을 사용한 텍스트 생성](#다양한-모델을-사용한-텍스트-생성)
+    2. [다양한 배치 크기로 프롬프트 처리](#다양한-배치-크기로-프롬프트-처리)
+    3. [다양한 스레드 수](#다양한-스레드-수)
+    4. [GPU로 오프로드되는 레이어 수의 차이](#GPU로-오프로드되는-레이어-수의-차이)
+3. [출력 형식](#출력-형식)
     1. [Markdown](#markdown)
     2. [CSV](#csv)
     3. [JSON](#json)
     4. [SQL](#sql)
 
-## Syntax
+## 구문
 
 ```
 usage: ./llama-bench [options]
@@ -48,25 +48,25 @@ options:
 Multiple values can be given for each parameter by separating them with ',' or by specifying the parameter multiple times.
 ```
 
-llama-bench can perform three types of tests:
+llama-bench는 다음 세 가지 유형의 테스트를 수행할 수 있습니다.
 
-- Prompt processing (pp): processing a prompt in batches (`-p`)
-- Text generation (tg): generating a sequence of tokens (`-n`)
-- Prompt processing + text generation (pg): processing a prompt followed by generating a sequence of tokens (`-pg`)
+- 프롬프트 처리 (pp): 배치로 프롬프트를 처리합니다 (`-p`)
+- 텍스트 생성 (tg): 토큰 시퀀스를 생성합니다 (`-n`)
+- 프롬프트 처리 + 텍스트 생성 (pg): 프롬프트를 처리한 후 토큰 시퀀스를 생성합니다 (`-pg`)
 
-With the exception of `-r`, `-o` and `-v`, all options can be specified multiple times to run multiple tests. Each pp and tg test is run with all combinations of the specified options. To specify multiple values for an option, the values can be separated by commas (e.g. `-n 16,32`), or the option can be specified multiple times (e.g. `-n 16 -n 32`).
+`-r`, `-o` 및 `-v`를 제외한 모든 옵션은 여러 번 지정하여 여러 테스트를 실행할 수 있습니다. 각 pp 및 tg 테스트는 지정된 옵션의 모든 조합으로 실행됩니다. 옵션에 대한 여러 값을 지정하려면 값을 쉼표로 구분할 수 있습니다 (예: `-n 16,32`), 또는 옵션을 여러 번 지정할 수 있습니다 (예: `-n 16 -n 32`).
 
-Each test is repeated the number of times given by `-r`, and the results are averaged. The results are given in average tokens per second (t/s) and standard deviation. Some output formats (e.g. json) also include the individual results of each repetition.
+각 테스트는 `-r`에 지정된 횟수만큼 반복되며, 결과는 평균됩니다. 결과는 초당 평균 토큰 (t/s) 및 표준 편차로 제공됩니다. 일부 출력 형식 (예: json)은 또한 각 반복의 개별 결과를 포함합니다.
 
-For a description of the other options, see the [main example](../main/README.md).
+기타 옵션에 대한 설명은 [주요 예제](../main/README.md)를 참조하십시오.
 
-Note:
+참고:
 
-- When using SYCL backend, there would be hang issue in some cases. Please set `--mmp 0`.
+- SYCL 백엔드를 사용할 때, 일부 경우에 걸림 문제가 발생할 수 있습니다. `--mmp 0`을 설정하십시오.
 
-## Examples
+## 예시
 
-### Text generation with different models
+### 다양한 모델로 텍스트 생성하기
 
 ```sh
 $ ./llama-bench -m models/7B/ggml-model-q4_0.gguf -m models/13B/ggml-model-q4_0.gguf -p 0 -n 128,256,512
@@ -81,7 +81,7 @@ $ ./llama-bench -m models/7B/ggml-model-q4_0.gguf -m models/13B/ggml-model-q4_0.
 | llama 13B mostly Q4_0          |   6.86 GiB |    13.02 B | CUDA       |  99 | tg 256     |     80.74 ± 0.23 |
 | llama 13B mostly Q4_0          |   6.86 GiB |    13.02 B | CUDA       |  99 | tg 512     |     78.08 ± 0.07 |
 
-### Prompt processing with different batch sizes
+### 다양한 배치 크기로 프롬프트 처리
 
 ```sh
 $ ./llama-bench -n 0 -p 1024 -b 128,256,512,1024
@@ -94,7 +94,7 @@ $ ./llama-bench -n 0 -p 1024 -b 128,256,512,1024
 | llama 7B mostly Q4_0           |   3.56 GiB |     6.74 B | CUDA       |  99 |        512 | pp 1024    |  2254.45 ± 15.59 |
 | llama 7B mostly Q4_0           |   3.56 GiB |     6.74 B | CUDA       |  99 |       1024 | pp 1024    |  2498.61 ± 13.58 |
 
-### Different numbers of threads
+### 다른 스레드 수
 
 ```sh
 $ ./llama-bench -n 0 -n 16 -p 64 -t 1,2,4,8,16,32
@@ -115,7 +115,7 @@ $ ./llama-bench -n 0 -n 16 -p 64 -t 1,2,4,8,16,32
 | llama 7B mostly Q4_0           |   3.56 GiB |     6.74 B | CPU        |         32 | pp 64      |     59.00 ± 1.11 |
 | llama 7B mostly Q4_0           |   3.56 GiB |     6.74 B | CPU        |         32 | tg 16      |     16.41 ± 0.79 ||
 
-### Different numbers of layers offloaded to the GPU
+### GPU로 오프로드된 레이어 수의 차이
 
 ```sh
 $ ./llama-bench -ngl 10,20,30,31,32,33,34,35
@@ -140,11 +140,11 @@ $ ./llama-bench -ngl 10,20,30,31,32,33,34,35
 | llama 7B mostly Q4_0           |   3.56 GiB |     6.74 B | CUDA       |  35 | pp 512     |   2400.01 ± 7.72 |
 | llama 7B mostly Q4_0           |   3.56 GiB |     6.74 B | CUDA       |  35 | tg 128     |    131.66 ± 0.49 |
 
-## Output formats
+## 출력 형식
 
-By default, llama-bench outputs the results in markdown format. The results can be output in other formats by using the `-o` option.
+기본적으로 llama-bench는 결과를 markdown 형식으로 출력합니다. `-o` 옵션을 사용하여 다른 형식으로 결과를 출력할 수 있습니다.
 
-### Markdown
+### 마크다운
 
 ```sh
 $ ./llama-bench -o md
@@ -240,7 +240,7 @@ $ ./llama-bench -o json
 
 ### SQL
 
-SQL output is suitable for importing into a SQLite database. The output can be piped into the `sqlite3` command line tool to add the results to a database.
+SQL 출력은 SQLite 데이터베이스로 가져올 수 있습니다. 출력을 `sqlite3` 명령줄 도구로 파이프 라인하여 결과를 데이터베이스에 추가할 수 있습니다.
 
 ```sh
 $ ./llama-bench -o sql

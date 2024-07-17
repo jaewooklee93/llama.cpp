@@ -1,60 +1,49 @@
 
 # llama-gguf-hash
 
-CLI to hash GGUF files to detect difference on a per model and per tensor level.
+모델과 텐서 수준에서의 차이를 감지하기 위해 GGUF 파일을 해싱하는 CLI 도구입니다.
 
-**Command line options:**
+**명령줄 옵션:**
 
-- `--help`: display help message
-- `--xxh64`: use xhash 64bit hash mode (default)
-- `--sha1`: use sha1
-- `--uuid`: use uuid
-- `--sha256`: use sha256
-- `--all`: use all hash
-- `--no-layer`: exclude per layer hash
-- `--uuid`: generate UUIDv5 ID
-- `-c`, `--check <manifest>`:  verify against a manifest
+- `--help`: 도움 메시지 표시
+- `--xxh64`: 64비트 해시 모드 사용 (기본값)
+- `--sha1`: sha1 사용
+- `--uuid`: uuid 사용
+- `--sha256`: sha256 사용
+- `--all`: 모든 해시 사용
+- `--no-layer`: 층별 해시 제외
+- `--uuid`: UUIDv5 ID 생성
+- `-c`, `--check <manifest>`: manifest와 비교
 
-## About
+## 소개
 
-While most POSIX systems already have hash checking programs like sha256sum, it
-is designed to check entire files. This is not ideal for our purpose if we want
-to check for consistency of the tensor data even if the metadata content of the
-gguf KV store has been updated.
+대부분의 POSIX 시스템은 sha256sum과 같은 파일 해시 검사 프로그램을 이미 가지고 있지만, 이는 전체 파일을 검사하도록 설계되었습니다. gguf KV 저장소의 메타데이터 내용이 업데이트되었더라도 텐서 데이터의 일관성을 확인하려는 목적에서는 이상적이지 않습니다.
 
-This program is designed to hash a gguf tensor payload on a 'per tensor layer'
-in addition to a 'entire tensor model' hash. The intent is that the entire
-tensor layer can be checked first but if there is any detected inconsistencies,
-then the per tensor hash can be used to narrow down the specific tensor layer
-that has inconsistencies.
+이 프로그램은 '전체 텐서 모델' 해시 외에도 '텐서 레이어별'로 gguf 텐서 유효성을 해시하는 데 설계되었습니다. 전체 텐서 레이어를 먼저 확인하는 것이 목적이며, 일관성 문제가 감지되면 해시를 사용하여 일관성 문제가 있는 특정 텐서 레이어를 식별할 수 있습니다.
 
-For Maintainers:
-- Detection of tensor inconsistency during development and automated tests
-    - This is served by xxh64 which is fast
-    - This is also served by having per tensor layer to assist in narrowing down
-      the location of the faulty tensor layer
-    - This is also served by sha1 which is much slower but more widely supported
 
-For Model Creators:
-- Optional consistent UUID generation based on model tensor content
-    - This is served by UUIDv5 which is useful for databases keys
+**유지보수자를 위한 내용:**
+- 개발 및 자동 테스트 중 텐서 일관성 검출
+    - xxh64를 사용하여 빠르게 처리합니다.
+    - 오류가 있는 텐서 레이어의 위치를 좁히는 데 도움이 되는 텐서 레이어별 해시를 제공합니다.
+    - sha1은 느리지만 널리 지원되는 해시 알고리즘입니다.
+
+**모델 제작자를 위한 내용:**
+- 모델 텐서 내용에 기반한 옵션적 일관성 UUID 생성
+    - UUIDv5는 데이터베이스 키에 유용합니다.
         - llama.cpp UUIDv5 Namespace: `ef001206-dadc-5f6d-a15f-3359e577d4e5`
-            - Made via UUIDv5 URL namespace of `en.wikipedia.org/wiki/Llama.cpp`
+            - `en.wikipedia.org/wiki/Llama.cpp`의 UUIDv5 URL 네임스페이스를 통해 생성되었습니다.
 
-For Model Users:
-- Assurance of tensor layer integrity even if metadata was updated
-    - This is served by sha256 which is still considered very secure as of 2024
+**모델 사용자를 위한 내용:**
+- 메타데이터가 업데이트되었더라도 텐서 레이어 무결성 보장
+    - 2024년 현재 여전히 매우 안전하다고 여겨지는 sha256를 사용합니다.
 
-### Design Note
+### 디자인 노트
 
-- The default behavior of this program if no arguments is provided is to hash
-  using xxhash's xxh32 mode because it is very fast and is primarily targeted
-  towards maintainers who may want to use this in automated tests.
-- xxhash support xxh32 and xxh128 for 32bit hash and 128bit hash respectively
-  however we picked 64bit xxhash as most computers are 64bit as of 2024 and thus
-  would have a better affinity to calculating hash that is 64bit in size.
+- 프로그램에 인자가 제공되지 않으면 기본적으로 xxhash의 xxh32 모드를 사용하여 해시를 계산합니다. 이는 매우 빠르기 때문에 주로 자동화된 테스트에서 사용하려는 유지보수 담당자를 대상으로 합니다.
+- xxhash는 각각 32비트 해시와 128비트 해시를 위한 xxh32와 xxh128를 지원하지만, 2024년 현재 대부분의 컴퓨터가 64비트이기 때문에 64비트 크기의 해시를 계산하는 데 더 적합하기 때문에 64비트 xxhash를 선택했습니다.
 
-## Compile Example
+## 컴파일 예제
 
 ```bash
 cmake -B build -DCMAKE_BUILD_TYPE=Debug -DLLAMA_FATAL_WARNINGS=ON
@@ -67,16 +56,16 @@ make -C build llama-gguf-hash VERBOSE=1
 ./build/bin/llama-gguf-hash --sha256 test.gguf
 ```
 
-## Generation and Verification Example
+## 생성 및 검증 예시
 
-To generate we may use this command
+생성을 위해 다음 명령어를 사용할 수 있습니다.
 
 ```bash
 ./llama-gguf-hash --all test.gguf > test.gguf.manifest
 ```
 
-Which would generate a manifest that looks like below, which contains multiple hash type and per tensor layer hashes as well
-(This excludes UUID as that is an ID not a hash)
+다음과 같은 manifest를 생성하는 것은 어떻게 될까요? 여러 해시 유형과 텐서 레이어별 해시를 포함합니다
+(UUID는 ID이기 때문에 해시가 아닌 것을 제외합니다)
 
 ```bash
 xxh64     f66e9cd66a4396a0  test.gguf:tensor_0
@@ -114,7 +103,7 @@ sha1      d15be52c4ff213e823cb6dd13af7ee2f978e7042  test.gguf
 sha256    7dd641b32f59b60dbd4b5420c4b0f6321ccf48f58f6ae201a3dbc4a58a27c6e4  test.gguf
 ```
 
-We can then use the normal check command which will by default check for the highest security strength hash and verify against that:
+그런 다음 기본적으로 가장 높은 보안 강도 해시를 확인하고 그에 대해 검증하는 일반적인 확인 명령을 사용할 수 있습니다.
 
 ```bash
 $ ./llama-gguf-hash --check test.gguf.manifest test.gguf
@@ -134,7 +123,7 @@ sha256    7dd641b32f59b60dbd4b5420c4b0f6321ccf48f58f6ae201a3dbc4a58a27c6e4  test
 Verification results for test.gguf.manifest - Success
 ```
 
-Or we may explicitly ask for a faster hash like:
+혹은 명시적으로 더 빠른 해시를 요청할 수도 있습니다:
 
 ```bash
 $ ./llama-gguf-hash --check test.gguf.manifest --xxh64 test.gguf
@@ -154,7 +143,7 @@ xxh64     5a54d3aad816f302  test.gguf  -  Ok
 Verification results for test.gguf.manifest - Success
 ```
 
-Or maybe we want to just check that all the hash is valid:
+혹시 해시가 모두 유효한지 확인하고 싶을 수도 있습니다:
 
 ```bash
 $./llama-gguf-hash --check test.gguf.manifest --all test.gguf.manifest
@@ -197,9 +186,9 @@ Verification results for test.gguf.manifest - Success
 ```
 
 
-## Crypto/Hash Libraries Used
+## 사용된 암호/해시 라이브러리
 
-These micro c libraries dependencies was installed via the [clib c package manager](https://github.com/clibs)
+이러한 마이크로 C 라이브러리 의존성은 [clib C 패키지 관리자](https://github.com/clibs)를 통해 설치되었습니다.
 
 - https://github.com/Cyan4973/xxHash
 - https://github.com/clibs/sha1/

@@ -1,6 +1,6 @@
 # export-lora
 
-Apply LORA adapters to base model and export the resulting model.
+기본 모델에 LORA 어댑터를 적용하고 결과 모델을 내보냅니다.
 
 ```
 usage: llama-export-lora [options]
@@ -14,7 +14,7 @@ options:
   -t N, --threads N                  number of threads to use during computation (default: 4)
 ```
 
-For example:
+예를 들어:
 
 ```bash
 ./bin/llama-export-lora \
@@ -23,4 +23,4 @@ For example:
     -l lora-open-llama-3b-v2-q8_0-english2tokipona-chat-LATEST.bin
 ```
 
-Multiple LORA adapters can be applied by passing multiple `-l FN` or `-s FN S` command line parameters.
+여러 LORA 어댑터를 적용하려면 여러 개의 `-l FN` 또는 `-s FN S` 명령줄 매개변수를 전달합니다.
