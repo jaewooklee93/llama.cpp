@@ -1,8 +1,8 @@
 # llama.cpp/examples/speculative
 
-Demonstration of speculative decoding and tree-based speculative decoding techniques
+추측 디코딩 및 트리 기반 추측 디코딩 기술의 시연
 
-More info:
+자세한 내용:
 
 - https://github.com/ggerganov/llama.cpp/pull/2926
 - https://github.com/ggerganov/llama.cpp/pull/3624

@@ -1,18 +1,18 @@
-# GBNF Guide
+# GBNF 가이드
 
-GBNF (GGML BNF) is a format for defining [formal grammars](https://en.wikipedia.org/wiki/Formal_grammar) to constrain model outputs in `llama.cpp`. For example, you can use it to force the model to generate valid JSON, or speak only in emojis. GBNF grammars are supported in various ways in `examples/main` and `examples/server`.
+GBNF (GGML BNF)는 `llama.cpp`에서 모델 출력을 제한하는 데 사용되는 [형식 문법](https://ko.wikipedia.org/wiki/%EC%88%98%EC%82%AC_%EB%B0%A9%EB%B2%95)을 정의하는 형식입니다. 예를 들어, 이를 사용하여 모델이 유효한 JSON을 생성하거나, 오직 이모티콘으로만 말하도록 강제할 수 있습니다. GBNF 문법은 `examples/main` 및 `examples/server`에서 다양한 방식으로 지원됩니다.
 
-## Background
+## 배경
 
-[Backus-Naur Form (BNF)](https://en.wikipedia.org/wiki/Backus%E2%80%93Naur_form) is a notation for describing the syntax of formal languages like programming languages, file formats, and protocols. GBNF is an extension of BNF that primarily adds a few modern regex-like features.
+[백스-나우어 형식 (BNF)](https://ko.wikipedia.org/wiki/백스%E2%80%93나우어_형식)은 프로그래밍 언어, 파일 형식 및 프로토콜과 같은 형식 언어의 문법을 설명하는 표기법입니다. GBNF는 BNF의 확장으로 주로 몇 가지 현대적인 정규식과 유사한 기능을 추가합니다.
 
-## Basics
+## 기본 개념
 
-In GBNF, we define *production rules* that specify how a *non-terminal* (rule name) can be replaced with sequences of *terminals* (characters, specifically Unicode [code points](https://en.wikipedia.org/wiki/Code_point)) and other non-terminals. The basic format of a production rule is `nonterminal ::= sequence...`.
+GBNF에서 우리는 *생산 규칙*을 정의합니다. 이 규칙은 *비종료 기호* (규칙 이름)를 *종료 기호* (문자, 특히 Unicode [코드 포인트](https://ko.wikipedia.org/wiki/코드_포인트))와 다른 비종료 기호의 순서로 대체하는 방법을 지정합니다. 생산 규칙의 기본 형식은 `비종료 기호 ::= 순서...` 입니다.
 
-## Example
+## 예시
 
-Before going deeper, let's look at some of the features demonstrated in `grammars/chess.gbnf`, a small chess notation grammar:
+더 깊이 있게 들어가기 전에, `grammars/chess.gbnf`와 같은 체스 표기법 문법에서 보여주는 몇 가지 기능을 살펴보겠습니다.
 ```
 # `root` specifies the pattern for the overall output
 root ::= (
@@ -34,42 +34,43 @@ nonpawn ::= ...
 castle ::= ...
 ```
 
-## Non-Terminals and Terminals
+## 비종합 기호와 종합 기호
 
-Non-terminal symbols (rule names) stand for a pattern of terminals and other non-terminals. They are required to be a dashed lowercase word, like `move`, `castle`, or `check-mate`.
+비종합 기호(규칙 이름)는 종합 기호와 다른 비종합 기호의 패턴을 나타냅니다.  `move`, `castle`, 또는 `check-mate`와 같이 연장선 아래 소문자 단어여야 합니다.
 
-Terminals are actual characters ([code points](https://en.wikipedia.org/wiki/Code_point)). They can be specified as a sequence like `"1"` or `"O-O"` or as ranges like `[1-9]` or `[NBKQR]`.
+종합 기호는 실제 문자입니다 ([코드 포인트](https://ko.wikipedia.org/wiki/코드_포인트)). `"1"` 또는 `"O-O"`와 같이 순서로 지정하거나 `[1-9]` 또는 `[NBKQR]`와 같이 범위로 지정할 수 있습니다.
 
-## Characters and character ranges
+## 문자 및 문자 범위
 
-Terminals support the full range of Unicode. Unicode characters can be specified directly in the grammar, for example `hiragana ::= [ぁ-ゟ]`, or with escapes: 8-bit (`\xXX`), 16-bit (`\uXXXX`) or 32-bit (`\UXXXXXXXX`).
+단어들은 유니코드의 전체 범위를 지원합니다. 유니코드 문자는 문법에 직접 지정할 수 있습니다. 예를 들어 `hiragana ::= [ぁ-ゟ]` 또는 이스케이프 문자를 사용하여 지정할 수 있습니다: 8비트 (`\xXX`), 16비트 (`\uXXXX`) 또는 32비트 (`\UXXXXXXXX`).
 
-Character ranges can be negated with `^`:
+문자 범위는 `^`를 사용하여 부정할 수 있습니다:
 ```
 single-line ::= [^\n]+ "\n"`
 ```
 
-## Sequences and Alternatives
+## 순서와 선택
 
-The order of symbols in a sequence matters. For example, in `"1. " move " " move "\n"`, the `"1. "` must come before the first `move`, etc.
+
+순서가 중요합니다. 예를 들어, `"1. " move " " move "\n"` 에서는 `"1. "` 가 첫 번째 `move` 전에 와야 하며, 이와 같이 모든 순서가 중요합니다.
 
 Alternatives, denoted by `|`, give different sequences that are acceptable. For example, in `move ::= pawn | nonpawn | castle`, `move` can be a `pawn` move, a `nonpawn` move, or a `castle`.
 
-Parentheses `()` can be used to group sequences, which allows for embedding alternatives in a larger rule or applying repetition and optional symbols (below) to a sequence.
+괄호 `()`를 사용하여 순서를 그룹화할 수 있습니다. 이를 통해 더 큰 규칙에 대안을 포함하거나 반복 및 선택적 기호(아래)를 순서에 적용할 수 있습니다.
 
-## Repetition and Optional Symbols
+## 반복 및 선택적 기호
 
-- `*` after a symbol or sequence means that it can be repeated zero or more times (equivalent to `{0,}`).
-- `+` denotes that the symbol or sequence should appear one or more times (equivalent to `{1,}`).
-- `?` makes the preceding symbol or sequence optional (equivalent to `{0,1}`).
-- `{m}` repeats the precedent symbol or sequence exactly `m` times
-- `{m,}` repeats the precedent symbol or sequence at least `m` times
-- `{m,n}` repeats the precedent symbol or sequence at between `m` and `n` times (included)
-- `{0,n}` repeats the precedent symbol or sequence at most `n` times (included)
+- 기호 또는 문자열 뒤에 `*`를 붙이면 0회 이상 반복될 수 있습니다 ( `{0,}` 와 동일합니다).
+- `+`는 기호 또는 문자열이 한 번 이상 나타나야 함을 나타냅니다 ( `{1,}` 와 동일합니다).
+- `?`는 preceding 기호 또는 문자열을 선택적으로 만듭니다 ( `{0,1}` 와 동일합니다).
+- `{m}`는 preceding 기호 또는 문자열을 정확히 `m` 번 반복합니다
+- `{m,}`는 preceding 기호 또는 문자열을 최소 `m` 번 반복합니다
+- `{m,n}`는 preceding 기호 또는 문자열을 `m` 에서 `n` 까지 (포함) 반복합니다
+- `{0,n}`는 preceding 기호 또는 문자열을 최대 `n` 번 (포함) 반복합니다
 
-## Comments and newlines
+## 주석 및 새 줄
 
-Comments can be specified with `#`:
+`#`를 사용하여 주석을 지정할 수 있습니다.:
 ```
 # defines optional whitespace
 ws ::= [ \t\n]+
@@ -77,9 +78,9 @@ ws ::= [ \t\n]+
 
 Newlines are allowed between rules and between symbols or sequences nested inside parentheses. Additionally, a newline after an alternate marker `|` will continue the current rule, even outside of parentheses.
 
-## The root rule
+## 루트 규칙
 
-In a full grammar, the `root` rule always defines the starting point of the grammar. In other words, it specifies what the entire output must match.
+완전한 문법에서 `root` 규칙은 항상 문법의 시작점을 정의합니다. 즉, 전체 출력이 일치해야 하는 것을 지정합니다.
 
 ```
 # a grammar for lists
@@ -87,46 +88,46 @@ root ::= ("- " item)+
 item ::= [^\n]+ "\n"
 ```
 
-## Next steps
+## 다음 단계
 
-This guide provides a brief overview. Check out the GBNF files in this directory (`grammars/`) for examples of full grammars. You can try them out with:
+이 가이드는 간략한 개요를 제공합니다. 이 디렉토리 (`grammars/`)의 GBNF 파일을 확인하여 전체 문법의 예를 살펴보세요. 다음과 같은 방법으로 시도해 볼 수 있습니다:
 ```
 ./llama-cli -m <model> --grammar-file grammars/some-grammar.gbnf -p 'Some prompt'
 ```
 
-`llama.cpp` can also convert JSON schemas to grammars either ahead of time or at each request, see below.
+`llama.cpp`는 JSON 스키마를 미리 또는 요청마다 문법으로 변환할 수 있습니다. 아래를 참조하세요.
 
-## Troubleshooting
+## 문제 해결
 
-Grammars currently have performance gotchas (see https://github.com/ggerganov/llama.cpp/issues/4218).
+현재 문법은 성능 문제가 있습니다 (https://github.com/ggerganov/llama.cpp/issues/4218 참조).
 
-### Efficient optional repetitions
+### 효율적인 선택적 반복
 
-A common pattern is to allow repetitions of a pattern `x` up to N times.
+흔한 패턴은 패턴 `x`를 최대 N번 반복할 수 있도록 허용하는 것입니다.
 
-While semantically correct, the syntax `x? x? x?.... x?` (with N repetitions) may result in extremely slow sampling. Instead, you can write `x{0,N}` (or `(x (x (x ... (x)?...)?)?)?` w/ N-deep nesting in earlier llama.cpp versions).
+문맥적으로는 올바르지만, 문법 `x? x? x?.... x?` (N번 반복)는 샘플링 속도가 매우 느려질 수 있습니다. 대신 `x{0,N}` (또는 이전 llama.cpp 버전의 N-깊이  pertanian `(x (x (x ... (x)?...)?)?)?`)를 사용할 수 있습니다.
 
-## Using GBNF grammars
+## GBNF 문법 사용하기
 
-You can use GBNF grammars:
+GBNF 문법을 사용할 수 있습니다.
 
-- In [llama-server](../examples/server)'s completion endpoints, passed as the `grammar` body field
-- In [llama-cli](../examples/main), passed as the `--grammar` & `--grammar-file` flags
-- With [llama-gbnf-validator](../examples/gbnf-validator) tool, to test them against strings.
+- [llama-server](../examples/server)의 완성 앤드포인트에서 `grammar` 바디 필드로 전달합니다.
+- [llama-cli](../examples/main)에서 `--grammar` 및 `--grammar-file` 플래그로 전달합니다.
+- [llama-gbnf-validator](../examples/gbnf-validator) 도구와 함께 문자열에 대해 테스트합니다.
 
-## JSON Schemas → GBNF
+## JSON 스키마 → GBNF
 
-`llama.cpp` supports converting a subset of https://json-schema.org/ to GBNF grammars:
+`llama.cpp`는 https://json-schema.org/의 일부를 GBNF 문법으로 변환할 수 있습니다.
 
-- In [llama-server](../examples/server):
-    - For any completion endpoints, passed as the `json_schema` body field
-    - For the `/chat/completions` endpoint, passed inside the `result_format` body field (e.g. `{"type", "json_object", "schema": {"items": {}}}`)
-- In [llama-cli](../examples/main), passed as the `--json` / `-j` flag
-- To convert to a grammar ahead of time:
-    - in CLI, with [examples/json_schema_to_grammar.py](../examples/json_schema_to_grammar.py)
-    - in JavaScript with [json-schema-to-grammar.mjs](../examples/server/public/json-schema-to-grammar.mjs) (this is used by the [server](../examples/server)'s Web UI)
+- [llama-server](../examples/server) 에서:
+    - `json_schema` 바디 필드로 전달되는 모든 완성 앤드포인트
+    - `/chat/completions` 엔드포인트에서 `result_format` 바디 필드 내부에 전달됩니다 (예: `{"type", "json_object", "schema": {"items": {}}}`)
+- [llama-cli](../examples/main) 에서 `--json` / `-j` 플래그로 전달됩니다.
+- 미리 문법으로 변환하려면:
+    - CLI에서 [examples/json_schema_to_grammar.py](../examples/json_schema_to_grammar.py)를 사용합니다.
+    - JavaScript에서 [json-schema-to-grammar.mjs](../examples/server/public/json-schema-to-grammar.mjs)를 사용합니다 (이것은 [서버](../examples/server)의 웹 UI에서 사용됩니다).
 
-Take a look at [tests](../tests/test-json-schema-to-grammar.cpp) to see which features are likely supported (you'll also find usage examples in https://github.com/ggerganov/llama.cpp/pull/5978, https://github.com/ggerganov/llama.cpp/pull/6659 & https://github.com/ggerganov/llama.cpp/pull/6555).
+[tests](../tests/test-json-schema-to-grammar.cpp)를 참조하여 지원되는 기능을 확인할 수 있습니다 (https://github.com/ggerganov/llama.cpp/pull/5978, https://github.com/ggerganov/llama.cpp/pull/6659 & https://github.com/ggerganov/llama.cpp/pull/6555 에서도 사용 예제를 찾을 수 있습니다).
 
 ```bash
 llama-cli \
@@ -159,9 +160,9 @@ llama-cli \
 
 <details>
 
-<summary>Show grammar</summary>
+<summary>문법 보기</summary>
 
-You can convert any schema in command-line with:
+명령줄에서 스키마를 어떤 방식으로 변환할 수 있는지 확인하세요.
 
 ```bash
 examples/json_schema_to_grammar.py name-age-schema.json
@@ -180,36 +181,36 @@ space ::= | " " | "\n" [ \t]{0,20}
 
 </details>
 
-Here is also a list of known limitations (contributions welcome):
+다음은 알려진 제한 사항 목록입니다 (기여 환영):
 
-- `additionalProperties` defaults to `false` (produces faster grammars + reduces hallucinations).
-- `"additionalProperties": true` may produce keys that contain unescaped newlines.
-- Unsupported features are skipped silently. It is currently advised to use the command-line Python converter (see above) to see any warnings, and to inspect the resulting grammar / test it w/ [llama-gbnf-validator](../examples/gbnf-validator/gbnf-validator.cpp).
-- Can't mix `properties` w/ `anyOf` / `oneOf` in the same type (https://github.com/ggerganov/llama.cpp/issues/7703)
-- [prefixItems](https://json-schema.org/draft/2020-12/json-schema-core#name-prefixitems) is broken (but [items](https://json-schema.org/draft/2020-12/json-schema-core#name-items) works)
-- `minimum`, `exclusiveMinimum`, `maximum`, `exclusiveMaximum`: only supported for `"type": "integer"` for now, not `number`
-- Nested `$ref`s are broken (https://github.com/ggerganov/llama.cpp/issues/8073)
-- [pattern](https://json-schema.org/draft/2020-12/json-schema-validation#name-pattern)s must start with `^` and end with `$`
-- Remote `$ref`s not supported in the C++ version (Python & JavaScript versions fetch https refs)
-- `string` [formats](https://json-schema.org/draft/2020-12/json-schema-validation#name-defined-formats) lack `uri`, `email`
-- No [`patternProperties`](https://json-schema.org/draft/2020-12/json-schema-core#name-patternproperties)
+- `additionalProperties`는 기본적으로 `false`로 설정되어 있습니다 (빠른 문법 생성 및 홀로우 이션 감소).
+- `"additionalProperties": true`는 탈출되지 않은 새 줄이 포함된 키를 생성할 수 있습니다.
+- 지원되지 않는 기능은 무음으로 건너뜁니다. 현재는 위에서 언급한 명령줄 Python 변환기를 사용하여 경고를 확인하고, 결과 문법을 검사하거나 [llama-gbnf-validator](../examples/gbnf-validator/gbnf-validator.cpp)와 함께 테스트하는 것이 좋습니다.
+- `properties`를 `anyOf` / `oneOf`과 동시에 같은 유형에서 사용할 수 없습니다 (https://github.com/ggerganov/llama.cpp/issues/7703)
+- [prefixItems](https://json-schema.org/draft/2020-12/json-schema-core#name-prefixitems)는 작동하지 않습니다 (그러나 [items](https://json-schema.org/draft/2020-12/json-schema-core#name-items)는 작동합니다)
+- `minimum`, `exclusiveMinimum`, `maximum`, `exclusiveMaximum`: 현재는 `"type": "integer"`에만 지원되며 `number`에는 지원되지 않습니다.
+- 중첩된 `$ref`는 작동하지 않습니다 (https://github.com/ggerganov/llama.cpp/issues/8073)
+- [pattern](https://json-schema.org/draft/2020-12/json-schema-validation#name-pattern)은 `^`로 시작하고 `$`으로 끝나야 합니다.
+- C++ 버전에서는 원격 `$ref`가 지원되지 않습니다 (Python 및 JavaScript 버전은 https 참조를 가져옵니다)
+- `string` [formats](https://json-schema.org/draft/2020-12/json-schema-validation#name-defined-formats)는 `uri`, `email`이 부족합니다.
+- [`patternProperties`](https://json-schema.org/draft/2020-12/json-schema-core#name-patternproperties)가 없습니다.
 
-And a non-exhaustive list of other unsupported features that are unlikely to be implemented (hard and/or too slow to support w/ stateless grammars):
+그리고 상태 없는 문법으로 지원하기 어렵거나 너무 느리기 때문에 구현될 가능성이 낮은 다른 지원되지 않는 기능 목록입니다.
 
 - [`uniqueItems`](https://json-schema.org/draft/2020-12/json-schema-validation#name-uniqueitems)
 - [`contains`](https://json-schema.org/draft/2020-12/json-schema-core#name-contains) / `minContains`
 - `$anchor` (cf. [dereferencing](https://json-schema.org/draft/2020-12/json-schema-core#name-dereferencing))
 - [`not`](https://json-schema.org/draft/2020-12/json-schema-core#name-not)
-- [Conditionals](https://json-schema.org/draft/2020-12/json-schema-core#name-keywords-for-applying-subsche) `if` / `then` / `else` / `dependentSchemas`
+- [조건문](https://json-schema.org/draft/2020-12/json-schema-core#name-keywords-for-applying-subsche) `if` / `then` / `else` / `dependentSchemas`
 
-### A word about additionalProperties
+### additionalProperties에 대한 추가 정보
 
 > [!WARNING]
-> The JSON schemas spec states `object`s accept [additional properties](https://json-schema.org/understanding-json-schema/reference/object#additionalproperties) by default.
-> Since this is slow and seems prone to hallucinations, we default to no additional properties.
-> You can set `"additionalProperties": true` in the the schema of any object to explicitly allow additional properties.
+> JSON 스키마 사양은 `object`가 기본적으로 [추가 속성](https://json-schema.org/understanding-json-schema/reference/object#additionalproperties)을 허용한다고 명시합니다.
+> 이는 느리고 홀루시네이션에 취약해 보이므로, 기본적으로 추가 속성을 허용하지 않습니다.
+> 어떤 객체의 스키마에서 `"additionalProperties": true`를 설정하면 명시적으로 추가 속성을 허용할 수 있습니다.
 
-If you're using [Pydantic](https://pydantic.dev/) to generate schemas, you can enable additional properties with the `extra` config on each model class:
+[Pydantic](https://pydantic.dev/)를 사용하여 스키마를 생성하는 경우, 각 모델 클래스의 `extra` 구성을 사용하여 추가 속성을 활성화할 수 있습니다:
 
 ```python
 # pip install pydantic
@@ -233,7 +234,7 @@ print(json.dumps(Summary.model_json_schema(), indent=2))
 ```
 
 <details>
-<summary>Show JSON schema & grammar</summary>
+<summary>JSON 스키마 및 문법 보기</summary>
 
 ```json
 {
@@ -328,7 +329,7 @@ value ::= object | array | string | number | boolean | null
 
 </details>
 
-If you're using [Zod](https://zod.dev/), you can make your objects to explicitly allow extra properties w/ `nonstrict()` / `passthrough()` (or explicitly no extra props w/ `z.object(...).strict()` or `z.strictObject(...)`) but note that [zod-to-json-schema](https://github.com/StefanTerdell/zod-to-json-schema) currently always sets `"additionalProperties": false` anyway.
+[Zod](https://zod.dev/)를 사용하는 경우, `nonstrict()` / `passthrough()`으로 객체에 추가 속성을 명시적으로 허용하거나 (또는 `z.object(...).strict()` 또는 `z.strictObject(...)`으로 명시적으로 추가 속성을 허용하지 않음) 하지만 [zod-to-json-schema](https://github.com/StefanTerdell/zod-to-json-schema)는 현재 항상 `"additionalProperties": false`로 설정됩니다.
 
 ```js
 import { z } from 'zod';
@@ -343,7 +344,7 @@ console.log(zodToJsonSchema(Foo));
 ```
 
 <details>
-<summary>Show JSON schema & grammar</summary>
+<summary>JSON 스키마 및 문법 보기</summary>
 
 ```json
 {

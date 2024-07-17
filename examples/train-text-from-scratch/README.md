@@ -1,6 +1,6 @@
 # train-text-from-scratch
 
-Basic usage instructions:
+기본 사용 방법 지침:
 
 ```bash
 # get training data
@@ -21,7 +21,7 @@ wget https://raw.githubusercontent.com/brunoklein99/deep-learning-notes/master/s
 ./bin/llama-cli -m ggml-shakespeare-256x16-f32.gguf
 ```
 
-Output files will be saved every N iterations (config with `--save-every N`).
-The pattern "ITERATION" in the output filenames will be replaced with the iteration number and "LATEST" for the latest output.
+출력 파일은 N번째 반복마다 저장됩니다 (config에서 `--save-every N`을 사용하여 설정). 
+출력 파일 이름에서 "ITERATION" 패턴은 반복 번호로, "LATEST"는 최신 출력으로 대체됩니다. 
 
-To train GGUF models just pass them to `--checkpoint-in FN`.
+GGUF 모델을 훈련하려면 `--checkpoint-in FN`에 그 모델을 전달합니다. 

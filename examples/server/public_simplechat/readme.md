@@ -1,286 +1,206 @@
 
 # SimpleChat
 
-by Humans for All.
+모두를 위한 인간에 의한 개발.
 
-## quickstart
+## 빠른 시작
 
-To run from the build dir
+빌드 디렉토리에서 실행하려면
 
 bin/llama-server -m path/model.gguf --path ../examples/server/public_simplechat
 
-Continue reading for the details.
+자세한 내용은 아래를 참조하십시오.
 
-## overview
+## 개요
 
-This simple web frontend, allows triggering/testing the server's /completions or /chat/completions endpoints
-in a simple way with minimal code from a common code base. Inturn additionally it tries to allow single or
-multiple independent back and forth chatting to an extent, with the ai llm model at a basic level, with their
-own system prompts.
+이 간단한 웹 프론트엔드는 서버의 `/completions` 또는 `/chat/completions` 엔드포인트를 간단하게 트리거하고 테스트할 수 있도록 합니다.
+최소한의 코드로 일반적인 코드베이스에서 작동합니다. 또한, 기본적인 수준에서 AI LLM 모델을 사용하여 단일 또는 여러 개의 독립적인 왕복 채팅을 허용하려고 합니다.
 
-This allows seeing the generated text / ai-model response in oneshot at the end, after it is fully generated,
-or potentially as it is being generated, in a streamed manner from the server/ai-model.
+이를 통해 AI 모델의 응답인 생성된 텍스트를 한 번에 볼 수 있습니다. 생성이 완료된 후 또는 서버/AI 모델에서 스트리밍 방식으로 생성되는 동안 볼 수 있습니다.
 
-![Chat and Settings screens](./simplechat_screens.webp "Chat and Settings screens")
+![채팅 및 설정 화면](./simplechat_screens.webp "채팅 및 설정 화면")
 
-Auto saves the chat session locally as and when the chat is progressing and inturn at a later time when you
-open SimpleChat, option is provided to restore the old chat session, if a matching one exists.
+채팅이 진행되는 동안 로컬로 채팅 세션을 자동으로 저장하고, 나중에 SimpleChat를 열면 일치하는 세션이 있으면 해당 세션을 복원할 수 있는 옵션이 제공됩니다.
 
-The UI follows a responsive web design so that the layout can adapt to available display space in a usable
-enough manner, in general.
+UI는 사용 가능한 디스플레이 공간에 맞춰 레이아웃을 조정할 수 있는 반응형 웹 디자인을 따릅니다.
 
-Allows developer/end-user to control some of the behaviour by updating gMe members from browser's devel-tool
-console. Parallely some of the directly useful to end-user settings can also be changed using the provided
-settings ui.
+개발자/사용자가 브라우저의 개발 도구 콘솔에서 gMe 멤버를 업데이트하여 일부 동작을 제어할 수 있습니다. 동시에 사용자에게 직접 유용한 설정은 제공된 설정 UI를 통해 변경할 수도 있습니다.
 
-NOTE: Current web service api doesnt expose the model context length directly, so client logic doesnt provide
-any adaptive culling of old messages nor of replacing them with summary of their content etal. However there
-is a optional sliding window based chat logic, which provides a simple minded culling of old messages from
-the chat history before sending to the ai model.
+참고: 현재 웹 서비스 API는 모델 컨텍스트 길이를 직접 노출하지 않으므로 클라이언트 로직은 오래된 메시지를 적응적으로 제거하거나 내용 요약으로 대체하는 기능을 제공하지 않습니다. 그러나 간단한 오래된 메시지 제거 로직이 있는 선택 사항이 있습니다.
 
-NOTE: Wrt options sent with the request, it mainly sets temperature, max_tokens and optionaly stream for now.
-However if someone wants they can update the js file or equivalent member in gMe as needed.
+참고: 요청에 전달되는 옵션은 현재 주로 온도, 최대 토큰 및 스트림 옵션을 설정합니다. 그러나 필요에 따라 사용자는 js 파일 또는 gMe의 해당 멤버를 업데이트할 수 있습니다.
 
-NOTE: One may be able to use this to chat with openai api web-service /chat/completions endpoint, in a very
-limited / minimal way. One will need to set model, openai url and authorization bearer key in settings ui.
+참고: 이를 사용하여 오픈AI API 웹 서비스 `/chat/completions` 엔드포인트와 매우 제한된 방식으로 채팅할 수 있습니다. 설정 UI에서 모델, 오픈AI URL 및 인증 토큰을 설정해야 합니다.
 
 
-## usage
+## 사용법
 
-One could run this web frontend directly using server itself or if anyone is thinking of adding a built in web
-frontend to configure the server over http(s) or so, then run this web frontend using something like python's
-http module.
+이 웹 프론트엔드를 서버 자체로 직접 실행하거나, HTTP(S)를 통해 서버를 구성하는 데 내장된 웹 프론트엔드를 추가하려는 경우, Python의 http 모듈과 같은 것을 사용하여 이 웹 프론트엔드를 실행할 수 있습니다.
 
-### running using examples/server
+### examples/server를 사용하여 실행하기
 
 ./llama-server -m path/model.gguf --path examples/server/public_simplechat [--port PORT]
 
-### running using python3's server module
+### Python3의 서버 모듈을 사용하여 실행하기
 
-first run examples/server
+먼저 examples/server에서 실행합니다.
 * ./llama-server -m path/model.gguf
 
-next run this web front end in examples/server/public_simplechat
+다음으로 examples/server/public_simplechat에서 웹 프론트엔드를 실행합니다.
 * cd ../examples/server/public_simplechat
 * python3 -m http.server PORT
 
-### using the front end
+### 프론트엔드 사용 방법
 
-Open this simple web front end from your local browser
+ 로컬 브라우저에서 이 간단한 웹 프론트엔드를 열어보세요.
 
 * http://127.0.0.1:PORT/index.html
 
-Once inside
+ 내부에서
 
-* If you want to, you can change many of the default global settings
-  * the base url (ie ip addr / domain name, port)
-  * chat (default) vs completion mode
-  * try trim garbage in response or not
-  * amount of chat history in the context sent to server/ai-model
-  * oneshot or streamed mode.
+* 원하는 경우, 여러 개의 기본 글로벌 설정을 변경할 수 있습니다.
+  * 기본 URL (예: IP 주소/도메인 이름, 포트)
+  * 채팅 (기본) vs 완성 모드
+  * 응답에서 불필요한 텍스트를 제거할지 여부
+  * 서버/AI 모델에 전달되는 챗 히스토리의 양
+  * 단일 요청 또는 스트리밍 모드
 
-* In completion mode
-  * one normally doesnt use a system prompt in completion mode.
-  * logic by default doesnt insert any role specific "ROLE: " prefix wrt each role's message.
-    If the model requires any prefix wrt user role messages, then the end user has to
-    explicitly add the needed prefix, when they enter their chat message.
-    Similarly if the model requires any prefix to trigger assistant/ai-model response,
-    then the end user needs to enter the same.
-    This keeps the logic simple, while still giving flexibility to the end user to
-    manage any templating/tagging requirement wrt their messages to the model.
-  * the logic doesnt insert newline at the begining and end wrt the prompt message generated.
-    However if the chat being sent to /completions end point has more than one role's message,
-    then insert newline when moving from one role's message to the next role's message, so
-    that it can be clearly identified/distinguished.
-  * given that /completions endpoint normally doesnt add additional chat-templating of its
-    own, the above ensures that end user can create a custom single/multi message combo with
-    any tags/special-tokens related chat templating to test out model handshake. Or enduser
-    can use it just for normal completion related/based query.
+* 완성 모드의 경우
+  * 일반적으로 완성 모드에서는 시스템 프롬프트를 사용하지 않습니다.
+  * 논리적으로 기본적으로 각 역할의 메시지에 대한 특정 역할을 나타내는 "ROLE: " 접두어를 삽입하지 않습니다. 모델이 사용자 역할 메시지에 대한 어떤 접두어를 필요로 하는 경우, 사용자는 메시지를 입력할 때 필요한 접두어를 명시적으로 추가해야 합니다. 마찬가지로 모델이 AI 모델 응답을 트리거하기 위해 어떤 접두어를 필요로 하는 경우, 사용자는 동일한 접두어를 입력해야 합니다. 이는 논리를 간단하게 유지하면서도 사용자가 모델에 보내는 메시지에 대한 임시 템플릿/태그 요구 사항을 관리할 수 있는 유연성을 제공합니다.
+  * 논리는 프롬프트 메시지에 줄 바꿈을 삽입하지 않습니다. 그러나 사용자 메시지가 여러 역할의 메시지를 포함하는 경우, 역할의 메시지 간에 줄 바꿈을 삽입하여 명확하게 구분됩니다.
+  * /completions 엔드포인트가 일반적으로 추가적인 챗 템플릿을 추가하지 않기 때문에, 위의 설정은 사용자가 모델과의 손뼉 테스트를 위해 임의의 태그/특수 토큰이 포함된 단일/다중 메시지 조합을 만들 수 있도록 합니다. 또는 사용자는 일반적인 완성 관련 쿼리에 대해서도 사용할 수 있습니다.
 
-* If you want to provide a system prompt, then ideally enter it first, before entering any user query.
-  Normally Completion mode doesnt need system prompt, while Chat mode can generate better/interesting
-  responses with a suitable system prompt.
-  * if chat.add_system_begin is used
-    * you cant change the system prompt, after it is has been submitted once along with user query.
-    * you cant set a system prompt, after you have submitted any user query
-  * if chat.add_system_anytime is used
-    * one can change the system prompt any time during chat, by changing the contents of system prompt.
-    * inturn the updated/changed system prompt will be inserted into the chat session.
-    * this allows for the subsequent user chatting to be driven by the new system prompt set above.
+* 시스템 프롬프트를 제공하려면, 사용자 쿼리를 입력하기 전에 먼저 입력하십시오. 일반적으로 완성 모드는 시스템 프롬프트가 필요하지 않지만, 채팅 모드는 적절한 시스템 프롬프트를 사용하면 더 나은/흥미로운 응답을 생성할 수 있습니다.
+  * 만약 chat.add_system_begin 을 사용한다면
+    * 사용자 쿼리와 함께 시스템 프롬프트가 제출된 후에는 시스템 프롬프트를 변경할 수 없습니다.
+    * 사용자 쿼리를 제출한 후에는 시스템 프롬프트를 설정할 수 없습니다.
+  * 만약 chat.add_system_anytime 을 사용한다면
+    * 사용자는 채팅 중 언제든지 시스템 프롬프트를 변경할 수 있습니다. 시스템 프롬프트의 내용을 변경하면 됩니다.
+    * 그 결과 업데이트된/변경된 시스템 프롬프트가 채팅 세션에 삽입됩니다.
+    * 이를 통해 이후 사용자의 채팅이 위에서 설정된 새로운 시스템 프롬프트에 의해 제어됩니다.
 
-* Enter your query and either press enter or click on the submit button.
-  If you want to insert enter (\n) as part of your chat/query to ai model, use shift+enter.
+* 쿼리를 입력하고 Enter 키를 누르거나 제출 버튼을 클릭하십시오.
+  AI 모델에 엔터(\n)를 포함시키려면 Shift+Enter를 사용하십시오.
 
-* Wait for the logic to communicate with the server and get the response.
-  * the user is not allowed to enter any fresh query during this time.
-  * the user input box will be disabled and a working message will be shown in it.
-  * if trim garbage is enabled, the logic will try to trim repeating text kind of garbage to some extent.
+* 논리가 서버와 통신하고 응답을 가져오는 동안 기다립니다.
+  * 이 기간 동안 사용자는 새 쿼리를 입력할 수 없습니다.
+  * 사용자 입력 상자는 비활성화되고 작업 중인 메시지가 표시됩니다.
+  * 불필요한 텍스트를 제거하는 기능이 활성화된 경우, 논리는 반복되는 텍스트와 같은 불필요한 텍스트를 일정 정도 제거하려고 합니다.
 
-* just refresh the page, to reset wrt the chat history and or system prompt and start afresh.
+* 채팅 히스토리와 시스템 프롬프트를 초기화하고 새로 시작하려면 페이지를 새로 고칩니다.
 
-* Using NewChat one can start independent chat sessions.
-  * two independent chat sessions are setup by default.
+* NewChat을 사용하면 독립적인 채팅 세션을 시작할 수 있습니다.
+  * 기본적으로 두 개의 독립적인 채팅 세션이 설정됩니다.
 
-* When you want to print, switching ChatHistoryInCtxt to Full and clicking on the chat session button of
-  interest, will display the full chat history till then wrt same, if you want full history for printing.
+* 인쇄하려면 ChatHistoryInCtxt를 Full로 설정하고 원하는 채팅 세션 버튼을 클릭하면 해당 세션의 전체 채팅 히스토리가 표시됩니다.
 
 
-## Devel note
+## 개발 노트
 
-### Reason behind this
+### 이것의 이유
 
-The idea is to be easy enough to use for basic purposes, while also being simple and easily discernable
-by developers who may not be from web frontend background (so inturn may not be familiar with template /
-end-use-specific-language-extensions driven flows) so that they can use it to explore/experiment things.
+기본적인 용도로 사용하기 쉽도록 하면서도, 웹 프론트엔드 배경이 없는 개발자(따라서 템플릿/엔드-유저-구체적인-언어 확장 기반 흐름에 익숙하지 않을 수 있는)도 쉽게 이해하고 사용할 수 있도록 간단하게 만들었습니다. 이를 통해 개발자가 탐색하고 실험할 수 있도록 합니다.
 
-And given that the idea is also to help explore/experiment for developers, some flexibility is provided
-to change behaviour easily using the devel-tools/console or provided minimal settings ui (wrt few aspects).
-Skeletal logic has been implemented to explore some of the end points and ideas/implications around them.
+또한 개발자들이 탐색하고 실험하는 데 도움을 주기 위해, 개발 도구/콘솔 또는 제공된 최소 설정 UI(몇 가지 측면에 대해)를 사용하여 동작을 쉽게 변경할 수 있는 유연성을 제공합니다. 몇 가지 엔드포인트와 그 주변의 아이디어/의미에 대한 탐색을 위한 기본적인 논리 구조가 구현되었습니다.
 
 
-### General
+### 일반 정보
 
-Me/gMe consolidates the settings which control the behaviour into one object.
-One can see the current settings, as well as change/update them using browsers devel-tool/console.
-It is attached to the document object. Some of these can also be updated using the Settings UI.
+Me/gMe는 동작을 제어하는 설정을 하나의 객체로 통합합니다.
+브라우저 개발 도구/콘솔을 사용하여 현재 설정을 확인하고 변경하거나 업데이트할 수 있습니다.
+문서 객체에 연결되어 있습니다. 이 중 일부는 설정 UI를 사용하여 업데이트할 수도 있습니다.
 
-  baseURL - the domain-name/ip-address and inturn the port to send the request.
+  baseURL - 요청을 보낼 도메인 이름/IP 주소 및 포트
 
-  bStream - control between oneshot-at-end and live-stream-as-its-generated collating and showing
-  of the generated response.
+  bStream - oneshot-at-end와 live-stream-as-its-generated을 통제하여 생성된 응답을 수집하고 표시합니다.
 
-    the logic assumes that the text sent from the server follows utf-8 encoding.
+    이 로직은 서버에서 전송되는 텍스트가 UTF-8 인코딩을 따르는 것으로 가정합니다.
 
-    in streaming mode - if there is any exception, the logic traps the same and tries to ensure
-    that text generated till then is not lost.
+    스트리밍 모드에서 예외가 발생하면 로직이 예외를 잡고 생성된 텍스트가 손실되지 않도록 합니다.
 
-      if a very long text is being generated, which leads to no user interaction for sometime and
-      inturn the machine goes into power saving mode or so, the platform may stop network connection,
-      leading to exception.
+      매우 긴 텍스트가 생성되면 사용자가 일정 시간 동안 상호 작용하지 않고 기계가 절전 모드로 들어가거나, 플랫폼이 네트워크 연결을 중단하여 예외가 발생할 수 있습니다.
 
-  apiEP - select between /completions and /chat/completions endpoint provided by the server/ai-model.
+  apiEP - 서버/AI 모델에서 제공하는 /completions 또는 /chat/completions 엔드포인트 중 선택합니다.
 
-  bCompletionFreshChatAlways - whether Completion mode collates complete/sliding-window history when
-  communicating with the server or only sends the latest user query/message.
+  bCompletionFreshChatAlways - Completion 모드가 서버와 통신할 때 완전한/슬라이딩 창 기록을 수집하거나 최신 사용자 쿼리/메시지만 보내는지 여부를 결정합니다.
 
-  bCompletionInsertStandardRolePrefix - whether Completion mode inserts role related prefix wrt the
-  messages that get inserted into prompt field wrt /Completion endpoint.
+  bCompletionInsertStandardRolePrefix - Completion 모드가 /Completion 엔드포인트에 대한 프롬프트 필드에 삽입되는 메시지에 대한 역할 관련 접두어를 삽입하는지 여부를 결정합니다.
 
-  bTrimGarbage - whether garbage repeatation at the end of the generated ai response, should be
-  trimmed or left as is. If enabled, it will be trimmed so that it wont be sent back as part of
-  subsequent chat history. At the same time the actual trimmed text is shown to the user, once
-  when it was generated, so user can check if any useful info/data was there in the response.
+  bTrimGarbage - 생성된 AI 응답의 끝에 있는 불필요한 반복을 잘라내거나 그대로 유지하는지 여부를 결정합니다. 활성화되면 잘라내어 이후 채팅 기록의 일부로 다시 전송되지 않습니다. 동시에 실제 잘라낸 텍스트가 사용자에게 한 번 표시되므로 응답에 유용한 정보/데이터가 있는지 확인할 수 있습니다.
 
-    One may be able to request the ai-model to continue (wrt the last response) (if chat-history
-    is enabled as part of the chat-history-in-context setting), and chances are the ai-model will
-    continue starting from the trimmed part, thus allows long response to be recovered/continued
-    indirectly, in many cases.
+    사용자는 AI 모델에 마지막 응답을 계속하도록 요청할 수 있으며 (채팅 기록이 채팅 기록 맥락 설정의 일부로 활성화된 경우), AI 모델은 잘라낸 부분부터 계속해서 시작할 가능성이 높습니다. 이를 통해 긴 응답이 간접적으로 복구되거나 계속될 수 있습니다.
 
-    The histogram/freq based trimming logic is currently tuned for english language wrt its
+    히스토그램/빈도 기반 잘라내기 로직은 현재 영어 언어에 대해 조정되어 있습니다.
+
     is-it-a-alpabetic|numeral-char regex match logic.
 
-  apiRequestOptions - maintains the list of options/fields to send along with api request,
-  irrespective of whether /chat/completions or /completions endpoint.
+  apiRequestOptions - /chat/completions 또는 /completions 엔드포인트에 관계없이 api 요청과 함께 전송할 옵션/필드 목록을 유지합니다.
 
-    If you want to add additional options/fields to send to the server/ai-model, and or
-    modify the existing options value or remove them, for now you can update this global var
-    using browser's development-tools/console.
+    서버/AI 모델에 추가 옵션/필드를 전송하거나 기존 옵션 값을 수정하거나 제거하려면 현재 이 글로벌 변수를 브라우저의 개발 도구/콘솔에서 업데이트할 수 있습니다.
 
-    For string, numeric and boolean fields in apiRequestOptions, including even those added by a
-    user at runtime by directly modifying gMe.apiRequestOptions, setting ui entries will be auto
-    created.
+    apiRequestOptions의 문자열, 숫자 및 불린 필드는 사용자가 실행 시간에 직접 gMe.apiRequestOptions를 수정하여 추가한 필드를 포함하여 자동으로 UI 항목이 생성됩니다.
 
-    cache_prompt option supported by example/server is allowed to be controlled by user, so that
-    any caching supported wrt system-prompt and chat history, if usable can get used. When chat
-    history sliding window is enabled, cache_prompt logic may or may not kick in at the backend
-    wrt same, based on aspects related to model, positional encoding, attention mechanism etal.
-    However system prompt should ideally get the benefit of caching.
+    예시/서버에서 지원하는 cache_prompt 옵션은 사용자가 제어할 수 있으므로 시스템 프롬프트 및 채팅 기록에 대한 캐싱이 지원되는 경우 사용할 수 있습니다. 채팅 기록 슬라이딩 창이 활성화되면 캐시_프롬프트 논리는 모델, 위치 인코딩, 주의 메커니즘 등과 관련된 측면에 따라 백엔드에서 동일하게 작동하지 않을 수 있습니다. 그러나 시스템 프롬프트는 캐싱의 이점을 받아야 합니다.
 
-  headers - maintains the list of http headers sent when request is made to the server. By default
-  Content-Type is set to application/json. Additionally Authorization entry is provided, which can
-  be set if needed using the settings ui.
+  headers - 요청이 서버로 전송될 때 전송되는 HTTP 헤더 목록을 유지합니다. 기본적으로 Content-Type은 application/json으로 설정됩니다. 또한 Authorization 항목이 제공되며, 설정 UI를 사용하여 필요에 따라 설정할 수 있습니다.
 
-  iRecentUserMsgCnt - a simple minded SlidingWindow to limit context window load at Ai Model end.
-  This is disabled by default. However if enabled, then in addition to latest system message, only
-  the last/latest iRecentUserMsgCnt user messages after the latest system prompt and its responses
-  from the ai model will be sent to the ai-model, when querying for a new response. IE if enabled,
-  only user messages after the latest system message/prompt will be considered.
+  iRecentUserMsgCnt - AI 모델 측에서 컨텍스트 창 로드를 제한하기 위한 간단한 슬라이딩 창입니다. 기본적으로 비활성화되어 있습니다. 그러나 활성화되면 최신 시스템 메시지 외에도 iRecentUserMsgCnt 개의 최신 사용자 메시지만이 최신 시스템 프롬프트 및 AI 모델의 응답 이후에 AI 모델에 전송됩니다. 즉, 활성화되면 최신 시스템 메시지/프롬프트 이후의 사용자 메시지만 고려됩니다.
 
-    This specified sliding window user message count also includes the latest user query.
-    <0 : Send entire chat history to server
-     0 : Send only the system message if any to the server
-    >0 : Send the latest chat history from the latest system prompt, limited to specified cnt.
+    이 지정된 슬라이딩 창 사용자 메시지 카운트에는 최신 사용자 쿼리도 포함됩니다.
+    <0 : 서버에 전체 채팅 기록을 전송합니다.
+     0 : 서버에 시스템 메시지만 전송합니다.
+    >0 : 최신 시스템 프롬프트부터 제한된 카운트만큼 최신 채팅 기록을 전송합니다.
 
 
-By using gMe's iRecentUserMsgCnt and apiRequestOptions.max_tokens/n_predict one can try to control
-the implications of loading of the ai-model's context window by chat history, wrt chat response to
-some extent in a simple crude way. You may also want to control the context size enabled when the
-server loads ai-model, on the server end.
+ gMe의 iRecentUserMsgCnt 및 apiRequestOptions.max_tokens/n_predict를 사용하면 AI 모델의 컨텍스트 창 로드에 대한 영향을 간단하고 촌스럽게 제어할 수 있습니다. 서버에서 AI 모델을 로드할 때 사용되는 컨텍스트 크기를 제어하는 것도 고려해야 합니다.
 
 
-Sometimes the browser may be stuborn with caching of the file, so your updates to html/css/js
-may not be visible. Also remember that just refreshing/reloading page in browser or for that
-matter clearing site data, dont directly override site caching in all cases. Worst case you may
-have to change port. Or in dev tools of browser, you may be able to disable caching fully.
+ 때로는 브라우저가 파일 캐싱을 고집하여 HTML/CSS/JS 업데이트가 표시되지 않을 수 있습니다. 또한 브라우저에서 페이지를 새로 고치거나 사이트 데이터를 삭제하는 것만으로도 모든 경우에 사이트 캐싱을 직접 무효화하지는 않습니다. 최악의 경우에는 포트를 변경해야 할 수도 있습니다. 또는 브라우저의 개발 도구에서 캐싱을 완전히 비활성화할 수도 있습니다.
 
 
-Currently the server to communicate with is maintained globally and not as part of a specific
-chat session. So if one changes the server ip/url in setting, then all chat sessions will auto
-switch to this new server, when you try using those sessions.
+ 현재 서버와의 통신은 특정 채팅 세션의 일부가 아니라 글로벌로 유지됩니다. 따라서 설정에서 서버 IP/URL을 변경하면 모든 채팅 세션이 새 서버로 자동으로 전환됩니다. 
 
 
-By switching between chat.add_system_begin/anytime, one can control whether one can change
-the system prompt, anytime during the conversation or only at the beginning.
+ chat.add_system_begin/anytime 간을 전환하면 대화 중 언제든 시스템 프롬프트를 변경할 수 있는지, 또는 시작 시에만 변경할 수 있는지 제어할 수 있습니다.
 
 
-### Default setup
+### 기본 설정
 
-By default things are setup to try and make the user experience a bit better, if possible.
-However a developer when testing the server of ai-model may want to change these value.
+기본적으로 사용자 경험을 조금 더 향상시키기 위해 설정이 되어 있습니다. 그러나 AI 모델의 서버를 테스트하는 개발자는 이 값을 변경하고 싶을 수 있습니다.
 
-Using iRecentUserMsgCnt reduce chat history context sent to the server/ai-model to be
-just the system-prompt, prev-user-request-and-ai-response and cur-user-request, instead of
-full chat history. This way if there is any response with garbage/repeatation, it doesnt
-mess with things beyond the next question/request/query, in some ways. The trim garbage
-option also tries to help avoid issues with garbage in the context to an extent.
+`iRecentUserMsgCnt`를 사용하면 서버/AI 모델에 전송되는 채팅 기록 맥락을 줄여 시스템 프롬프트, 이전 사용자 요청 및 AI 응답, 현재 사용자 요청만으로 합니다. 이렇게 하면 응답에 쓸모없거나 반복되는 내용이 있더라도 다음 질문/요청/쿼리 이후의 내용에 영향을 미치지 않습니다. `trim garbage` 옵션 또한 맥락에 있는 쓸모없는 내용으로 인한 문제를 어느 정도 방지하려고 합니다.
 
-Set max_tokens to 1024, so that a relatively large previous reponse doesnt eat up the space
-available wrt next query-response. However dont forget that the server when started should
-also be started with a model context size of 1k or more, to be on safe side.
+`max_tokens`를 1024로 설정하여 상대적으로 큰 이전 응답이 다음 쿼리-응답에 사용 가능한 공간을 차지하지 않도록 합니다. 그러나 서버가 시작될 때 모델 맥락 크기를 1k 이상으로 설정해야 안전합니다.
 
-  The /completions endpoint of examples/server doesnt take max_tokens, instead it takes the
-  internal n_predict, for now add the same here on the client side, maybe later add max_tokens
-  to /completions endpoint handling code on server side.
+  `examples/server/completions` 엔드포인트는 `max_tokens`를 받지 않고 현재는 내부 `n_predict`를 사용합니다. 나중에 서버 측 `completions` 엔드포인트 처리 코드에 `max_tokens`를 추가할 수도 있습니다.
 
-NOTE: One may want to experiment with frequency/presence penalty fields in apiRequestOptions
-wrt the set of fields sent to server along with the user query, to check how the model behaves
-wrt repeatations in general in the generated text response.
-
-A end-user can change these behaviour by editing gMe from browser's devel-tool/console or by
-using the provided settings ui (for settings exposed through the ui).
+참고: `apiRequestOptions`의 `frequency/presence penalty` 필드를 사용자 쿼리와 함께 서버에 전송되는 필드 세트에 대해 실험하여 모델이 생성된 텍스트 응답에서 반복에 대해 어떻게 행동하는지 확인할 수 있습니다.
 
 
-### OpenAi / Equivalent API WebService
+엔드 사용자는 브라우저의 개발 도구/콘솔에서 `gMe`를 편집하거나 제공된 설정 UI(UI를 통해 노출되는 설정)를 사용하여 이러한 동작을 변경할 수 있습니다.
 
-One may be abe to handshake with OpenAI/Equivalent api web service's /chat/completions endpoint
-for a minimal chatting experimentation by setting the below.
 
-* the baseUrl in settings ui
-  * https://api.openai.com/v1 or similar
+### OpenAi / 동등한 API 웹 서비스
 
-* Wrt request body - gMe.apiRequestOptions
-  * model (settings ui)
-  * any additional fields if required in future
+OpenAI/동등한 API 웹 서비스의 /chat/completions 엔드포인트와 손을 잡을 수 있을 수 있습니다.
+아래 설정을 통해 최소한의 채팅 실험을 수행할 수 있습니다.
 
-* Wrt request headers - gMe.headers
-  * Authorization (available through settings ui)
+* 설정 UI에서 baseUrl
+  * https://api.openai.com/v1 또는 유사한 값
+
+* 요청 바디 - gMe.apiRequestOptions
+  * 모델 (설정 UI)
+  * 필요에 따라 추가 필드
+
+* 요청 헤더 - gMe.headers
+  * Authorization (설정 UI에서 사용 가능)
     * Bearer THE_OPENAI_API_KEY
-  * any additional optional header entries like "OpenAI-Organization", "OpenAI-Project" or so
+  * 추가적인 옵션 헤더 항목 (예: "OpenAI-Organization", "OpenAI-Project")
 
-NOTE: Not tested, as there is no free tier api testing available. However logically this might
-work.
+참고: 무료 계층 API 테스트가 제공되지 않아 테스트되지 않았습니다. 그러나 논리적으로 이것이 작동할 수 있습니다.
 
 
-## At the end
+## 끝맺음
 
-Also a thank you to all open source and open model developers, who strive for the common good.
+모두에게 이익을 가져다주려는 노력을 하는 모든 오픈소스 및 오픈 모델 개발자들에게 감사 인사를 전합니다.

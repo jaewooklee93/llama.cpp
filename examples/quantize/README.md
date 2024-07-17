@@ -1,10 +1,10 @@
 # quantize
 
-You can also use the [GGUF-my-repo](https://huggingface.co/spaces/ggml-org/gguf-my-repo) space on Hugging Face to build your own quants without any setup.
+[GGUF-my-repo](https://huggingface.co/spaces/ggml-org/gguf-my-repo)를 사용하여 설정 없이 자신의 quants를 만들 수도 있습니다.
 
-Note: It is synced from llama.cpp `main` every 6 hours.
+참고: llama.cpp `main`에서 6시간마다 동기화됩니다.
 
-Example usage:
+사용 예시:
 
 ```bash
 # obtain the official LLaMA model weights and place them in ./models
@@ -30,18 +30,18 @@ python3 convert_hf_to_gguf.py models/mymodel/
 ./llama-quantize ./models/mymodel/ggml-model-Q4_K_M.gguf ./models/mymodel/ggml-model-Q4_K_M-v2.gguf COPY
 ```
 
-Run the quantized model:
+Quantized 모델 실행:
 
 ```bash
 # start inference on a gguf model
 ./llama-cli -m ./models/mymodel/ggml-model-Q4_K_M.gguf -n 128
 ```
 
-When running the larger models, make sure you have enough disk space to store all the intermediate files.
+더 큰 모델을 실행할 때는 중간 파일을 모두 저장할 수 있는 충분한 디스크 공간이 있는지 확인하십시오.
 
-## Memory/Disk Requirements
+## 메모리/디스크 요구 사항
 
-As the models are currently fully loaded into memory, you will need adequate disk space to save them and sufficient RAM to load them. At the moment, memory and disk requirements are the same.
+현재 모델이 메모리에 완전히 로드되므로 저장을 위한 충분한 디스크 공간과 로드를 위한 충분한 RAM이 필요합니다. 현재 메모리 및 디스크 요구 사항은 동일합니다.
 
 | Model | Original size | Quantized size (Q4_0) |
 |------:|--------------:|----------------------:|
@@ -50,11 +50,11 @@ As the models are currently fully loaded into memory, you will need adequate dis
 |   30B |         60 GB |               19.5 GB |
 |   65B |        120 GB |               38.5 GB |
 
-## Quantization
+## 양자화
 
-Several quantization methods are supported. They differ in the resulting model disk size and inference speed.
+여러 양자화 방법이 지원됩니다. 결과 모델 디스크 크기와 인퍼런스 속도는 다릅니다.
 
-*(outdated)*
+*(오래된 정보)*
 
 | Model | Measure      |    F16 |   Q4_0 |   Q4_1 |   Q5_0 |   Q5_1 |   Q8_0 |
 |------:|--------------|-------:|-------:|-------:|-------:|-------:|-------:|
@@ -70,21 +70,21 @@ Several quantization methods are supported. They differ in the resulting model d
 |   13B | bits/weight  |   16.0 |    4.5 |    5.0 |    5.5 |    6.0 |    8.5 |
 
 - [k-quants](https://github.com/ggerganov/llama.cpp/pull/1684)
-- recent k-quants improvements and new i-quants
+- 최근 k-quants 개선 및 새로운 i-quants
   - [#2707](https://github.com/ggerganov/llama.cpp/pull/2707)
   - [#2807](https://github.com/ggerganov/llama.cpp/pull/2807)
-  - [#4773 - 2-bit i-quants (inference)](https://github.com/ggerganov/llama.cpp/pull/4773)
-  - [#4856 - 2-bit i-quants (inference)](https://github.com/ggerganov/llama.cpp/pull/4856)
-  - [#4861 - importance matrix](https://github.com/ggerganov/llama.cpp/pull/4861)
-  - [#4872 - MoE models](https://github.com/ggerganov/llama.cpp/pull/4872)
-  - [#4897 - 2-bit quantization](https://github.com/ggerganov/llama.cpp/pull/4897)
-  - [#4930 - imatrix for all k-quants](https://github.com/ggerganov/llama.cpp/pull/4930)
-  - [#4951 - imatrix on the GPU](https://github.com/ggerganov/llama.cpp/pull/4957)
-  - [#4969 - imatrix for legacy quants](https://github.com/ggerganov/llama.cpp/pull/4969)
-  - [#4996 - k-qunats tuning](https://github.com/ggerganov/llama.cpp/pull/4996)
+  - [#4773 - 2-bit i-quants (인퍼런스)](https://github.com/ggerganov/llama.cpp/pull/4773)
+  - [#4856 - 2-bit i-quants (인퍼런스)](https://github.com/ggerganov/llama.cpp/pull/4856)
+  - [#4861 - 중요성 행렬](https://github.com/ggerganov/llama.cpp/pull/4861)
+  - [#4872 - MoE 모델](https://github.com/ggerganov/llama.cpp/pull/4872)
+  - [#4897 - 2-bit 양자화](https://github.com/ggerganov/llama.cpp/pull/4897)
+  - [#4930 - 모든 k-quants에 대한 imatrix](https://github.com/ggerganov/llama.cpp/pull/4930)
+  - [#4951 - GPU에서의 imatrix](https://github.com/ggerganov/llama.cpp/pull/4957)
+  - [#4969 - 레거시 양자화에 대한 imatrix](https://github.com/ggerganov/llama.cpp/pull/4969)
+  - [#4996 - k-quants 튜닝](https://github.com/ggerganov/llama.cpp/pull/4996)
   - [#5060 - Q3_K_XS](https://github.com/ggerganov/llama.cpp/pull/5060)
   - [#5196 - 3-bit i-quants](https://github.com/ggerganov/llama.cpp/pull/5196)
-  - [quantization tuning](https://github.com/ggerganov/llama.cpp/pull/5320), [another one](https://github.com/ggerganov/llama.cpp/pull/5334), and [another one](https://github.com/ggerganov/llama.cpp/pull/5361)
+  - [양자화 튜닝](https://github.com/ggerganov/llama.cpp/pull/5320), [또 다른 하나](https://github.com/ggerganov/llama.cpp/pull/5334), 그리고 [또 다른 하나](https://github.com/ggerganov/llama.cpp/pull/5361)
 
 **Llama 2 7B**
 

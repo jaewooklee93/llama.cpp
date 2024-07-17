@@ -1,6 +1,6 @@
 # llama.cpp/example/simple
 
-The purpose of this example is to demonstrate a minimal usage of llama.cpp for generating text with a given prompt.
+이 예제는 llama.cpp를 사용하여 주어진 프롬프트로 텍스트를 생성하는 최소한의 방법을 보여줍니다.
 
 ```bash
 ./simple -m ./models/llama-7b-v2/ggml-model-f16.gguf -p "Hello my name is"

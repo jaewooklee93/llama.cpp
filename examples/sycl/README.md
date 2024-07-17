@@ -1,8 +1,8 @@
 # llama.cpp/example/sycl
 
-This example program provides the tools for llama.cpp for SYCL on Intel GPU.
+이 예제 프로그램은 Intel GPU에서 SYCL을 사용하는 llama.cpp를 위한 도구를 제공합니다.
 
-## Tool
+## 도구
 
 |Tool Name| Function|Status|
 |-|-|-|
@@ -10,23 +10,23 @@ This example program provides the tools for llama.cpp for SYCL on Intel GPU.
 
 ### llama-ls-sycl-device
 
-List all SYCL devices with ID, compute capability, max work group size, ect.
+모든 SYCL 장치를 ID, 컴퓨트 능력, 최대 작업 그룹 크기 등으로 나열합니다.
 
-1. Build the llama.cpp for SYCL for all targets.
+1. 모든 대상에 대해 SYCL용 llama.cpp를 빌드합니다.
 
-2. Enable oneAPI running environment
+2. oneAPI 실행 환경을 활성화합니다.
 
 ```
 source /opt/intel/oneapi/setvars.sh
 ```
 
-3. Execute
+3. 실행
 
 ```
 ./build/bin/llama-ls-sycl-device
 ```
 
-Check the ID in startup log, like:
+시작 로그에서 ID를 확인하세요, 예를 들어:
 
 ```
 found 4 SYCL devices:

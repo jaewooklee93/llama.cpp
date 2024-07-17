@@ -1,21 +1,21 @@
-# LLaMA.cpp HTTP Server
+# LLaMA.cpp HTTP 서버
 
-Fast, lightweight, pure C/C++ HTTP server based on [httplib](https://github.com/yhirose/cpp-httplib), [nlohmann::json](https://github.com/nlohmann/json) and **llama.cpp**.
+[httplib](https://github.com/yhirose/cpp-httplib), [nlohmann::json](https://github.com/nlohmann/json) 및 **llama.cpp** 기반의 빠르고 가벼운 순 C/C++ HTTP 서버입니다.
 
-Set of LLM REST APIs and a simple web front end to interact with llama.cpp.
+LLM REST API 세트 및 llama.cpp와 상호 작용하기 위한 간단한 웹 프론트 엔드입니다.
 
-**Features:**
- * LLM inference of F16 and quantum models on GPU and CPU
- * [OpenAI API](https://github.com/openai/openai-openapi) compatible chat completions and embeddings routes
- * Parallel decoding with multi-user support
- * Continuous batching
- * Multimodal (wip)
- * Monitoring endpoints
- * Schema-constrained JSON response format
+**특징:**
+ * GPU 및 CPU에서 F16 및 양자 모델의 LLM 유추
+ * [OpenAI API](https://github.com/openai/openai-openapi) 호환되는 채팅 완성 및 잠재형 엔드포인트
+ * 다중 사용자 지원을 위한 병렬 디코딩
+ * 지속적인 배치 처리
+ * 다중 모달 (준비 중)
+ * 모니터링 엔드포인트
+ * 스키마 제약 JSON 응답 형식
 
-The project is under active development, and we are [looking for feedback and contributors](https://github.com/ggerganov/llama.cpp/issues/4216).
+이 프로젝트는 적극적으로 개발 중이며, [피드백 및 기여자를 모집하고 있습니다](https://github.com/ggerganov/llama.cpp/issues/4216).
 
-## Usage
+## 사용법
 
 ```
 usage: ./llama-server [options]
@@ -291,30 +291,30 @@ cvector:
 ```
 
 
-## Build
+## 빌드
 
-`llama-server` is built alongside everything else from the root of the project
+`llama-server`는 프로젝트 루트에서 다른 모든 것과 함께 빌드됩니다.
 
-- Using `make`:
+- `make`를 사용하여:
 
   ```bash
   make llama-server
   ```
 
-- Using `CMake`:
+- `CMake`를 사용하는 경우:
 
   ```bash
   cmake -B build
   cmake --build build --config Release -t llama-server
   ```
 
-  Binary is at `./build/bin/llama-server`
+  이진 파일은 `./build/bin/llama-server`에 있습니다.
 
-## Build with SSL
+## SSL로 빌드하기
 
-`llama-server` can also be built with SSL support using OpenSSL 3
+`llama-server`는 OpenSSL 3를 사용하여 SSL 지원으로 빌드할 수 있습니다.
 
-- Using `make`:
+- `make`를 사용하여:
 
   ```bash
   # NOTE: For non-system openssl, use the following:
@@ -323,18 +323,18 @@ cvector:
   make LLAMA_SERVER_SSL=true llama-server
   ```
 
-- Using `CMake`:
+- `CMake`를 사용하는 경우:
 
   ```bash
   cmake -B build -DLLAMA_SERVER_SSL=ON
   cmake --build build --config Release -t llama-server
   ```
 
-## Quick Start
+## 빠른 시작
 
-To get started right away, run the following command, making sure to use the correct path for the model you have:
+바로 시작하려면 다음 명령을 실행하고, 사용 중인 모델의 경로를 올바르게 지정하십시오.
 
-### Unix-based systems (Linux, macOS, etc.)
+### Unix 기반 시스템 (Linux, macOS 등)
 
 ```bash
 ./llama-server -m models/7B/ggml-model.gguf -c 2048
@@ -346,8 +346,8 @@ To get started right away, run the following command, making sure to use the cor
 llama-server.exe -m models\7B\ggml-model.gguf -c 2048
 ```
 
-The above command will start a server that by default listens on `127.0.0.1:8080`.
-You can consume the endpoints with Postman or NodeJS with axios library. You can visit the web front end at the same url.
+위 명령어를 실행하면 기본적으로 `127.0.0.1:8080`에 귀 기울이는 서버가 시작됩니다.
+Postman 또는 NodeJS와 axios 라이브러리를 사용하여 엔드포인트를 사용할 수 있습니다. 동일한 URL에서 웹 프론트엔드를 방문할 수 있습니다.
 
 ### Docker
 
@@ -358,9 +358,9 @@ docker run -p 8080:8080 -v /path/to/models:/models ghcr.io/ggerganov/llama.cpp:s
 docker run -p 8080:8080 -v /path/to/models:/models --gpus all ghcr.io/ggerganov/llama.cpp:server-cuda -m models/7B/ggml-model.gguf -c 512 --host 0.0.0.0 --port 8080 --n-gpu-layers 99
 ```
 
-## Testing with CURL
+## CURL을 사용한 테스트
 
-Using [curl](https://curl.se/). On Windows, `curl.exe` should be available in the base OS.
+[curl](https://curl.se/)을 사용합니다. Windows에서는 `curl.exe`가 기본 운영 체제에 포함되어 있습니다.
 
 ```sh
 curl --request POST \
@@ -369,22 +369,23 @@ curl --request POST \
     --data '{"prompt": "Building a website can be done in 10 simple steps:","n_predict": 128}'
 ```
 
-## Advanced testing
+## 고급 테스트
 
-We implemented a [server test framework](./tests/README.md) using human-readable scenario.
+인간이 이해하기 쉬운 시나리오를 사용하여 [서버 테스트 프레임워크](./tests/README.md)를 구현했습니다.
 
-*Before submitting an issue, please try to reproduce it with this format.*
+*문제를 제출하기 전에 이 형식으로 재현해 보세요.*
 
-## Node JS Test
+## Node JS 테스트
 
-You need to have [Node.js](https://nodejs.org/en) installed.
+[Node.js](https://nodejs.org/ko/)
+이 설치되어 있어야 합니다.
 
 ```bash
 mkdir llama-client
 cd llama-client
 ```
 
-Create a index.js file and put this inside:
+index.js 파일을 만들고 아래 내용을 넣으세요:
 
 ```javascript
 const prompt = `Building a website can be done in 10 simple steps:`;
@@ -403,106 +404,106 @@ async function Test() {
 Test()
 ```
 
-And run it:
+그리고 실행하세요:
 
 ```bash
 node index.js
 ```
 
-## API Endpoints
+## API 엔드포인트
 
-- **GET** `/health`: Returns the current state of the server:
-  - 503 -> `{"status": "loading model"}` if the model is still being loaded.
-  - 500 -> `{"status": "error"}` if the model failed to load.
-  - 200 -> `{"status": "ok", "slots_idle": 1, "slots_processing": 2 }` if the model is successfully loaded and the server is ready for further requests mentioned below.
-  - 200 -> `{"status": "no slot available", "slots_idle": 0, "slots_processing": 32}` if no slots are currently available.
-  - 503 -> `{"status": "no slot available", "slots_idle": 0, "slots_processing": 32}` if the query parameter `fail_on_no_slot` is provided and no slots are currently available.
+- **GET** `/health`: 서버의 현재 상태를 반환합니다.
+  - 503 -> `{"status": "loading model"}` 모델이 여전히 로딩 중인 경우.
+  - 500 -> `{"status": "error"}` 모델 로딩에 실패한 경우.
+  - 200 -> `{"status": "ok", "slots_idle": 1, "slots_processing": 2 }` 모델이 성공적으로 로딩되었고 서버가 아래와 같은 추가 요청에 준비된 경우.
+  - 200 -> `{"status": "no slot available", "slots_idle": 0, "slots_processing": 32}` 현재 슬롯이 없을 때.
+  - 503 -> `{"status": "no slot available", "slots_idle": 0, "slots_processing": 32}` `fail_on_no_slot` 쿼리 매개변수가 제공되고 현재 슬롯이 없을 때.
 
-  If the query parameter `include_slots` is passed, `slots` field will contain internal slots data except if `--slots-endpoint-disable` is set.
+  `include_slots` 쿼리 매개변수가 전달되면 `slots` 필드에는 `--slots-endpoint-disable`가 설정되지 않는 한 내부 슬롯 데이터가 포함됩니다.
 
-- **POST** `/completion`: Given a `prompt`, it returns the predicted completion.
+- **POST** `/completion`: `prompt`를 주면 예측된 완성을 반환합니다.
 
-    *Options:*
+    *옵션:* 
 
-    `prompt`: Provide the prompt for this completion as a string or as an array of strings or numbers representing tokens. Internally, if `cache_prompt` is `true`, the prompt is compared to the previous completion and only the "unseen" suffix is evaluated. A `BOS` token is inserted at the start, if all of the following conditions are true:
+    `prompt`: 이 완성에 대한 프롬프트를 문자열 또는 토큰을 나타내는 문자열 또는 숫자 배열로 제공합니다. 내부적으로 `cache_prompt`가 `true`이면 프롬프트가 이전 완성과 비교되고, "보이지 않은" 접두사만 평가됩니다. 다음 조건이 모두 충족되면 시작에 `BOS` 토큰이 삽입됩니다.
 
-      - The prompt is a string or an array with the first element given as a string
-      - The model's `tokenizer.ggml.add_bos_token` metadata is `true`
-      - The system prompt is empty
+      - 프롬프트는 문자열 또는 첫 번째 요소가 문자열인 배열입니다.
+      - 모델의 `tokenizer.ggml.add_bos_token` 메타데이터가 `true`입니다.
+      - 시스템 프롬프트가 비어 있습니다.
 
-    `temperature`: Adjust the randomness of the generated text. Default: `0.8`
+    `temperature`: 생성된 텍스트의 무작위성을 조정합니다. 기본값: `0.8`
 
-    `dynatemp_range`: Dynamic temperature range. The final temperature will be in the range of `[temperature - dynatemp_range; temperature + dynatemp_range]` Default: `0.0`, which is disabled.
+    `dynatemp_range`: 동적 온도 범위. 최종 온도는 `[temperature - dynatemp_range; temperature + dynatemp_range]` 범위에 있을 것입니다. 기본값: `0.0`, 사용하지 않음.
 
-    `dynatemp_exponent`: Dynamic temperature exponent. Default: `1.0`
+    `dynatemp_exponent`: 동적 온도 지수. 기본값: `1.0`
 
-    `top_k`: Limit the next token selection to the K most probable tokens.  Default: `40`
+    `top_k`: 다음 토큰 선택을 K개의 가장 가능성이 높은 토큰으로 제한합니다. 기본값: `40`
 
-    `top_p`: Limit the next token selection to a subset of tokens with a cumulative probability above a threshold P. Default: `0.95`
+    `top_p`: 누적 확률이 P 이상인 토큰의 하위 집합으로 다음 토큰 선택을 제한합니다. 기본값: `0.95`
 
-    `min_p`: The minimum probability for a token to be considered, relative to the probability of the most likely token. Default: `0.05`
+    `min_p`: 가장 가능성이 높은 토큰의 확률에 대한 토큰의 최소 확률. 기본값: `0.05`
 
-    `n_predict`: Set the maximum number of tokens to predict when generating text. **Note:** May exceed the set limit slightly if the last token is a partial multibyte character. When 0, no tokens will be generated but the prompt is evaluated into the cache. Default: `-1`, where `-1` is infinity.
+    `n_predict`: 텍스트를 생성할 때 예측할 토큰의 최대 수를 설정합니다. **참고:** 마지막 토큰이 부분적인 다바이트 문자일 경우 설정한 한도를 약간 초과할 수 있습니다. 0일 경우 토큰이 생성되지 않지만 프롬프트가 캐시로 평가됩니다. 기본값: `-1`, `-1`은 무한대입니다.
 
-    `n_keep`: Specify the number of tokens from the prompt to retain when the context size is exceeded and tokens need to be discarded.
-    By default, this value is set to `0`, meaning no tokens are kept. Use `-1` to retain all tokens from the prompt.
+    `n_keep`: 맥락 크기가 초과되고 토큰을 버려야 할 때 프롬프트에서 유지할 토큰 수를 지정합니다. 기본값은 `0`으로, 이는 토큰을 유지하지 않는다는 의미입니다. `-1`을 사용하면 프롬프트에서 모든 토큰을 유지합니다.
 
-    `stream`: It allows receiving each predicted token in real-time instead of waiting for the completion to finish. To enable this, set to `true`.
+    `stream`: 실시간으로 각 예측 토큰을 받아들이도록 허용합니다. 이를 사용하려면 `true`로 설정합니다.
 
-    `stop`: Specify a JSON array of stopping strings.
-    These words will not be included in the completion, so make sure to add them to the prompt for the next iteration. Default: `[]`
+    `stop`: 중지 문자열의 JSON 배열을 지정합니다. 이러한 단어는 완성에 포함되지 않으므로 다음 반복에 프롬프트에 추가해야 합니다. 기본값: `[]`
 
-    `tfs_z`: Enable tail free sampling with parameter z. Default: `1.0`, which is disabled.
+    `tfs_z`: z 매개변수를 사용하여 꼬리 자유 샘플링을 사용합니다. 기본값: `1.0`, 사용하지 않음.
 
-    `typical_p`: Enable locally typical sampling with parameter p. Default: `1.0`, which is disabled.
+    `typical_p`: p 매개변수를 사용하여 지역적으로 유형적인 샘플링을 사용합니다. 기본값: `1.0`, 사용하지 않음.
 
-    `repeat_penalty`: Control the repetition of token sequences in the generated text. Default: `1.1`
+    `repeat_penalty`: 생성된 텍스트에서 토큰 시퀀스의 반복을 제어합니다. 기본값: `1.1`
 
-    `repeat_last_n`: Last n tokens to consider for penalizing repetition. Default: `64`, where `0` is disabled and `-1` is ctx-size.
+    `repeat_last_n`: 반복을 처벌하는 데 사용되는 마지막 n개의 토큰. 기본값: `64`, `0`은 사용하지 않음이고 `-1`은 ctx-size입니다.
 
-    `penalize_nl`: Penalize newline tokens when applying the repeat penalty. Default: `true`
+    `penalize_nl`: 반복 처벌을 적용할 때 줄 바꿈 토큰을 처벌합니다. 기본값: `true`
 
-    `presence_penalty`: Repeat alpha presence penalty. Default: `0.0`, which is disabled.
+    `presence_penalty`: 반복 알파 존재 처벌. 기본값: `0.0`, 사용하지 않음.
 
-    `frequency_penalty`: Repeat alpha frequency penalty. Default: `0.0`, which is disabled.
+    `frequency_penalty`: 반복 알파 빈도 처벌. 기본값: `0.0`, 사용하지 않음.
 
-    `penalty_prompt`: This will replace the `prompt` for the purpose of the penalty evaluation. Can be either `null`, a string or an array of numbers representing tokens. Default: `null`, which is to use the original `prompt`.
+    `penalty_prompt`: 처벌 평가를 위해 프롬프트를 대체합니다. `null`, 문자열 또는 토큰을 나타내는 숫자 배열일 수 있습니다. 기본값: `null`, 원래 프롬프트를 사용합니다.
 
-    `mirostat`: Enable Mirostat sampling, controlling perplexity during text generation. Default: `0`, where `0` is disabled, `1` is Mirostat, and `2` is Mirostat 2.0.
+    `mirostat`: 텍스트 생성 중 복잡도를 제어하는 Mirostat 샘플링을 사용합니다. 기본값: `0`, `0`은 사용하지 않음, `1`은 Mirostat, `2`는 Mirostat 2.0입니다.
 
-    `mirostat_tau`: Set the Mirostat target entropy, parameter tau. Default: `5.0`
+    `mirostat_tau`: Mirostat 목표 엔트로피, 매개변수 tau를 설정합니다. 기본값: `5.0`
 
-    `mirostat_eta`: Set the Mirostat learning rate, parameter eta.  Default: `0.1`
+    `mirostat_eta`: Mirostat 학습률, 매개변수 eta를 설정합니다. 기본값: `0.1`
 
-    `grammar`: Set grammar for grammar-based sampling.  Default: no grammar
+    `grammar`: 문법 기반 샘플링에 대한 문법을 설정합니다. 기본값: 문법 없음
 
-    `json_schema`: Set a JSON schema for grammar-based sampling (e.g. `{"items": {"type": "string"}, "minItems": 10, "maxItems": 100}` of a list of strings, or `{}` for any JSON). See [tests](../../tests/test-json-schema-to-grammar.cpp) for supported features.  Default: no JSON schema.
+    `json_schema`: 문법 기반 샘플링에 대한 JSON 스키마를 설정합니다. (예: `{"items": {"type": "string"}, "minItems": 10, "maxItems": 100}` 문자열 목록 또는 `{}`는 모든 JSON) 참조하세요. [tests](../../tests/test-json-schema-to-grammar.cpp) 지원되는 기능에 대한 정보.
+ 기본값: 문법 스키마 없음.
 
-    `seed`: Set the random number generator (RNG) seed.  Default: `-1`, which is a random seed.
+    `seed`: 랜덤 숫자 생성기(RNG) 씨드를 설정합니다. 기본값: `-1`, 무작위 씨드입니다.
 
-    `ignore_eos`: Ignore end of stream token and continue generating.  Default: `false`
+    `ignore_eos`: 종료 스트림 토큰을 무시하고 생성을 계속합니다. 기본값: `false`
 
-    `logit_bias`: Modify the likelihood of a token appearing in the generated text completion. For example, use `"logit_bias": [[15043,1.0]]` to increase the likelihood of the token 'Hello', or `"logit_bias": [[15043,-1.0]]` to decrease its likelihood. Setting the value to false, `"logit_bias": [[15043,false]]` ensures that the token `Hello` is never produced. The tokens can also be represented as strings, e.g. `[["Hello, World!",-0.5]]` will reduce the likelihood of all the individual tokens that represent the string `Hello, World!`, just like the `presence_penalty` does. Default: `[]`
+    `logit_bias`: 생성된 텍스트 완성에 토큰의 발생 가능성을 수정합니다. 예를 들어, `"logit_bias": [[15043,1.0]]`을 사용하여 'Hello' 토큰의 발생 가능성을 높이거나 `"logit_bias": [[15043,-1.0]]`을 사용하여 발생 가능성을 낮춥니다. `"logit_bias": [[15043,false]]`로 값을 false로 설정하면 'Hello' 토큰이 생성되지 않습니다. 토큰은 문자열로도 표현할 수 있습니다. 예를 들어 `[["Hello, World!",-0.5]]`는 'Hello, World!'를 나타내는 모든 개별 토큰의 발생 가능성을 줄입니다. `presence_penalty`와 마찬가지로.
+ 기본값: `[]`
 
-    `n_probs`: If greater than 0, the response also contains the probabilities of top N tokens for each generated token given the sampling settings. Note that for temperature < 0 the tokens are sampled greedily but token probabilities are still being calculated via a simple softmax of the logits without considering any other sampler settings. Default: `0`
+    `n_probs`: 0보다 크면 응답에 각 생성된 토큰에 대한 상위 N개 토큰의 확률도 포함됩니다. 참고: 온도가 0보다 작으면 토큰은 탐욕적으로 샘플링되지만, 다른 샘플링 설정을 고려하지 않고 단순히 소프트맥스를 사용하여 토큰 확률이 계산됩니다. 기본값: `0`
 
-    `min_keep`: If greater than 0, force samplers to return N possible tokens at minimum. Default: `0`
+    `min_keep`: 0보다 크면 샘플러가 최소 N개의 가능한 토큰을 반환하도록 강제합니다. 기본값: `0`
 
-    `image_data`: An array of objects to hold base64-encoded image `data` and its `id`s to be reference in `prompt`. You can determine the place of the image in the prompt as in the following: `USER:[img-12]Describe the image in detail.\nASSISTANT:`. In this case, `[img-12]` will be replaced by the embeddings of the image with id `12` in the following `image_data` array: `{..., "image_data": [{"data": "<BASE64_STRING>", "id": 12}]}`. Use `image_data` only with multimodal models, e.g., LLaVA.
+    `image_data`: 이미지 데이터를 담고 있는 객체 배열을 제공합니다. 이 배열은 base64 인코딩된 이미지 `data`와 `id`를 포함합니다. 프롬프트에서 이미지를 참조하는 방법은 다음과 같습니다. `USER:[img-12]이미지를 자세히 설명하세요.\nASSISTANT:` 이 경우 `[img-12]`는 `image_data` 배열에서 id가 12인 이미지의 임베딩으로 대체됩니다. `image_data`는 LLaVA와 같은 다모달 모델과 함께만 사용합니다.
 
-    `id_slot`: Assign the completion task to an specific slot. If is -1 the task will be assigned to a Idle slot.  Default: `-1`
+    `id_slot`: 완성 작업을 특정 슬롯에 할당합니다. -1이면 작업이 Idle 슬롯에 할당됩니다. 기본값: `-1`
 
-    `cache_prompt`: Re-use KV cache from a previous request if possible. This way the common prefix does not have to be re-processed, only the suffix that differs between the requests. Because (depending on the backend) the logits are **not** guaranteed to be bit-for-bit identical for different batch sizes (prompt processing vs. token generation) enabling this option can cause nondeterministic results. Default: `false`
+    `cache_prompt`: 이전 요청에서 가능하면 KV 캐시를 재사용합니다. 이렇게 하면 공통 접두사를 다시 처리하지 않고, 요청 간의 차이만 처리할 수 있습니다. (백엔드에 따라) 로지트가 배치 크기(프롬프트 처리 vs 토큰 생성)에 대해 동일하지 않기 때문에 이 옵션을 사용하면 비선형적인 결과가 발생할 수 있습니다. 기본값: `false`
 
-    `system_prompt`: Change the system prompt (initial prompt of all slots), this is useful for chat applications. [See more](#change-system-prompt-on-runtime)
+    `system_prompt`: 시스템 프롬프트(모든 슬롯의 초기 프롬프트)를 변경합니다. 이는 챗 애플리케이션에 유용합니다. [실시간에서 시스템 프롬프트 변경](#change-system-prompt-on-runtime) 참조
 
-    `samplers`: The order the samplers should be applied in. An array of strings representing sampler type names. If a sampler is not set, it will not be used. If a sampler is specified more than once, it will be applied multiple times. Default: `["top_k", "tfs_z", "typical_p", "top_p", "min_p", "temperature"]` - these are all the available values.
+    `samplers`: 샘플러를 적용할 순서를 나타내는 문자열 배열입니다. 샘플러가 설정되지 않으면 사용되지 않습니다. 샘플러가 여러 번 설정되면 여러 번 적용됩니다. 기본값: `["top_k", "tfs_z", "typical_p", "top_p", "min_p", "temperature"]` - 이는 모든 사용 가능한 값입니다.
 
-### Result JSON
+### 결과 JSON
 
-- Note: When using streaming mode (`stream`), only `content` and `stop` will be returned until end of completion.
+- 주의: 스트리밍 모드 (`stream`)를 사용할 때는 완료될 때까지 `content`와 `stop`만 반환됩니다.
 
-- `completion_probabilities`: An array of token probabilities for each completion. The array's length is `n_predict`. Each item in the array has the following structure:
+- `completion_probabilities`: 각 완료에 대한 토큰 확률의 배열입니다. 배열의 길이는 `n_predict`입니다. 배열의 각 항목은 다음과 같은 구조를 가지고 있습니다:
 
 ```json
 {
@@ -521,57 +522,57 @@ node index.js
 },
 ```
 
-Notice that each `probs` is an array of length `n_probs`.
+각 `probs`는 길이가 `n_probs`인 배열입니다.
 
-- `content`: Completion result as a string (excluding `stopping_word` if any). In case of streaming mode, will contain the next token as a string.
-- `stop`: Boolean for use with `stream` to check whether the generation has stopped (Note: This is not related to stopping words array `stop` from input options)
-- `generation_settings`: The provided options above excluding `prompt` but including `n_ctx`, `model`. These options may differ from the original ones in some way (e.g. bad values filtered out, strings converted to tokens, etc.).
-- `model`: The path to the model loaded with `-m`
-- `prompt`: The provided `prompt`
-- `stopped_eos`: Indicating whether the completion has stopped because it encountered the EOS token
-- `stopped_limit`: Indicating whether the completion stopped because `n_predict` tokens were generated before stop words or EOS was encountered
-- `stopped_word`: Indicating whether the completion stopped due to encountering a stopping word from `stop` JSON array provided
-- `stopping_word`: The stopping word encountered which stopped the generation (or "" if not stopped due to a stopping word)
-- `timings`: Hash of timing information about the completion such as the number of tokens `predicted_per_second`
-- `tokens_cached`: Number of tokens from the prompt which could be re-used from previous completion (`n_past`)
-- `tokens_evaluated`: Number of tokens evaluated in total from the prompt
-- `truncated`: Boolean indicating if the context size was exceeded during generation, i.e. the number of tokens provided in the prompt (`tokens_evaluated`) plus tokens generated (`tokens predicted`) exceeded the context size (`n_ctx`)
+- `content`: 완성 결과 문자열 (중지 단어가 있는 경우 제외). 스트리밍 모드의 경우 다음 토큰을 문자열로 포함합니다.
+- `stop`: `stream`과 함께 사용하여 생성이 중지되었는지 확인하는 Boolean 값입니다. (참고: 이는 입력 옵션에서 `stop` 배열과는 관련이 없습니다)
+- `generation_settings`: `prompt`를 제외한 위의 제공된 옵션 ( `n_ctx`, `model` 포함). 이러한 옵션은 어떤 방식으로 원본 옵션과 다를 수 있습니다 (예: 잘못된 값이 필터링되었거나, 문자열이 토큰으로 변환되었거나 등).
+- `model`: `-m`으로 로드된 모델 경로
+- `prompt`: 제공된 `prompt`
+- `stopped_eos`: 완성이 EOS 토큰을 만났기 때문에 중지되었는지 나타냅니다.
+- `stopped_limit`: `n_predict` 토큰이 생성되기 전에 중지 단어 또는 EOS가 발생했기 때문에 완성이 중지되었는지 나타냅니다.
+- `stopped_word`: `stop` JSON 배열에서 제공된 중지 단어를 만났기 때문에 완성이 중지되었는지 나타냅니다.
+- `stopping_word`: 생성을 중지시킨 중지 단어 (중지 단어로 인해 중지되지 않았다면 "")
+- `timings`: 예측된 토큰 수와 같은 완성에 대한 시간 정보 해시
+- `tokens_cached`: 이전 완성에서 재사용할 수 있는 프롬프트에서의 토큰 수 (`n_past`)
+- `tokens_evaluated`: 프롬프트에서 총 평가된 토큰 수
+- `truncated`: 생성 중에 맥락 크기가 초과되었는지 나타내는 Boolean 값입니다. 즉, 프롬프트에 제공된 토큰 수 (`tokens_evaluated`)와 생성된 토큰 수 (`tokens predicted`)가 맥락 크기 (`n_ctx`)를 초과했는지 여부
 
-- **POST** `/tokenize`: Tokenize a given text.
+- **POST** `/tokenize`: 주어진 텍스트를 토큰화합니다.
 
-    *Options:*
+    *옵션:* 
 
-    `content`: Set the text to tokenize.
+    `content`: 토큰화할 텍스트 설정
 
-    `add_special`: Boolean indicating if special tokens, i.e. `BOS`, should be inserted.  Default: `false`
+    `add_special`: `BOS`와 같은 특수 토큰을 삽입해야 하는지 나타내는 Boolean 값입니다. 기본값: `false`
 
-- **POST** `/detokenize`: Convert tokens to text.
+- **POST** `/detokenize`: 토큰을 텍스트로 변환합니다.
 
-    *Options:*
+    *옵션:* 
 
-    `tokens`: Set the tokens to detokenize.
+    `tokens`: 토큰화할 토큰 설정
 
-- **POST** `/embedding`: Generate embedding of a given text just as [the embedding example](../embedding) does.
+- **POST** `/embedding`: 주어진 텍스트의 임베딩을 생성합니다. [임베딩 예제](../embedding)와 같습니다.
 
-    *Options:*
+    *옵션:* 
 
-    `content`: Set the text to process.
+    `content`: 처리할 텍스트 설정
 
-    `image_data`: An array of objects to hold base64-encoded image `data` and its `id`s to be reference in `content`. You can determine the place of the image in the content as in the following: `Image: [img-21].\nCaption: This is a picture of a house`. In this case, `[img-21]` will be replaced by the embeddings of the image with id `21` in the following `image_data` array: `{..., "image_data": [{"data": "<BASE64_STRING>", "id": 21}]}`. Use `image_data` only with multimodal models, e.g., LLaVA.
+    `image_data`: `content`에 참조될 base64 인코딩된 이미지 `data`와 `id`를 포함하는 객체 배열입니다. 예를 들어, `Image: [img-21].\nCaption: This is a picture of a house`와 같이 텍스트에 이미지를 포함할 수 있습니다. 이 경우 `[img-21]`은 다음 `image_data` 배열에서 `id`가 21인 이미지의 임베딩으로 대체됩니다: `{..., "image_data": [{"data": "<BASE64_STRING>", "id": 21}]}`. 다모달 모델 (예: LLaVA)만 사용할 때 `image_data`를 사용하십시오.
 
-- **POST** `/infill`: For code infilling. Takes a prefix and a suffix and returns the predicted completion as stream.
+- **POST** `/infill`: 코드 채우기 용입니다. 접두사와 후두사를 받아 스트림으로 예측 완성을 반환합니다.
 
-    *Options:*
+    *옵션:* 
 
-    `input_prefix`: Set the prefix of the code to infill.
+    `input_prefix`: 채우기 위한 코드의 접두사 설정
 
-    `input_suffix`: Set the suffix of the code to infill.
+    `input_suffix`: 채우기 위한 코드의 후두사 설정
 
-    It also accepts all the options of `/completion` except `stream` and `prompt`.
+    `/completion`의 모든 옵션을 받아들입니다. `stream`과 `prompt`를 제외합니다.
 
-- **GET** `/props`: Return current server settings.
+- **GET** `/props`: 현재 서버 설정 반환
 
-### Result JSON
+### 결과 JSON
 
 ```json
 {
@@ -583,23 +584,23 @@ Notice that each `probs` is an array of length `n_probs`.
 }
 ```
 
-- `assistant_name` - the required assistant name to generate the prompt in case you have specified a system prompt for all slots.
-- `user_name` - the required anti-prompt to generate the prompt in case you have specified a system prompt for all slots.
-- `default_generation_settings` - the default generation settings for the `/completion` endpoint, which has the same fields as the `generation_settings` response object from the `/completion` endpoint.
-- `total_slots` - the total number of slots for process requests (defined by `--parallel` option)
-- `chat_template` - the model's original Jinja2 prompt template
+- `assistant_name` - 모든 슬롯에 시스템 프롬프트를 지정한 경우 프롬프트를 생성하기 위해 필요한 어시스턴트 이름입니다.
+- `user_name` - 모든 슬롯에 시스템 프롬프트를 지정한 경우 프롬프트를 생성하기 위해 필요한 사용자 이름입니다.
+- `default_generation_settings` - `/completion` 엔드포인트의 기본 생성 설정입니다. `/completion` 엔드포인트의 `generation_settings` 응답 객체와 동일한 필드를 가지고 있습니다.
+- `total_slots` - 프로세스 요청을 위한 총 슬롯 수 ( `--parallel` 옵션으로 정의됨)
+- `chat_template` - 모델의 원본 Jinja2 프롬프트 템플릿
 
-- **POST** `/v1/chat/completions`: OpenAI-compatible Chat Completions API. Given a ChatML-formatted json description in `messages`, it returns the predicted completion. Both synchronous and streaming mode are supported, so scripted and interactive applications work fine. While no strong claims of compatibility with OpenAI API spec is being made, in our experience it suffices to support many apps. Only models with a [supported chat template](https://github.com/ggerganov/llama.cpp/wiki/Templates-supported-by-llama_chat_apply_template) can be used optimally with this endpoint. By default, the ChatML template will be used.
+- **POST** `/v1/chat/completions`: OpenAI 호환형 채팅 완성 API. `messages` 에 있는 ChatML 형식의 JSON 설명을 주면 예측된 완성을 반환합니다. 동기식 및 스트리밍 모드 모두 지원되므로 스크립트 기반 및 상호 작용형 애플리케이션이 잘 작동합니다. OpenAI API 사양과의 호환성에 대한 강력한 주장은 하지 않지만, 많은 앱을 지원하기에 충분합니다. 이 엔드포인트를 최적화하여 사용하려면 [지원되는 채팅 템플릿](https://github.com/ggerganov/llama.cpp/wiki/Templates-supported-by-llama_chat_apply_template) 을 가진 모델만 사용할 수 있습니다. 기본적으로 ChatML 템플릿이 사용됩니다.
 
-    *Options:*
+    *옵션:* 
 
-    See [OpenAI Chat Completions API documentation](https://platform.openai.com/docs/api-reference/chat). While some OpenAI-specific features such as function calling aren't supported, llama.cpp `/completion`-specific features such as `mirostat` are supported.
+    [OpenAI Chat Completions API 설명서](https://platform.openai.com/docs/api-reference/chat)를 참조하십시오. 함수 호출과 같은 OpenAI 고유 기능은 지원되지 않지만, `mirostat`과 같은 llama.cpp `/completion` 고유 기능은 지원됩니다.
 
-    The `response_format` parameter supports both plain JSON output (e.g. `{"type": "json_object"}`) and schema-constrained JSON (e.g. `{"type": "json_object", "schema": {"type": "string", "minLength": 10, "maxLength": 100}}`), similar to other OpenAI-inspired API providers.
+    `response_format` 매개변수는 텍스트 JSON 출력 (예: `{"type": "json_object"}`)과 스키마 제약 JSON (예: `{"type": "json_object", "schema": {"type": "string", "minLength": 10, "maxLength": 100}}`) 모두를 지원합니다. 다른 OpenAI-inspired API 제공업체와 유사합니다.
 
-    *Examples:*
+    *예제:* 
 
-    You can use either Python `openai` library with appropriate checkpoints:
+    적절한 체크포인트를 사용하여 Python `openai` 라이브러리를 사용할 수 있습니다:
 
     ```python
     import openai
@@ -620,7 +621,7 @@ Notice that each `probs` is an array of length `n_probs`.
     print(completion.choices[0].message)
     ```
 
-    ... or raw HTTP requests:
+    ... 또는 원본 HTTP 요청:
 
     ```shell
     curl http://localhost:8080/v1/chat/completions \
@@ -641,15 +642,15 @@ Notice that each `probs` is an array of length `n_probs`.
     }'
     ```
 
-- **POST** `/v1/embeddings`: OpenAI-compatible embeddings API.
+- **POST** `/v1/embeddings`: OpenAI와 호환되는 텍스트 임베딩 API.
 
-    *Options:*
+    *옵션:* 
 
-    See [OpenAI Embeddings API documentation](https://platform.openai.com/docs/api-reference/embeddings).
+    [OpenAI Embeddings API 문서](https://platform.openai.com/docs/api-reference/embeddings)를 참조하세요.
 
-    *Examples:*
+    *예시:* 
 
-  - input as string
+  - 문자열 입력
 
     ```shell
     curl http://localhost:8080/v1/embeddings \
@@ -675,9 +676,9 @@ Notice that each `probs` is an array of length `n_probs`.
     }'
     ```
 
-- **GET** `/slots`: Returns the current slots processing state. Can be disabled with `--slots-endpoint-disable`.
+- **GET** `/slots`: 현재 슬롯 처리 상태를 반환합니다. `--slots-endpoint-disable`를 사용하여 비활성화할 수 있습니다.
 
-### Result JSON
+### 결과 JSON
 
 ```json
 [
@@ -738,25 +739,25 @@ Notice that each `probs` is an array of length `n_probs`.
 ]
 ```
 
-- **GET** `/metrics`: [Prometheus](https://prometheus.io/) compatible metrics exporter endpoint if `--metrics` is enabled:
+- **GET** `/metrics`: Prometheus 호환형 메트릭스 전달 엔드포인트입니다. `--metrics` 플래그가 활성화되어 있을 때 사용 가능합니다.
 
-Available metrics:
-- `llamacpp:prompt_tokens_total`: Number of prompt tokens processed.
-- `llamacpp:tokens_predicted_total`: Number of generation tokens processed.
-- `llamacpp:prompt_tokens_seconds`: Average prompt throughput in tokens/s.
-- `llamacpp:predicted_tokens_seconds`: Average generation throughput in tokens/s.
-- `llamacpp:kv_cache_usage_ratio`: KV-cache usage. `1` means 100 percent usage.
-- `llamacpp:kv_cache_tokens`: KV-cache tokens.
-- `llamacpp:requests_processing`: Number of requests processing.
-- `llamacpp:requests_deferred`: Number of requests deferred.
+사용 가능한 메트릭스:
+- `llamacpp:prompt_tokens_total`: 처리된 프롬프트 토큰 수.
+- `llamacpp:tokens_predicted_total`: 생성된 토큰 수.
+- `llamacpp:prompt_tokens_seconds`: 프롬프트 처리량 평균 (토큰/초).
+- `llamacpp:predicted_tokens_seconds`: 생성 토큰 처리량 평균 (토큰/초).
+- `llamacpp:kv_cache_usage_ratio`: KV 캐시 사용률. `1`은 100% 사용률을 나타냅니다.
+- `llamacpp:kv_cache_tokens`: KV 캐시 토큰 수.
+- `llamacpp:requests_processing`: 처리 중인 요청 수.
+- `llamacpp:requests_deferred`: 일시적으로 지연된 요청 수.
 
-- **POST** `/slots/{id_slot}?action=save`: Save the prompt cache of the specified slot to a file.
+- **POST** `/slots/{id_slot}?action=save`: 지정된 슬롯의 프롬프트 캐시를 파일로 저장합니다.
 
-    *Options:*
+    *옵션:* 
 
-    `filename`: Name of the file to save the slot's prompt cache. The file will be saved in the directory specified by the `--slot-save-path` server parameter.
+    `filename`: 슬롯의 프롬프트 캐시를 저장할 파일 이름. 파일은 `--slot-save-path` 서버 매개변수로 지정된 디렉토리에 저장됩니다.
 
-### Result JSON
+### 결과 JSON
 
 ```json
 {
@@ -770,13 +771,13 @@ Available metrics:
 }
 ```
 
-- **POST** `/slots/{id_slot}?action=restore`: Restore the prompt cache of the specified slot from a file.
+- **POST** `/slots/{id_slot}?action=restore`: 지정된 슬롯의 프롬프트 캐시를 파일에서 복원합니다.
 
-    *Options:*
+    *옵션:* 
 
-    `filename`: Name of the file to restore the slot's prompt cache from. The file should be located in the directory specified by the `--slot-save-path` server parameter.
+    `filename`: 슬롯의 프롬프트 캐시를 복원할 파일 이름입니다. 파일은 서버 매개변수 `--slot-save-path`로 지정된 디렉토리에 있어야 합니다.
 
-### Result JSON
+### 결과 JSON
 
 ```json
 {
@@ -790,9 +791,9 @@ Available metrics:
 }
 ```
 
-- **POST** `/slots/{id_slot}?action=erase`: Erase the prompt cache of the specified slot.
+- **POST** `/slots/{id_slot}?action=erase`: 지정된 슬롯의 프롬프트 캐시를 삭제합니다.
 
-### Result JSON
+### 결과 JSON
 
 ```json
 {
@@ -801,17 +802,17 @@ Available metrics:
 }
 ```
 
-## More examples
+## 더 많은 예시
 
-### Change system prompt on runtime
+### 실행 중 시스템 프롬프트 변경
 
-To use the server example to serve multiple chat-type clients while keeping the same system prompt, you can utilize the option `system_prompt`. This only needs to be used once.
+같은 시스템 프롬프트를 유지하면서 여러 개의 챗형 클라이언트를 서비스하기 위해 서버 예제를 사용하려면 `system_prompt` 옵션을 사용할 수 있습니다. 이 옵션은 한 번만 사용해야 합니다.
 
-`prompt`: Specify a context that you want all connecting clients to respect.
+`prompt`: 모든 연결된 클라이언트가 존중해야 하는 컨텍스트를 지정합니다.
 
-`anti_prompt`: Specify the word you want to use to instruct the model to stop. This must be sent to each client through the `/props` endpoint.
+`anti_prompt`: 모델이 중단하도록 지시하는 단어를 지정합니다. 이는 각 클라이언트에게 `/props` 엔드포인트를 통해 전송해야 합니다.
 
-`assistant_name`: The bot's name is necessary for each customer to generate the prompt. This must be sent to each client through the `/props` endpoint.
+`assistant_name`: 각 고객이 프롬프트를 생성하기 위해 필요한 봇의 이름입니다. 이는 각 클라이언트에게 `/props` 엔드포인트를 통해 전송해야 합니다.
 
 ```json
 {
@@ -823,34 +824,34 @@ To use the server example to serve multiple chat-type clients while keeping the 
 }
 ```
 
-**NOTE**: You can do this automatically when starting the server by simply creating a .json file with these options and using the CLI option `-spf FNAME` or `--system-prompt-file FNAME`.
+**참고**: 서버를 시작할 때 이를 자동으로 수행할 수 있습니다. 옵션이 포함된 .json 파일을 만들고 CLI 옵션 `-spf FNAME` 또는 `--system-prompt-file FNAME`를 사용하면 됩니다.
 
-### Interactive mode
+### 상호 작용 모드
 
-Check the sample in [chat.mjs](chat.mjs).
-Run with NodeJS version 16 or later:
+[chat.mjs](chat.mjs) 에서 샘플을 확인하세요.
+NodeJS 버전 16 이상을 사용하여 실행하세요:
 
 ```sh
 node chat.mjs
 ```
 
-Another sample in [chat.sh](chat.sh).
-Requires [bash](https://www.gnu.org/software/bash/), [curl](https://curl.se) and [jq](https://jqlang.github.io/jq/).
-Run with bash:
+chat.sh](chat.sh)에 있는 다른 샘플입니다.
+[bash](https://www.gnu.org/software/bash/), [curl](https://curl.se) 및 [jq](https://jqlang.github.io/jq/)가 필요합니다.
+bash로 실행하십시오:
 
 ```sh
 bash chat.sh
 ```
 
-### OAI-like API
+### OAI와 유사한 API
 
-The HTTP `llama-server` supports an OAI-like API: https://github.com/openai/openai-openapi
+HTTP `llama-server`는 OAI와 유사한 API를 지원합니다: https://github.com/openai/openai-openapi
 
-### API errors
+### API 오류
 
-`llama-server` returns errors in the same format as OAI: https://github.com/openai/openai-openapi
+`llama-server`는 OAI와 동일한 형식으로 오류를 반환합니다.: https://github.com/openai/openai-openapi
 
-Example of an error:
+오류 예시:
 
 ```json
 {
@@ -862,9 +863,9 @@ Example of an error:
 }
 ```
 
-Apart from error types supported by OAI, we also have custom types that are specific to functionalities of llama.cpp:
+OAI에서 지원하는 오류 유형 외에도 llama.cpp의 기능에 특정한 사용자 정의 유형이 있습니다.
 
-**When /metrics or /slots endpoint is disabled**
+** /metrics 또는 /slots 엔드포인트가 비활성화될 때**
 
 ```json
 {
@@ -876,7 +877,7 @@ Apart from error types supported by OAI, we also have custom types that are spec
 }
 ```
 
-**When the server receives invalid grammar via */completions endpoint**
+**서버가 */completions 엔드포인트를 통해 잘못된 문법을 받을 때**
 
 ```json
 {
@@ -888,13 +889,13 @@ Apart from error types supported by OAI, we also have custom types that are spec
 }
 ```
 
-### Extending or building alternative Web Front End
+### 웹 프론트엔드 확장 또는 대체 구축
 
-You can extend the front end by running the server binary with `--path` set to `./your-directory` and importing `/completion.js` to get access to the llamaComplete() method.
+`--path`를 `./your-directory`로 설정하여 서버 바이너리를 실행하고 `/completion.js`를 가져와 `llamaComplete()` 메서드에 액세스하여 프론트엔드를 확장할 수 있습니다.
 
-Read the documentation in `/completion.js` to see convenient ways to access llama.
+`/completion.js`의 설명서를 참조하여 llama에 액세스하는 편리한 방법을 확인하십시오.
 
-A simple example is below:
+아래는 간단한 예입니다:
 
 ```html
 <html>

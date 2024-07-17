@@ -1,30 +1,30 @@
 # llama.cpp/examples/retrieval
 
-Demonstration of simple retrieval technique based on cosine similarity
+코사인 유사도 기반 간단한 검색 기술의 시연
 
-More info:
+자세한 내용:
 https://github.com/ggerganov/llama.cpp/pull/6193
 
-### How to use
+### 사용 방법
 
-`retieval.cpp` has parameters of its own:
-- `--context-file`: file to be embedded - state this option multiple times to embed multiple files
-- `--chunk-size`: minimum size of each text chunk to be embedded
-- `--chunk-separator`: STRING to divide chunks by. newline by default
+`retieval.cpp`는 다음과 같은 매개변수를 가지고 있습니다.
+- `--context-file`: 잠금을 위한 파일 - 여러 번 지정하여 여러 파일을 잠금
+- `--chunk-size`: 잠금될 각 텍스트 조각의 최소 크기
+- `--chunk-separator`: 조각을 구분하는 문자열. 기본값은 줄바꿈
 
-`retrieval` example can be tested as follows:
+`retrieval` 예제는 다음과 같이 테스트할 수 있습니다.
 
 ```bash
 make -j && ./llama-retrieval --model ./models/bge-base-en-v1.5-f16.gguf --top-k 3 --context-file README.md --context-file License --chunk-size 100 --chunk-separator .
 ```
 
-This chunks and embeds all given files and starts a loop requesting query inputs:
+이 코드는 주어진 모든 파일을 조각화하고 임베딩하고, 쿼리 입력을 요청하는 루프를 시작합니다.
 
 ```
 Enter query:
 ```
 
-On each query input, top k chunks are shown along with file name, chunk position within file and original text:
+각 쿼리 입력에 대해, 파일 이름, 파일 내 덩어리 위치 및 원본 텍스트와 함께 상위 k개의 덩어리가 표시됩니다.
 
 ```
 Enter query: describe the mit license

@@ -1,7 +1,7 @@
-# LLaMA.cpp Server Buttons Top Theme
+# LLaMA.cpp 서버 버튼 상단 테마
 
-Simple tweaks to the UI. Chat buttons at the top of the page instead of bottom so you can hit Stop instead of chasing it down the page.
+UI에 간단한 변경 사항을 적용합니다. 채팅 버튼을 페이지 상단에 배치하여 페이지 아래로 내려가지 않고도 Stop을 눌러서 종료할 수 있도록 합니다.
 
-To use simply run server with `--path=themes/buttons_top`
+사용하려면 `--path=themes/buttons_top`을 사용하여 서버를 실행합니다.
 
-![image](buttons_top.png)
+![이미지](buttons_top.png)
